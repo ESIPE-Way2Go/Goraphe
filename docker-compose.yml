@@ -1,0 +1,39 @@
+version: '2'
+
+services:
+    db:
+        image: postgres
+        container_name: db
+        environment:
+          - POSTGRES_USER=postgres
+          - POSTGRES_PASSWORD=postgres
+        volumes:
+          - ./bdd:/docker-entrypoint-initdb.d/
+        ports:
+          - "5432:5432"
+
+    app:
+        image: 'spring-boot-vue'
+        build:
+          context: .
+        container_name: app
+        depends_on:
+          - db
+        environment:
+          - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/compte
+          - SPRING_DATASOURCE_USERNAME=postgres
+          - SPRING_DATASOURCE_PASSWORD=postgres
+          - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+        ports:
+          - "80:8080"
+
+    pgadmin:
+        ## Changer ça pour que Maxime soit content
+        container_name: phadmin
+        image: dpage/pgadmin4
+        restart: always
+        environment:
+          PGADMIN_DEFAULT_EMAIL: root@root.root
+          PGADMIN_DEFAULT_PASSWORD: root
+        ports:
+          - "5050:80"

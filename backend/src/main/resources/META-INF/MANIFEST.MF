@@ -1,0 +1,2 @@
+Manifest-Version: 1.0
+Main-Class: fr.esipe.way2go.Way2GoApplication
