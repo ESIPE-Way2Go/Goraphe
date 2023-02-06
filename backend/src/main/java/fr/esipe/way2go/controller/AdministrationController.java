@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdministrationController {
     @GetMapping
     //Page d'administration
-    public String administrationPage() {
+    public String administration() {
         return "Page d'administration";
     }
 
