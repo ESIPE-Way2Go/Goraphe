@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/home")
 public class HomeController {
     @GetMapping
-    //Regarde une simulation
+    //Page d'accueil
     public String home() {
         return "Page d'accueil";
     }
