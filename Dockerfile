@@ -11,8 +11,8 @@ WORKDIR /Way2Go
 RUN ls -l
 
 # Run Maven build
-RUN mvn clean install
-
+#RUN mvn clean install
+RUN mvn install
 
 
 # Just using the build artifact and then removing the build-container
@@ -32,9 +32,7 @@ COPY --from=0 "/Way2Go/backend/target/backend-0.0.1-SNAPSHOT.jar" app.jar
 COPY --from=0 "/Way2Go/scripts/" ./scripts
 
 ENV JAVA_OPTS=""
+RUN pip install --no-cache-dir -r ./scripts/requirements.txt
 
 # Fire up our Spring Boot app by default
 ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar" ]
-
-
-
