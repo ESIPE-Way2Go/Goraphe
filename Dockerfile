@@ -15,9 +15,12 @@ RUN mvn clean install
 
 
 
-
 # Just using the build artifact and then removing the build-container
 FROM openjdk:17.0.2-jdk-slim
+
+RUN apt-get update
+RUN apt-get install -y python3
+RUN apt-get install -y python3-pip
 
 MAINTAINER Way2Go Way2Go
 
@@ -26,6 +29,7 @@ VOLUME /tmp
 # Add Spring Boot app.jar to Container
 COPY --from=0 "/Way2Go/backend/target/backend-0.0.1-SNAPSHOT.jar" app.jar
 
+COPY --from=0 "/Way2Go/scripts/" ./scripts
 
 ENV JAVA_OPTS=""
 
