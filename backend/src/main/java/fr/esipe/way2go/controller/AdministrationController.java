@@ -3,7 +3,7 @@ package fr.esipe.way2go.controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/administration")
+@RequestMapping("/api/administration")
 public class AdministrationController {
     @GetMapping
     //Page d'administration
