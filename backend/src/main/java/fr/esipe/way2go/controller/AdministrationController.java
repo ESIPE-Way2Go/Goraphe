@@ -14,24 +14,24 @@ public class AdministrationController {
     @DeleteMapping("/user/{userId}")
     //Supprime un utilisateur
     public String removeUser(@PathVariable long userId) {
-        return "Supprime un utilisateur";
+        return "Supprime l'utilisateur " + userId;
     }
 
     @PostMapping("/invite/{inviteId}")
     //Envoie une invitation
     public String sendInvite(@PathVariable long inviteId) {
-        return "Envoie une invitation";
+        return "Envoie l'invitation " + inviteId;
     }
 
     @PutMapping("/invite/{inviteId}")
     //Re-envoie une invitation
     public String resendInvite(@PathVariable long inviteId) {
-        return "Re-envoie une invitation";
+        return "Re-envoie l'invitation " + inviteId;
     }
 
     @DeleteMapping("/invite/{inviteId}")
     //Supprime une invitation
     public String removeInvite(@PathVariable long inviteId) {
-        return "Supprime une invitation";
+        return "Supprime l'invitation " + inviteId;
     }
 }
