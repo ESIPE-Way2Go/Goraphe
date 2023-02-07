@@ -13,7 +13,7 @@ services:
           - "5432:5432"
 
     app:
-        image: 'spring-boot-vue'
+        image: 'mexima/goraphe'
         build:
           context: .
         container_name: app
