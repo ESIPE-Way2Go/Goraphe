@@ -55,7 +55,7 @@ public class AuthenticationController {
     }
 
     @ResponseBody
-    @RequestMapping(path = "/hello")
+    @RequestMapping(path = "/hello", method = RequestMethod.GET)
     public String sayHello() {
         return "Hello";
     }
