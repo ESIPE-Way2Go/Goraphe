@@ -3,7 +3,7 @@ package fr.esipe.way2go.controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/home")
+@RequestMapping("/api/home")
 public class HomeController {
     @GetMapping
     //Page d'accueil
