@@ -3,7 +3,7 @@ package fr.esipe.way2go.controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/map")
+@RequestMapping("/api/map")
 public class MapController {
     @GetMapping
     //Page de la carte interactive
