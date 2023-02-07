@@ -16,6 +16,11 @@ const routes = [
         component: () => import('@/views/LoginPage.vue'),
         meta: {requiresAuth: false, layout: 'blank'}
     },
+    {   path: '/map',
+        name: "map",
+        component: () => import('@/views/Home-map.vue'),
+        meta: {requiresAuth: false, layout: 'content'}
+    },
     {   path: '/',
         name: 'home',
         component: () => import('@/views/HomePage.vue'),
