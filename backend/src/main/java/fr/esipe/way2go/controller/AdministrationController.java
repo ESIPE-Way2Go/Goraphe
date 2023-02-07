@@ -11,27 +11,27 @@ public class AdministrationController {
         return "Page d'administration";
     }
 
-    @DeleteMapping("/user/remove/{userId}")
+    @DeleteMapping("/user/{userId}")
     //Supprime un utilisateur
-    private String removeUser(@PathVariable long userId) {
+    public String removeUser(@PathVariable long userId) {
         return "Supprime un utilisateur";
     }
 
-    @PutMapping("/invite/send/{inviteId}")
+    @PostMapping("/invite/{inviteId}")
     //Envoie une invitation
-    private String sendInvite(@PathVariable long inviteId) {
+    public String sendInvite(@PathVariable long inviteId) {
         return "Envoie une invitation";
     }
 
-    @PutMapping("/invite/resend/{inviteId}")
+    @PutMapping("/invite/{inviteId}")
     //Re-envoie une invitation
-    private String resendInvite(@PathVariable long inviteId) {
+    public String resendInvite(@PathVariable long inviteId) {
         return "Re-envoie une invitation";
     }
 
-    @DeleteMapping("/invite/remove/{inviteId}")
+    @DeleteMapping("/invite/{inviteId}")
     //Supprime une invitation
-    private String removeInvite(@PathVariable long inviteId) {
+    public String removeInvite(@PathVariable long inviteId) {
         return "Supprime une invitation";
     }
 }
