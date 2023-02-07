@@ -5,6 +5,7 @@ import fr.esipe.way2go.configuration.services.UserDetailsImpl;
 import fr.esipe.way2go.dto.auth.request.LoginRequest;
 import fr.esipe.way2go.dto.auth.response.JwtResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +36,6 @@ public class AuthenticationController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-
         Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -52,5 +52,11 @@ public class AuthenticationController {
                 userDetails.getUsername(),
                 userDetails.getEmail(),
                 roles));
+    }
+
+    @ResponseBody
+    @RequestMapping(path = "/hello")
+    public String sayHello() {
+        return "Hello";
     }
 }

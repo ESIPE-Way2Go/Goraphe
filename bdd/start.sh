@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-psql -v ON_ERROR_STOP=1 --username "postgres" --dbname "postgres" <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username "jeremy" --dbname "postgres" <<-EOSQL
 	DROP DATABASE IF EXISTS compte;
   --
   -- Name: compte; Type: DATABASE; Schema: -; Owner: postgres

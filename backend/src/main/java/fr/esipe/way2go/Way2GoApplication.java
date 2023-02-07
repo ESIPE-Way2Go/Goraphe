@@ -11,18 +11,6 @@ import java.io.InputStreamReader;
 public class Way2GoApplication {
     public static void main(String[] args) {
         SpringApplication.run(Way2GoApplication.class, args);
-        var command = "python3 /test.py";
-        try {
-            var process = Runtime.getRuntime().exec(command);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
 }

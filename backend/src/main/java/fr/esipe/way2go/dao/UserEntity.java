@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "user", schema = "public", catalog = "compte")
+@Table(name = "user", schema = "public")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)

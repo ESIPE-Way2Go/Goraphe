@@ -5,10 +5,12 @@
 </template>
 
 <script>
+
 import {computed} from "vue";
 import {useRouter} from '@/utils'
 import LayoutBlank from '@/layouts/LayoutBlank'
 import LayoutContent from '@/layouts/LayoutContent'
+
 export default {
   name: 'App',
   components: {
