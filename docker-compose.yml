@@ -13,7 +13,7 @@ services:
           - "5432:5432"
 
     app:
-        image: 'mexima/goraphe'
+        image: 'mixema/goraphe'
         build:
           context: .
         container_name: app
