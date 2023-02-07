@@ -3,7 +3,7 @@ package fr.esipe.way2go.controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/simulation")
+@RequestMapping("/api/simulation")
 public class SimulationController {
     @GetMapping("/{simulationId}")
     //Regarde une simulation
@@ -11,7 +11,7 @@ public class SimulationController {
         return "Regarde la simulation " + simulationId;
     }
 
-    @DeleteMapping("/{simulationId}/deleteSimulation")
+    @DeleteMapping("/{simulationId}")
     //Regarde une simulation
     public String removeSimulation(@PathVariable long simulationId) {
         return "Supprime la simulation " + simulationId;
