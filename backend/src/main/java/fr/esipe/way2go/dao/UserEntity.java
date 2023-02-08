@@ -1,7 +1,6 @@
 package fr.esipe.way2go.dao;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "user", schema = "public", catalog = "compte")
@@ -9,26 +8,17 @@ import java.util.List;
 public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @Column(name = "firstname", nullable = false)
-    private String firstname;
-
-    @Column(name = "mail", nullable = false)
-    private String mail;
-
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "type", nullable = false)
-    private String type;
+    @Column(name = "email", nullable = false)
+    private String email;
 
     @Column(name = "role", nullable = false)
     private String role;
@@ -36,19 +26,19 @@ public class UserEntity {
     /**
      * Returns this user's ID.
      *
-     * @return id This user's ID. (Long)
+     * @return userId This user's ID. (Long)
      */
     public Long getId() {
-        return id;
+        return userId;
     }
 
     /**
      * Sets a new ID for this user.
      *
-     * @param id This user's new ID. (Long)
+     * @param userId This user's new ID. (Long)
      */
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(Long userId) {
+        this.userId = userId;
     }
 
     /**
@@ -70,60 +60,6 @@ public class UserEntity {
     }
 
     /**
-     * Returns this user's name.
-     *
-     * @return name This user's name (String)
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets a new name for this user.
-     *
-     * @param name This user's new name. (String)
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Returns this user's first name.
-     *
-     * @return This user's first name (String)
-     */
-    public String getFirstname() {
-        return firstname;
-    }
-
-    /**
-     * Sets a new first name for this user.
-     *
-     * @param firstname This user's new first name.
-     */
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    /**
-     * Returns this user's email address.
-     *
-     * @return mail This user's email address. (String)
-     */
-    public String getMail() {
-        return mail;
-    }
-
-    /**
-     * Sets a new email address for this user.
-     *
-     * @param mail This user's new email address. (String)
-     */
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
-
-    /**
      * Returns this user's password.
      *
      * @return password This user's password. (String)
@@ -142,37 +78,38 @@ public class UserEntity {
     }
 
     /**
-     * Returns this user's type.
+     * Returns this user's email address.
      *
-     * @return type This user's type. (String)
+     * @return email This user's email address. (String)
      */
-    public String getType() {
-        return type;
+    public String getEmail() {
+        return email;
     }
 
     /**
-     * Sets a new type for this user.
+     * Sets a new email address for this user.
      *
-     * @param type This user's new type. (String)
+     * @param email This user's new email address. (String)
      */
-    public void setType(String type) {
-        this.type = type;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     /**
+     * Returns this user's role.
      *
-     * @return
+     * @return role This user's role. (String)
      */
     public String getRole() {
         return role;
     }
 
     /**
+     * Sets a new role for this user.
      *
-     * @param role
+     * @param role This user's new role. (String)
      */
     public void setRole(String role) {
-
         this.role = role;
     }
 }
