@@ -15,6 +15,6 @@ public class SimulationController {
     @PermitAll
     @GetMapping("/launch")
     public void launchSimulation() {
-        ScriptPythonServiceImpl.executeScript("jeremy", "sim1", "test.py");
+        ScriptPythonServiceImpl.executeScript("jeremy", "sim1", "test");
     }
 }
