@@ -11,9 +11,4 @@ public class HomeController {
         return "Page d'accueil";
     }
 
-    @GetMapping
-    //Filtre l'affichage des simulations
-    public String homeSearch(@RequestParam("search") String search) {
-        return "Page d'accueil filtrée avec filtre = " + search;
-    }
 }
