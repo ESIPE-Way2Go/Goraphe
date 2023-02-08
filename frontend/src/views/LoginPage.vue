@@ -11,7 +11,7 @@
           <div class="container">
             <div class="row">
               <div class="col-lg-10 col-xl-7 mx-auto">
-                <h3 class="display-4">Banxxy</h3>
+                <h3 class="display-4">GoRaphe</h3>
                 <p class="text-muted mb-4">Reactive Bank application for your safe transaction.</p>
                 <form @submit.prevent="handleLogin">
                   <div class="mb-3">
@@ -74,7 +74,7 @@ export default {
   min-height: 100vh;
 }
 .bg-image {
-  background-image: url('@/assets/login.jpg');
+  background-image: url('@/assets/login.png');
   background-size: cover;
   background-position: center center;
 }
