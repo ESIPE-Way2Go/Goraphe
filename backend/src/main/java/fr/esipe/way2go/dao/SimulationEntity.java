@@ -39,7 +39,7 @@ public class SimulationEntity {
     @Column(name = "log_path", nullable = false)
     private String logPath;
 
-    @Column(name = "share_link", nullable = false)
+    @Column(name = "share_link", nullable = false, unique = true)
     private String shareLink;
 
     @Column(name = "statistics", nullable = false)
