@@ -9,18 +9,21 @@ from datetime import datetime
 
 # Build the directory of log
 os.makedirs( "scripts/" + sys.argv[1], exist_ok=True)
-logging.info("Commencement")
 DATE_FORMAT = datetime.now().strftime("%Y%m%d%H%M%S")
+
 LOG_FILENAME = os.getcwd()+ "/scripts/" + sys.argv[1] + "/" + sys.argv[2] + "_" + DATE_FORMAT + ".log";
-logging.basicConfig(
+logging.basicConfig(level=logging.DEBUG,
     filename=LOG_FILENAME,
-    filemode="a",
+    filemode="a+",
     format='%(asctime)s - %(levelname)s - %(message)s')
+
+logging.info("Commencement")
+
 logging.debug("La fonction commence")
+
 num = float(sys.argv[3])
 result = num + 10
 logging.debug("Change value")
-
 a = 5
 b = 0
 try:
