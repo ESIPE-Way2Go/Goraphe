@@ -11,7 +11,7 @@ public class MapController {
         return "Page de la carte interactive";
     }
 
-    @GetMapping
+    @GetMapping("/town")
     //Page de la carte interactive centrée sur une ville
     public String mapTownCentred(@RequestParam("townName") String townName) {
         return "Page de la carte interactive centrée sur la ville " + townName;
