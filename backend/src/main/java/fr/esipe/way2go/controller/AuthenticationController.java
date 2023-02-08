@@ -4,8 +4,6 @@ import fr.esipe.way2go.configuration.jwt.JwtUtils;
 import fr.esipe.way2go.configuration.services.UserDetailsImpl;
 import fr.esipe.way2go.dto.auth.request.LoginRequest;
 import fr.esipe.way2go.dto.auth.response.JwtResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,8 +25,6 @@ public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
 
     private final JwtUtils jwtUtils;
-
-    Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Autowired
     AuthenticationController(AuthenticationManager authenticationManager,
