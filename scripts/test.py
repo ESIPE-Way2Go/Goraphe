@@ -10,7 +10,7 @@ from datetime import datetime
 # Build the directory of log
 os.makedirs( "scripts/" + sys.argv[1], exist_ok=True)
 logging.info("Commencement")
-DATE_FORMAT = datetime.now().strftime("%Y%m%d_%H%M%S")
+DATE_FORMAT = datetime.now().strftime("%Y%m%d%H%M%S")
 LOG_FILENAME = os.getcwd()+ "/scripts/" + sys.argv[1] + "/" + sys.argv[2] + "_" + DATE_FORMAT + ".log";
 logging.basicConfig(
     filename=LOG_FILENAME,
