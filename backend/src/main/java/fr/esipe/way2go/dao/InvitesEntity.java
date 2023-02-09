@@ -54,7 +54,7 @@ public class InvitesEntity {
      *
      * @return user This invite's receiver user. (UserEntity)
      */
-    public UserEntity getUserId() {
+    public UserEntity getUser() {
         return user;
     }
 
@@ -63,7 +63,7 @@ public class InvitesEntity {
      *
      * @param user This new invite's receiver user. (UserEntity)
      */
-    public void setUserId(UserEntity user) {
+    public void setUser(UserEntity user) {
         this.user = user;
     }
 
