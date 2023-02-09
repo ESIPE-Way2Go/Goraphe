@@ -25,7 +25,6 @@ services:
           - "80:8080"
 
     pgadmin:
-        ## Changer ça pour que Maxime soit content
         container_name: phadmin
         image: dpage/pgadmin4
         restart: always
@@ -34,3 +33,4 @@ services:
           PGADMIN_DEFAULT_PASSWORD: root
         ports:
           - "5050:80"
+

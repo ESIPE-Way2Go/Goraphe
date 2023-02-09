@@ -13,7 +13,7 @@ public class MapController {
 
 
 
-    @GetMapping("/newSimulation")
+    @PostMapping("/newSimulation")
     //Nouvelle simulation
     public String newSimulation() {
         return "Nouvelle simulation";
