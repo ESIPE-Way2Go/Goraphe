@@ -13,22 +13,22 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
      * @param nameScript : name of the script
      */
     public void executeScript(String user, String simulation, String nameScript) {
-        var path = System.getProperty("user.dir") + System.getProperty("file.separator")+ "scripts" + System.getProperty("file.separator") + "test.py";
+        var pathGeneric = System.getProperty("user.dir") + System.getProperty("file.separator")+ "scripts" + System.getProperty("file.separator");
+        var path = pathGeneric  + "test.py";
+        var pathLog = pathGeneric + "/" + user + "/" + simulation + "_1.log";
+
         var builder = new ProcessBuilder("python3", Path.of(path).toString(), user, simulation, "10");
 
         try {
             var process = builder.start();
             var res = new String(process.getInputStream().readAllBytes());
             int exitCode = process.waitFor();
-//            System.out.println("result = " + res);
-//            System.out.println("exitCode = " + exitCode);
 
-            System.out.println("result"+res);
+
+            System.out.println(readFile(Path.of(pathLog).toString()));
         } catch (IOException e) {
             throw new RuntimeException();
-        } /*catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }*/ catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

@@ -15,7 +15,6 @@ import java.nio.file.Path;
 @RestController
 @RequestMapping("/simulation")
 public class SimulationController {
-
     private final ScriptPythonService scriptPythonService;
 
     @Autowired
@@ -24,13 +23,9 @@ public class SimulationController {
     }
 
     @PermitAll
-    @GetMapping("/launch")
-    public void launchSimulation(@RequestBody SimulationRequest simulationRequest) {
+    @GetMapping("/launch/{idSimulation}")
+    public void launchSimulation(@PathVariable int idSimulation) {
         scriptPythonService.executeScript("jeremy", "sim1", "test");
-        if (simulationRequest.getId() == 1) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "entity not found");
-        }
-
     }
 
     @PermitAll

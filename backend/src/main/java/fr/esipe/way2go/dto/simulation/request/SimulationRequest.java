@@ -13,4 +13,12 @@ public class SimulationRequest {
     public Long getId() {
         return id;
     }
+
+    /**
+     * Set id of the simulation
+     * @param id
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

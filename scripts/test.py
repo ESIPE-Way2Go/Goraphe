@@ -9,9 +9,8 @@ from datetime import datetime
 
 # Build the directory of log
 os.makedirs( "scripts/" + sys.argv[1], exist_ok=True)
-DATE_FORMAT = datetime.now().strftime("%Y%m%d%H%M%S")
 
-LOG_FILENAME = os.getcwd()+ "/scripts/" + sys.argv[1] + "/" + sys.argv[2] + "_" + DATE_FORMAT + ".log";
+LOG_FILENAME = os.getcwd()+ "/scripts/" + sys.argv[1] + "/" + sys.argv[2] + "_1.log";
 logging.basicConfig(level=logging.DEBUG,
     filename=LOG_FILENAME,
     filemode="a+",
@@ -31,3 +30,4 @@ try:
 except Exception as e:
     logging.error("Exception", exc_info=True)
 
+print("LOG_FILENAME", LOG_FILENAME)
