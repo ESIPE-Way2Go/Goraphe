@@ -1,3 +1,5 @@
+import sys
+
 import osmnx as ox
 import networkx as nx
 import geopandas as gpd
@@ -7,9 +9,6 @@ import math
 import time
 import argparse
 import compute
-
-from geojson import MultiLineString, LineString
-from shapely import wkt
 
 #################SELECTION OF THE ROADNETWORK#######################################################
 
@@ -92,7 +91,7 @@ for k in edges_proj.index:
         maxspeed = float(edges_proj.at[k, 'maxspeed'])
     fixedmaxspeed[(u, v, key)] = maxspeed
     traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / fixedmaxspeed[(u, v, key)]) / 3.6) if \
-        fixedmaxspeed[(u, v, key)] != 0 else "NaN"
+        fixedmaxspeed[(u, v, key)] != 0 else sys.maxsize#99999TODO"NaN"
 
 nx.set_edge_attributes(g, fixedmaxspeed, 'fixedmaxspeed')
 nx.set_edge_attributes(g, traveltimes, 'traveltimes')
