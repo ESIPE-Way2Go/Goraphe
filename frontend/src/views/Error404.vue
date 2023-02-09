@@ -8,7 +8,7 @@
         <v-btn
             class="ma-2"
             color="primary"
-            @click="() => {this.$router.push('map')}"
+            @click="() => {this.$router.push('/')}"
             max-width="404"
         >
           Go back
