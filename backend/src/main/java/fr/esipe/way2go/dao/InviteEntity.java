@@ -6,7 +6,7 @@ import java.sql.Date;
 @Entity
 @Table(name = "invite", schema = "public", catalog = "goraphe")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class InvitesEntity {
+public class InviteEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "invite_id")
