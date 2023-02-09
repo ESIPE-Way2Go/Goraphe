@@ -60,7 +60,7 @@ g = g.subgraph(largest_scc)
 print(f"Nodes of graph after scc :{g.number_of_nodes()}")
 print(f"Edges of graph after scc :{g.number_of_edges()}")
 
-no_speed_roads = [data for u, v, data in g.edges(data=True) if 'maxspeed' in data]
+no_speed_roads = [data for u, v, data in g.edges(data=True) if 'maxspeed' not in data]
 nodes_proj, edges_proj = ox.graph_to_gdfs(g, nodes=True, edges=True)
 
 speed_map = {
