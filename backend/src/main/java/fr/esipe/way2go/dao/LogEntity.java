@@ -12,14 +12,24 @@ public class LogEntity {
     private Long logId;
 
     @ManyToOne
-    @JoinColumn(name="simulation_id", nullable = false)
+    @JoinColumn(name="simulation", nullable = false)
     private SimulationEntity simulation;
 
     @Column(name = "status", nullable = false)
     private String status;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, length = 10000)
     private String content;
+
+
+    public LogEntity() {
+    }
+
+    public LogEntity(SimulationEntity simulation, String content) {
+        this.simulation = simulation;
+        this.status = "status";
+        this.content = content;
+    }
 
     /**
      * Returns this log's ID.

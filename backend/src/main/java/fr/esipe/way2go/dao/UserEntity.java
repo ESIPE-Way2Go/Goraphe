@@ -28,6 +28,13 @@ public class UserEntity {
     @JoinColumn(name = "simulations")
     private List<SimulationEntity> simulations;
 
+    public UserEntity() {
+    }
+
+    public UserEntity(String username) {
+        this.username = username;
+    }
+
     /**
      * Returns this user's ID.
      *
@@ -134,5 +141,17 @@ public class UserEntity {
      */
     public void setSimulation(List<SimulationEntity> simulations) {
         this.simulations = simulations;
+    }
+
+    @Override
+    public String toString() {
+        return "UserEntity{" +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", role='" + role + '\'' +
+                ", simulations=" + simulations +
+                '}';
     }
 }
