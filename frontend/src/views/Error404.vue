@@ -8,7 +8,7 @@
         <v-btn
             class="ma-2"
             color="primary"
-            @click="() => {this.$router.push('/')}"
+            @click="() => {this.$router.push('map')}"
             max-width="404"
         >
           Go back
@@ -62,7 +62,7 @@ body{
 }
 
 @keyframes type{
-  from{box-shadow: inset -3px 0px 0px #888;}
-  to{box-shadow: inset -3px 0px 0px transparent;}
+  from{box-shadow: inset -3px 0 0 #888;}
+  to{box-shadow: inset -3px 0 0 transparent;}
 }
 </style>
