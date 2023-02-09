@@ -1,9 +1,12 @@
 package fr.esipe.way2go.service;
 
+import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+@Service
 public interface ScriptPythonService {
 
     void executeScript(String user, String simulation, String script);
