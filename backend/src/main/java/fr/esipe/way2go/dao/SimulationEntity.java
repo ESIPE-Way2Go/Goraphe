@@ -1,22 +1,23 @@
 package fr.esipe.way2go.dao;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name = "simulation", schema = "public", catalog = "compte")
+@Table(name = "simulation", schema = "public", catalog = "goraphe")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class SimulationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "simulation_id", nullable = false)
+    @Column(name = "simulation_id")
     private Long simulationId;
 
     @Column(name = "name", nullable = false)
     private String name;
 
     @ManyToOne
-    @JoinColumn(name="user_id", referencedColumnName="user_id")
-    private UserEntity userId;
+    @JoinColumn(name="user_id", nullable = false)
+    private UserEntity user;
 
     @Column(name = "graph", nullable = false)
     private String graph;
@@ -44,6 +45,10 @@ public class SimulationEntity {
 
     @Column(name = "statistics", nullable = false)
     private String statistics;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "logs")
+    private List<LogEntity> logs;
 
     /**
      * Returns this simulation's ID.
@@ -82,21 +87,21 @@ public class SimulationEntity {
     }
 
     /**
-     * Returns this simulation's owner user's ID.
+     * Returns this simulation's owner user.
      *
-     * @return userId This simulation's owner user's ID. (Long)
+     * @return user This simulation's owner user. (UserEntity)
      */
-    public UserEntity getUserId() {
-        return userId;
+    public UserEntity getUser() {
+        return user;
     }
 
     /**
-     * Sets a new ID for this simulation.
+     * Sets a new user owner for this simulation.
      *
-     * @param userId The new ID for this simulation's owner user. (Long)
+     * @param user This simulation's new owner user. (UserEntity)
      */
-    public void setUserId(UserEntity userId) {
-        this.userId = userId;
+    public void setUser(UserEntity user) {
+        this.user = user;
     }
 
     /**
@@ -259,5 +264,23 @@ public class SimulationEntity {
      */
     public void setStatistics(String statistics) {
         this.statistics = statistics;
+    }
+
+    /**
+     * Returns this simulation's logs.
+     *
+     * @return logs This simulation's logs. (List<LogEntity>)
+     */
+    public List<LogEntity> getLogs() {
+        return logs;
+    }
+
+    /**
+     * Sets new logs for this simulation.
+     *
+     * @param logs This simulation's new statistics. (List<LogEntity>)
+     */
+    public void setLogs(List<LogEntity> logs) {
+        this.logs = logs;
     }
 }
