@@ -24,8 +24,8 @@ public class UserEntity {
     @Column(name = "role", nullable = false)
     private String role;
 
-    @OneToMany
-    @Column(name = "simulations")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "simulations")
     private List<SimulationEntity> simulations;
 
     /**
