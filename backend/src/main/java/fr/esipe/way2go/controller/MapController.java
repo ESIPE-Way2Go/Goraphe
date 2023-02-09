@@ -11,7 +11,9 @@ public class MapController {
         return "Page de la carte interactive";
     }
 
-    @GetMapping("/newSimulation")
+sssssssssssssssssssssssssssssssssssssssssss
+    @PostMapping("/newSimulation")
+
     //Nouvelle simulation
     public String newSimulation() {
         return "Nouvelle simulation";
