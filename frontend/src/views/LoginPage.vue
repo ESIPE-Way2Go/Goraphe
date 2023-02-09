@@ -12,7 +12,7 @@
             <div class="row">
               <div class="col-lg-10 col-xl-7 mx-auto">
                 <h3 class="display-4">GoRaphe</h3>
-                <p class="text-muted mb-4">Reactive Bank application for your safe transaction.</p>
+                <p class="text-muted mb-4">The road to success.</p>
                 <form @submit.prevent="handleLogin">
                   <div class="mb-3">
                     <input id="inputEmail" type="text" v-model="form.username" placeholder="username" required="" autofocus="" class="form-control rounded-pill border-0 shadow-sm px-4" />
