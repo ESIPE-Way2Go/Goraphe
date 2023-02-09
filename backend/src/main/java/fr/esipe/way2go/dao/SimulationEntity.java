@@ -47,7 +47,7 @@ public class SimulationEntity {
     private String statistics;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "logs")
+    @JoinColumn(name = "logs", nullable = false)
     private List<LogEntity> logs;
 
     /**
