@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.sql.Date;
 
 @Entity
-@Table(name = "invite", schema = "public", catalog = "compte")
+@Table(name = "invite", schema = "public", catalog = "goraphe")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class InvitesEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,8 +13,8 @@ public class InvitesEntity {
     private Long inviteId;
 
     @ManyToOne
-    @JoinColumn(name="user_id", referencedColumnName="user_id")
-    private UserEntity userId;
+    @JoinColumn(name="user_id", nullable = false)
+    private UserEntity user;
 
     @Column(name = "target_email", nullable = false)
     private String targetEmail;
@@ -50,21 +50,21 @@ public class InvitesEntity {
     }
 
     /**
-     * Returns this invite's receiver user's ID.
+     * Returns this invite's receiver user.
      *
-     * @return inviteId This invite's receiver user's ID. (Long)
+     * @return user This invite's receiver user. (UserEntity)
      */
     public UserEntity getUserId() {
-        return userId;
+        return user;
     }
 
     /**
      * Sets a new ID for this invite's receiver user.
      *
-     * @param userId The new ID for this invite's receiver user. (Long)
+     * @param user This new invite's receiver user. (UserEntity)
      */
-    public void setUserId(UserEntity userId) {
-        this.userId = userId;
+    public void setUserId(UserEntity user) {
+        this.user = user;
     }
 
     /**
@@ -131,7 +131,7 @@ public class InvitesEntity {
     }
 
     /**
-     * Sets a new ID for this invite.
+     * Sets a new date for this invite's last mail sent.
      *
      * @param lastMailSent The new date for this invite's last mail sent. (Date)
      */
