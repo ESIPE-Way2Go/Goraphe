@@ -13,17 +13,14 @@ services:
           - "5432:5432"
 
     app:
-        image: 'spring-boot-vue'
+        image: 'goraphe'
         build:
           context: .
         container_name: app
         depends_on:
           - db
-        environment:
-          - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/compte
-          - SPRING_DATASOURCE_USERNAME=postgres
-          - SPRING_DATASOURCE_PASSWORD=postgres
-          - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+        env_file:
+          .env
         ports:
           - "80:8080"
 
