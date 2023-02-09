@@ -20,7 +20,7 @@ services:
         depends_on:
           - db
         environment:
-          - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/
+          - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/compte
           - SPRING_DATASOURCE_USERNAME=postgres
           - SPRING_DATASOURCE_PASSWORD=postgres
           - SPRING_JPA_HIBERNATE_DDL_AUTO=update
