@@ -1,20 +1,42 @@
 package fr.esipe.way2go.controller;
 
-import fr.esipe.way2go.service.impl.ScriptPythonServiceImpl;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import fr.esipe.way2go.dto.simulation.request.SimulationRequest;
+import fr.esipe.way2go.service.ScriptPythonService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.security.PermitAll;
+import java.io.File;
+import java.nio.file.Path;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/simulation")
 public class SimulationController {
+
+    private final ScriptPythonService scriptPythonService;
+
+    @Autowired
+    public SimulationController(ScriptPythonService scriptPythonService) {
+        this.scriptPythonService = scriptPythonService;
+    }
+
     @PermitAll
     @GetMapping("/launch")
-    public void launchSimulation() {
-        ScriptPythonServiceImpl.executeScript("jeremy", "sim1", "test");
+    public void launchSimulation(@RequestBody SimulationRequest simulationRequest) {
+        scriptPythonService.executeScript("jeremy", "sim1", "test");
+        if (simulationRequest.getId() == 1) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "entity not found");
+        }
+
+    }
+
+    @PermitAll
+    @GetMapping("/getFile")
+    public @ResponseBody  File getFile() {
+        var p = System.getProperty("user.dir") + System.getProperty("file.separator")+ "scripts" + System.getProperty("file.separator") + "test.py";
+        return new File(Path.of(p).toString());
     }
 }

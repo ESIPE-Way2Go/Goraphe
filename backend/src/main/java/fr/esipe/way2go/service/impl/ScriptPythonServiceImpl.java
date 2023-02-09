@@ -1,23 +1,20 @@
 package fr.esipe.way2go.service.impl;
 
-import java.io.BufferedReader;
+import fr.esipe.way2go.service.ScriptPythonService;
+import org.springframework.stereotype.Service;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Path;
-
-public class ScriptPythonServiceImpl {
+@Service
+public class ScriptPythonServiceImpl implements ScriptPythonService {
     /**
      *
      * @param user : identifiant de la simulation
      * @param simulation : id of the simulation
      * @param nameScript : name of the script
      */
-    public static void executeScript(String user, String simulation, String nameScript) {
-        var path =  System.getProperty("user.dir") + System.getProperty("file.separator")+ "scripts" + System.getProperty("file.separator") + "test.py";
-        System.out.println(path);
-        var command = "python3 " + path + " " + user + " " + simulation + "10";
-        var p = System.getProperty("user.dir") + System.getProperty("file.separator")+ "scripts" + System.getProperty("file.separator") + "test.py";
-        var  builder = new ProcessBuilder("python3", Path.of(p).toString(), user, simulation, "10");
+    public void executeScript(String user, String simulation, String nameScript) {
+        var path = System.getProperty("user.dir") + System.getProperty("file.separator")+ "scripts" + System.getProperty("file.separator") + "test.py";
+        var builder = new ProcessBuilder("python3", Path.of(path).toString(), user, simulation, "10");
 
         try {
             var process = builder.start();
