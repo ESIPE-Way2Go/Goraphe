@@ -1,9 +1,10 @@
 package fr.esipe.way2go.dao;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name = "user", schema = "public", catalog = "compte")
+@Table(name = "user", schema = "public", catalog = "goraphe")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +23,10 @@ public class UserEntity {
 
     @Column(name = "role", nullable = false)
     private String role;
+
+    @OneToMany
+    @Column(name = "simulations")
+    private List<SimulationEntity> simulations;
 
     /**
      * Returns this user's ID.
@@ -44,7 +49,7 @@ public class UserEntity {
     /**
      * Returns this user's username.
      *
-     * @return username this user's username. (String)
+     * @return username This user's username. (String)
      */
     public String getUsername() {
         return username;
@@ -111,5 +116,23 @@ public class UserEntity {
      */
     public void setRole(String role) {
         this.role = role;
+    }
+
+    /**
+     * Returns this user's simulations.
+     *
+     * @return simulations This user's simulations. (List<SimulationEntity>)
+     */
+    public List<SimulationEntity> getSimulations() {
+        return simulations;
+    }
+
+    /**
+     * Sets new simulations for this user.
+     *
+     * @param simulations This user's new simulations. (List<SimulationEntity>)
+     */
+    public void setSimulation(List<SimulationEntity> simulations) {
+        this.simulations = simulations;
     }
 }
