@@ -12,8 +12,8 @@ public class MapController {
     }
 
 
-
     @PostMapping("/newSimulation")
+
     //Nouvelle simulation
     public String newSimulation() {
         return "Nouvelle simulation";
