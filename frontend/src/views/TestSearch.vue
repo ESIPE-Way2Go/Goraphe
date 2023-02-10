@@ -1,6 +1,9 @@
 <template>
   <div id="map" class="map"></div>
-  <button @click="makePostRequest()"> SEND</button>
+   <div>
+         <v-text-field v-model="name" label="Name"></v-text-field>
+        <button @click="makePostRequest()"> SEND</button>
+   </div>
 </template>
 <script>
 import L from 'leaflet';
@@ -10,9 +13,9 @@ export default {
   name: 'TestSearch',
   data() {
     return {
+      name: "",
       map: null,
       waypoints: []
-
     };
   },
   mounted() {
@@ -38,14 +41,15 @@ export default {
     async makePostRequest() {
       try {
         let coordinates = this.waypoints;
+        const name = this.$data.name;
         console.log(coordinates)
-        const distance = 100;
-        const response = await fetch('http://localhost:8080/api/map/newSimulation', {
+        //const distance = 100;
+        const response = await fetch('/api/simulation/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({coordinates, distance})
+          body: JSON.stringify({ name })
         });
 
         if (!response.ok) {
@@ -54,6 +58,7 @@ export default {
 
         const data = await response.json();
         console.log(data);
+         this.$router.push({name: 'logsSimulation', params: {id: data}});
       } catch (error) {
         console.error(error);
       }

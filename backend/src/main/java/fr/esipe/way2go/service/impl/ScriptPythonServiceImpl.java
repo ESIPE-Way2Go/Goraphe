@@ -6,7 +6,6 @@ import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.service.LogService;
 import fr.esipe.way2go.service.ScriptPythonService;
 import fr.esipe.way2go.service.SimulationService;
-import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
@@ -43,13 +42,9 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             var res = new String(process.getInputStream().readAllBytes());
             int exitCode = process.waitFor();
             var content = readFile(Path.of(pathLog).toString());
-            System.out.println(content);
             var listLog = new ArrayList<LogEntity>();
             listLog.add(new LogEntity(simulation, content));
             simulation.setLogs(listLog);
-           // simulationService.createSimulation(simulation);
-        //    simulationService.createSimulation(simulation);
-            System.out.println(simulation);
             logService.createLog(new LogEntity(simulation, content));
         } catch (IOException e) {
             throw new RuntimeException();
