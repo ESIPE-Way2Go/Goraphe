@@ -5,8 +5,19 @@
 <script>
 import L from 'leaflet';
 import 'leaflet-routing-machine';
+import authHeader from "@/services/auth-header";
+import {useTheme} from "vuetify";
+
 
 export default {
+  setup () {
+    const theme = useTheme();
+    return {
+      theme,
+      toggleTheme: () => theme.global.name.value = theme.global.current.value.dark ? 'myCustomLightTheme' : 'dark',
+    }
+  },
+
   name: 'TestSearch',
   data() {
     return {
@@ -16,18 +27,30 @@ export default {
     };
   },
   mounted() {
-    let map = L.map('map');
+    let map = L.map('map',{
+      maxBounds:[[-90,-180], [90,180]],
+      maxZoom:18,
+      minZoom:3,
+      zoomControl: false
+    }).setView([48.83935609413248, 2.585938493701621], 16);
+    L.control.zoom({
+      position: 'bottomright'
+    }).addTo(map);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
     let control = L.Routing.control({
       show: false,
       showInstructions: false,
-      routeWhileDragging: true,
-      showAlternatives: true,
+      routeWhileDragging: false,
+      showAlternatives: false,
+      lineOptions : {
+        addWaypoints: false
+      },
       waypoints: [
-        L.latLng(57.74, 11.94),
-        L.latLng(57.6792, 11.949)
+        L.latLng(48.83935609413248, 2.585938493701621),
+        L.latLng(48.84009439586693, 2.586180556928124)
       ],
     }).addTo(map);
     control.on('routesfound', (e) => {
@@ -36,16 +59,27 @@ export default {
   },
   methods: {
     async makePostRequest() {
+      class Point {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+        }
+      }
       try {
-        let coordinates = this.waypoints;
-        console.log(coordinates)
+        let coordinates = this.waypoints.map(coord => new Point(coord[0], coord[1]));
+        let start=coordinates.pop();
+        let startX=start.x;
+        let startY=start.y;
+
+        let end=coordinates.pop();
+        let endX=end.x;
+        let endY=end.y;
         const distance = 100;
-        const response = await fetch('http://localhost:8080/api/map/newSimulation', {
+        let body = JSON.stringify({startX,startY,endX,endY,distance});
+        const response = await fetch('/api/map/newsimulation', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({coordinates, distance})
+          headers: authHeader(),
+          body: body
         });
 
         if (!response.ok) {
@@ -58,7 +92,9 @@ export default {
         console.error(error);
       }
     }
-  }
+  },
+
+
 };
 
 </script>
@@ -68,4 +104,8 @@ export default {
   width: 100%;
   height: 95%;
 }
+.leaflet-routing-container {
+  display: none !important;
+}
+
 </style>
