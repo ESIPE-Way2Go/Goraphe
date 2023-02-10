@@ -6,29 +6,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 // Each route should map to a component.
 // We'll talk about nested routes later.
 const routes = [
-    {   path: '/example',
-        name: 'example',
-        component: () => import('@/views/HelloWorld.vue'),
-        meta: {requiresAuth: false, layout: 'content'}
-    },
+
     {   path: '/login',
         name: "login",
         component: () => import('@/views/LoginPage.vue'),
         meta: {requiresAuth: false, layout: 'blank'}
     },
-    {   path: '/map',
-        name: "map",
-        component: () => import('@/views/Home-map.vue'),
-        meta: {requiresAuth: false, layout: 'content'}
-    },
-    {   path: '/search',
-        name: "search",
-        component: () => import('@/views/TestSearch.vue'),
-        meta: {requiresAuth: false, layout: 'content'}
-    },
     {   path: '/',
-        name: 'home',
-        component: () => import('@/views/HomePage.vue'),
+        name: "map",
+        component: () => import('@/views/TestSearch.vue'),
         meta: {requiresAuth: true, layout: 'content'}
     },
     {   path: '/logs/:id',
@@ -75,9 +61,9 @@ router.beforeEach((to,from,next)=>{
 export default router;
 
 function parseJwt (token) {
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
 
