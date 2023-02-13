@@ -1,7 +1,9 @@
 package fr.esipe.way2go.dao;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Entity
 @Table(name = "simulation", schema = "public", catalog = "goraphe")
@@ -46,9 +48,28 @@ public class SimulationEntity {
     @Column(name = "statistics", nullable = false)
     private String statistics;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "logs", nullable = false)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "simulation")
     private List<LogEntity> logs;
+
+    public SimulationEntity() {
+    }
+
+    public SimulationEntity(String name, UserEntity user, String description) {
+        this.name = name;
+        this.user = user;
+        this.graph = "graph";
+        this.description = description;
+        this.computingScript = "computingScript";
+        this.generationDistance = 5.2;
+        this.randomPoints = "randomPoints";
+        this.roadType = "roadType";
+        this.logPath = "logPath";
+        Random rand = new Random();
+        int randomNumber = rand.nextInt(100000) + 1;
+        this.shareLink = String.valueOf(randomNumber);
+        this.statistics = "statistics";
+        this.logs = new ArrayList<>();
+    }
 
     /**
      * Returns this simulation's ID.
@@ -282,5 +303,15 @@ public class SimulationEntity {
      */
     public void setLogs(List<LogEntity> logs) {
         this.logs = logs;
+    }
+
+    @Override
+    public String toString() {
+        return "SimulationEntity{" +
+                "simulationId=" + simulationId +
+                ", name='" + name + '\'' +
+                ", user=" + user +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

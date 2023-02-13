@@ -1,6 +1,9 @@
 <template>
   <div id="map" class="map"></div>
-  <button @click="makePostRequest()"> SEND</button>
+   <div>
+         <v-text-field v-model="name" label="Name"></v-text-field>
+        <button @click="makePostRequest()"> SEND</button>
+   </div>
 </template>
 <script>
 import L from 'leaflet';
@@ -21,9 +24,9 @@ export default {
   name: 'TestSearch',
   data() {
     return {
+      name: "",
       map: null,
       waypoints: []
-
     };
   },
   mounted() {
@@ -67,6 +70,7 @@ export default {
       }
       try {
         let coordinates = this.waypoints.map(coord => new Point(coord[0], coord[1]));
+        const name = this.$data.name;
         let start=coordinates.pop();
         let startX=start.x;
         let startY=start.y;
@@ -88,6 +92,7 @@ export default {
 
         const data = await response.json();
         console.log(data);
+         this.$router.push({name: 'logsSimulation', params: {id: data}});
       } catch (error) {
         console.error(error);
       }
