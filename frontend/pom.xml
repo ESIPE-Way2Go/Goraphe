@@ -14,6 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
+        <sonar.sources>src</sonar.sources>
     </properties>
 
     <build>
@@ -30,7 +31,7 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                         <configuration>
-                            <nodeVersion>v15.8.0</nodeVersion>
+                            <nodeVersion>v18.4.0</nodeVersion>
                         </configuration>
                     </execution>
                     <!-- Install all project dependencies -->

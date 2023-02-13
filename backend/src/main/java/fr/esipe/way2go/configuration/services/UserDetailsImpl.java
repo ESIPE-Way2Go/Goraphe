@@ -42,7 +42,7 @@ public class UserDetailsImpl implements UserDetails {
         return new UserDetailsImpl(
                 user.getId(),
                 user.getUsername(),
-                user.getMail(),
+                user.getEmail(),
                 user.getPassword(),
                 authority);
     }
@@ -98,5 +98,9 @@ public class UserDetailsImpl implements UserDetails {
             return false;
         UserDetailsImpl user = (UserDetailsImpl) o;
         return Objects.equals(id, user.id);
+    }
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
     }
 }

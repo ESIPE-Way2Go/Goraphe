@@ -62,7 +62,7 @@ body{
 }
 
 @keyframes type{
-  from{box-shadow: inset -3px 0px 0px #888;}
-  to{box-shadow: inset -3px 0px 0px transparent;}
+  from{box-shadow: inset -3px 0 0 #888;}
+  to{box-shadow: inset -3px 0 0 transparent;}
 }
 </style>

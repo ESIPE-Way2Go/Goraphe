@@ -4,7 +4,7 @@
     <v-app-bar>
 
 
-      <v-app-bar-title class="font-weight-bold">Banxxy</v-app-bar-title>
+      <v-app-bar-title class="font-weight-bold">GoRaphe</v-app-bar-title>
 
       <v-spacer></v-spacer>
 
@@ -12,7 +12,6 @@
 
         <v-col cols = auto>
           <v-row dense class="font-weight-bold text-lg-subtitle-1 text-sm-subtitle-3"> {{user.username}} </v-row>
-          <v-row dense class="text-grey-darken-1 text-caption">{{showUserRole(user.role)}}</v-row>
         </v-col>
         <v-btn
             :prepend-icon="theme.global.name.value === 'myCustomLightTheme' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
