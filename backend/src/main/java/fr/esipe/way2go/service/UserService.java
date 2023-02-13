@@ -5,5 +5,5 @@ import fr.esipe.way2go.dao.UserEntity;
 import java.util.Optional;
 
 public interface UserService {
-    Optional<UserEntity> getUser(String userId);
+    Optional<UserEntity> getUser(String user);
 }

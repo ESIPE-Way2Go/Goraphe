@@ -1,9 +1,10 @@
 <template>
   <div id="map" class="map"></div>
-   <div>
-         <v-text-field v-model="name" label="Name"></v-text-field>
-        <button @click="makePostRequest()"> SEND</button>
-   </div>
+  <div>
+    <v-text-field v-model="name" label="Name"></v-text-field>
+    <v-text-field v-model="desc" label="Description"></v-text-field>
+    <button @click="makePostRequest()"> SEND</button>
+  </div>
 </template>
 <script>
 import L from 'leaflet';
@@ -13,7 +14,7 @@ import {useTheme} from "vuetify";
 
 
 export default {
-  setup () {
+  setup() {
     const theme = useTheme();
     return {
       theme,
@@ -25,15 +26,16 @@ export default {
   data() {
     return {
       name: "",
+      desc: "",
       map: null,
       waypoints: []
     };
   },
   mounted() {
-    let map = L.map('map',{
-      maxBounds:[[-90,-180], [90,180]],
-      maxZoom:18,
-      minZoom:3,
+    let map = L.map('map', {
+      maxBounds: [[-90, -180], [90, 180]],
+      maxZoom: 18,
+      minZoom: 3,
       zoomControl: false
     }).setView([48.83935609413248, 2.585938493701621], 16);
     L.control.zoom({
@@ -48,7 +50,7 @@ export default {
       showInstructions: false,
       routeWhileDragging: false,
       showAlternatives: false,
-      lineOptions : {
+      lineOptions: {
         addWaypoints: false
       },
       waypoints: [
@@ -68,19 +70,21 @@ export default {
           this.y = y;
         }
       }
+
       try {
         let coordinates = this.waypoints.map(coord => new Point(coord[0], coord[1]));
         const name = this.$data.name;
-        let start=coordinates.pop();
-        let startX=start.x;
-        let startY=start.y;
+        const desc = this.$data.desc;
+        let start = coordinates.pop();
+        let startX = start.x;
+        let startY = start.y;
 
-        let end=coordinates.pop();
-        let endX=end.x;
-        let endY=end.y;
+        let end = coordinates.pop();
+        let endX = end.x;
+        let endY = end.y;
         const distance = 100;
-        let body = JSON.stringify({startX,startY,endX,endY,distance});
-        const response = await fetch('/api/map/newsimulation', {
+        let body = JSON.stringify({startX, startY, endX, endY, distance, name,desc});
+        const response = await fetch('/api/simulation', {
           method: 'POST',
           headers: authHeader(),
           body: body
@@ -92,7 +96,7 @@ export default {
 
         const data = await response.json();
         console.log(data);
-         this.$router.push({name: 'logsSimulation', params: {id: data}});
+        // this.$router.push({name: 'logsSimulation', params: {id: data}});
       } catch (error) {
         console.error(error);
       }
@@ -107,8 +111,9 @@ export default {
 <style>
 .map {
   width: 100%;
-  height: 95%;
+  height: 70%;
 }
+
 .leaflet-routing-container {
   display: none !important;
 }

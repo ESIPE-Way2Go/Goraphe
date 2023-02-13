@@ -7,7 +7,15 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/map")
 public class MapController {
-    record Point(double x, double y){ }
+    public record Point(double x, double y){
+        @Override
+        public String toString() {
+            return x+","+y;
+        }
+        public static Point midPoint(Point a, Point b){
+            return new Point((a.x+b.x)/2,(a.y+ b.y)/2);
+        }
+    }
     @GetMapping
     //Page de la carte interactive
     public String map() {

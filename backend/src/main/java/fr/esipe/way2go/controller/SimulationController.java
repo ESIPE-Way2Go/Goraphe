@@ -37,10 +37,12 @@ public class SimulationController {
     @PermitAll
     @PostMapping
     public ResponseEntity<Long> createSimulation(@RequestBody SimulationRequest simulationRequest) {
-        var user = userService.getUser("jeremy");
-        var simulation = new SimulationEntity(simulationRequest.getName(), user.get(), "Hello world");
+        var user = userService.getUser("admin");
+        var simulation = new SimulationEntity(simulationRequest.getName(), user.orElseThrow(), simulationRequest.getDesc());
         var simulationSave = simulationService.createSimulation(simulation);
-        scriptPythonService.executeScript(user.get(), simulationSave, "test");
+        var midPoint= MapController.Point.midPoint(new MapController.Point(simulationRequest.getStartX(), simulationRequest.getStartY()),
+                new MapController.Point(simulationRequest.getEndX(),simulationRequest.getEndY()));
+        scriptPythonService.executeScript(user.orElseThrow(), simulationSave, midPoint,simulationRequest.getDistance(),simulationRequest.getDesc());
         return new ResponseEntity<>(simulationSave.getSimulationId(), HttpStatus.ACCEPTED);
     }
 
@@ -52,7 +54,7 @@ public class SimulationController {
             return new ResponseEntity<>(new LogResponse(), HttpStatus.NOT_FOUND);
 
         var logs = new StringBuilder();
-        simulation.get().getLogs().stream().forEach(x -> logs.append(x.getContent()).append("\n"));
+        simulation.get().getLogs().forEach(x -> logs.append(x.getContent()).append("\n"));
         var log = simulation.get().getLogs().get(0);
         var t = log.getContent().split("\n");
         var test = new LogResponse();
