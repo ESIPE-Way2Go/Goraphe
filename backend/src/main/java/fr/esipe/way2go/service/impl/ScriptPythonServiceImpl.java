@@ -18,7 +18,6 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
     private final LogService logService;
     private final SimulationService simulationService;
 
-
     @Autowired
     public ScriptPythonServiceImpl(LogService logService, SimulationService simulationService) {
         this.logService = logService;
@@ -34,18 +33,16 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
         var pathGeneric = System.getProperty("user.dir") + System.getProperty("file.separator")+ "scripts" + System.getProperty("file.separator");
         var path = pathGeneric  + "test.py";
         var pathLog = pathGeneric + "/" + user.getUsername() + "/" + simulation.getName() + "_1.log";
-
         var builder = new ProcessBuilder("python3", Path.of(path).toString(), user.getUsername(), simulation.getName(), "10");
 
         try {
             var process = builder.start();
+
             var res = new String(process.getInputStream().readAllBytes());
             int exitCode = process.waitFor();
             var content = readFile(Path.of(pathLog).toString());
-            var listLog = new ArrayList<LogEntity>();
-            listLog.add(new LogEntity(simulation, content));
-            simulation.setLogs(listLog);
-            logService.createLog(new LogEntity(simulation, content));
+            var status = exitCode == 0 ? "SUCCESS" : "ERROR";
+            logService.createLog(new LogEntity(simulation, content, status, nameScript));
         } catch (IOException e) {
             throw new RuntimeException();
         } catch (InterruptedException e) {

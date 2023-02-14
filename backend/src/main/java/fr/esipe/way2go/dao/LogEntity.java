@@ -18,6 +18,9 @@ public class LogEntity {
     @Column(name = "status", nullable = false)
     private String status;
 
+    @Column(name = "script", nullable = false)
+    private String script;
+
     @Column(name = "content", nullable = false, length = 10000)
     private String content;
 
@@ -25,9 +28,10 @@ public class LogEntity {
     public LogEntity() {
     }
 
-    public LogEntity(SimulationEntity simulation, String content) {
+    public LogEntity(SimulationEntity simulation, String content, String status, String script) {
         this.simulation = simulation;
-        this.status = "status";
+        this.script = script;
+        this.status = status;
         this.content = content;
     }
 
@@ -101,5 +105,13 @@ public class LogEntity {
      */
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
     }
 }

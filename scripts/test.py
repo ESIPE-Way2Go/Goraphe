@@ -1,6 +1,6 @@
 import sys
 import os
-#import osmnx as ox
+import osmnx as ox
 import logging
 from datetime import datetime
 
@@ -29,5 +29,6 @@ try:
     x = a / b
 except Exception as e:
     logging.error("Exception", exc_info=True)
+    exit 1
 
 print("LOG_FILENAME", LOG_FILENAME)

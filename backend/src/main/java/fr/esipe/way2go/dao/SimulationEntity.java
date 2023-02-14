@@ -1,7 +1,11 @@
 package fr.esipe.way2go.dao;
 
+import fr.esipe.way2go.dao.converter.StringListConverter;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -17,7 +21,7 @@ public class SimulationEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="user_id", nullable = false)
     private UserEntity user;
 
@@ -35,12 +39,18 @@ public class SimulationEntity {
 
     @Column(name = "random_points", nullable = false)
     private String randomPoints;
-
     @Column(name = "road_type", nullable = false)
-    private String roadType;
+    @Convert(converter = StringListConverter.class)
+    private List<String> roadType;
 
     @Column(name = "log_path", nullable = false)
     private String logPath;
+
+    @Column(name = "begin_date", nullable = false)
+    private Date beginDate;
+
+    @Column(name = "end_date")
+    private Date endDate;
 
     @Column(name = "share_link", nullable = false, unique = true)
     private String shareLink;
@@ -48,23 +58,26 @@ public class SimulationEntity {
     @Column(name = "statistics", nullable = false)
     private String statistics;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "simulation")
+    @OneToMany(mappedBy = "simulation")
     private List<LogEntity> logs;
 
     public SimulationEntity() {
     }
 
-    public SimulationEntity(String name, UserEntity user, String description) {
+    public SimulationEntity(String name, UserEntity user, String description, String computingScript) {
         this.name = name;
         this.user = user;
         this.graph = "graph";
         this.description = description;
-        this.computingScript = "computingScript";
+        this.computingScript = computingScript;
         this.generationDistance = 5.2;
         this.randomPoints = "randomPoints";
-        this.roadType = "roadType";
+        this.roadType = new ArrayList<>();
+        roadType.add("motorway");
+        roadType.add("autoroutes");
         this.logPath = "logPath";
         Random rand = new Random();
+        beginDate = new Date();
         int randomNumber = rand.nextInt(100000) + 1;
         this.shareLink = String.valueOf(randomNumber);
         this.statistics = "statistics";
@@ -220,7 +233,7 @@ public class SimulationEntity {
      *
      * @return roadType This simulation's road type. (String)
      */
-    public String getRoadType() {
+    public List<String> getRoadType() {
         return roadType;
     }
 
@@ -229,7 +242,7 @@ public class SimulationEntity {
      *
      * @param roadType This simulation's new road type. (String)
      */
-    public void setRoadType(String roadType) {
+    public void setRoadType(List<String> roadType) {
         this.roadType = roadType;
     }
 

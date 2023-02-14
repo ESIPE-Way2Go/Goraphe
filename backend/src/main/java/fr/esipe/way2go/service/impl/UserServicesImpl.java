@@ -21,4 +21,9 @@ public class UserServicesImpl implements UserService {
     public Optional<UserEntity> getUser(String userId) {
         return userRepository.findByUsername(userId);
     }
+
+    @Override
+    public UserEntity saveUser(UserEntity user) {
+        return userRepository.save(user);
+    }
 }

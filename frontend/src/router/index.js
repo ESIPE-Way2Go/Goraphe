@@ -20,7 +20,7 @@ const routes = [
     {   path: '/logs/:id',
             name: "logsSimulation",
             component: () => import('@/views/LogSimulation.vue'),
-            meta: {requiresAuth: false, layout: 'blank'}
+            meta: {requiresAuth: false, layout: 'content'}
      },
     {   path: '/:pathMatch(.*)*',
         name: "error-404",
