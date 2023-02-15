@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 @Service
 public class ScriptPythonServiceImpl implements ScriptPythonService {
@@ -85,11 +86,16 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             var process = builder.start();
             var error = new String(process.getErrorStream().readAllBytes());
             System.out.println("error: " + error);
+            var logEntity = logService.createLog(new LogEntity(simulation, nameScript));
             var res = new String(process.getInputStream().readAllBytes());
-            System.out.println(res);
             int exitCode = process.waitFor();
-            System.out.println(exitCode);
-
+            var content = readFile(Path.of(pathLog).toString());
+            var status = exitCode == 0 ? "SUCCESS" : "ERROR";
+            logEntity.setContent(content);
+            logEntity.setStatus(status);
+            logService.createLog(logEntity);
+            simulation.setEndDate(Calendar.getInstance());
+            simulationService.createSimulation(simulation);
         } catch (IOException e) {
             throw new RuntimeException();
         } catch (InterruptedException e) {

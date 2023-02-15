@@ -17,7 +17,7 @@ public class LogServiceImpl implements LogService {
         this.logRepository = logRepository;
     }
     @Override
-    public void createLog(LogEntity logEntity) {
-        logRepository.save(logEntity);
+    public LogEntity createLog(LogEntity logEntity) {
+        return logRepository.save(logEntity);
     }
 }

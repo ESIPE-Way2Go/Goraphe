@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.PermitAll;
+
 @RestController
 @RequestMapping("/api/simulation")
 public class SimulationController {
@@ -34,26 +36,34 @@ public class SimulationController {
 
     /**
      * Create simulation
-     * @param headers : params where it is the token
+     *
+     * @param headers           : params where it is the token
      * @param simulationRequest : information of the simulation
      * @return the id of the simulation
      */
 
     @PostMapping
-    public ResponseEntity<Long> createSimulation(@RequestHeader HttpHeaders headers,@RequestBody SimulationRequest simulationRequest) {
-        var user = userService.getUser("admin");
-        var simulation = new SimulationEntity(simulationRequest.getName(), user.orElseThrow(), simulationRequest.getDesc(),"test");
+    public ResponseEntity<SimulationIdResponse> createSimulation(@RequestHeader HttpHeaders headers, @RequestBody SimulationRequest simulationRequest) throws InterruptedException {
+        var userName = jwtUtils.getUsersFromHeaders(headers);
+        var userOptional = userService.getUser(userName);
+        if (userOptional.isEmpty())
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        var user = userOptional.get();
+        var simulation = new SimulationEntity(simulationRequest.getName(), user, "Hello world", "test");
         var simulationSave = simulationService.createSimulation(simulation);
         var midPoint= MapController.Point.midPoint(new MapController.Point(simulationRequest.getStartX(), simulationRequest.getStartY()),
                 new MapController.Point(simulationRequest.getEndX(),simulationRequest.getEndY()));
-        scriptPythonService.executeScript(user.orElseThrow(), simulationSave, midPoint,simulationRequest.getDistance(),simulationRequest.getDesc());
-        return new ResponseEntity<>(simulationSave.getSimulationId(), HttpStatus.ACCEPTED);
+
+       new Thread(() -> scriptPythonService.executeScript(user, simulationSave, midPoint,simulationRequest.getDistance(),simulationRequest.getDesc())).start();
+
+        return new ResponseEntity<>(new SimulationIdResponse(simulationSave.getSimulationId()), HttpStatus.ACCEPTED);
     }
 
     /**
      * Get information of the simulation
+     *
      * @param headers : params where it is the token
-     * @param id id of the simulation
+     * @param id      id of the simulation
      * @return
      */
     @GetMapping(value = "/{id}")
@@ -86,5 +96,23 @@ public class SimulationController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<>(new SimulationResponse(simulation), HttpStatus.OK);
+    }
+
+    @PermitAll
+    @GetMapping("/allo")
+    public void test() {
+       /* ThreadGroup rootGroup = Thread.currentThread().getThreadGroup().getParent();
+        while (rootGroup.getParent() != null) {
+            rootGroup = rootGroup.getParent();
+        }
+
+        Thread[] threads = new Thread[rootGroup.activeCount()];
+        rootGroup.enumerate(threads);
+
+        for (Thread thread : threads) {
+            System.out.println(thread.getName());
+        }*/
+        for (var t :Thread.getAllStackTraces().keySet())
+            System.out.println(t.getName());
     }
 }
