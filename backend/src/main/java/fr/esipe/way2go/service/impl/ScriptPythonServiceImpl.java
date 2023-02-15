@@ -58,9 +58,9 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             var content = readFile(Path.of(pathLog).toString());
 
             var listLog = new ArrayList<LogEntity>();
-            listLog.add(new LogEntity(simulation, content));
+            listLog.add(new LogEntity(simulation, content,"STARTED","test.py"));
             simulation.setLogs(listLog);
-            logService.createLog(new LogEntity(simulation, content));
+            logService.createLog(listLog.get(0));
         } catch (IOException e) {
             throw new RuntimeException();
         } catch (InterruptedException e) {

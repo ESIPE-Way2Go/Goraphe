@@ -3,6 +3,7 @@ package fr.esipe.way2go.controller;
 import fr.esipe.way2go.configuration.jwt.JwtUtils;
 import fr.esipe.way2go.dao.SimulationEntity;
 import fr.esipe.way2go.dto.simulation.request.SimulationRequest;
+import fr.esipe.way2go.dto.simulation.response.LogResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationIdResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationResponse;
 import fr.esipe.way2go.service.ScriptPythonService;
@@ -39,11 +40,13 @@ public class SimulationController {
      */
 
     @PostMapping
-    public ResponseEntity<Long> createSimulation(@RequestBody SimulationRequest simulationRequest) {
-        var user = userService.getUser("jeremy");
-        var simulation = new SimulationEntity(simulationRequest.getName(), user.get(), "Hello world");
+    public ResponseEntity<Long> createSimulation(@RequestHeader HttpHeaders headers,@RequestBody SimulationRequest simulationRequest) {
+        var user = userService.getUser("admin");
+        var simulation = new SimulationEntity(simulationRequest.getName(), user.orElseThrow(), simulationRequest.getDesc(),"test");
         var simulationSave = simulationService.createSimulation(simulation);
-        scriptPythonService.executeScript(user.get(), simulationSave, "test");
+        var midPoint= MapController.Point.midPoint(new MapController.Point(simulationRequest.getStartX(), simulationRequest.getStartY()),
+                new MapController.Point(simulationRequest.getEndX(),simulationRequest.getEndY()));
+        scriptPythonService.executeScript(user.orElseThrow(), simulationSave, midPoint,simulationRequest.getDistance(),simulationRequest.getDesc());
         return new ResponseEntity<>(simulationSave.getSimulationId(), HttpStatus.ACCEPTED);
     }
 
@@ -54,7 +57,7 @@ public class SimulationController {
      * @return
      */
     @GetMapping(value = "/{id}")
-    public ResponseEntity<LogResponse> getLogs(@PathVariable Long id) {
+    public ResponseEntity<LogResponse> getLogs(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
         var simulation = simulationService.find(id);
         if (simulation.isEmpty())
             return new ResponseEntity<>(new LogResponse(), HttpStatus.NOT_FOUND);
