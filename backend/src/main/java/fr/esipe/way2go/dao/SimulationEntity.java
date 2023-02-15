@@ -1,13 +1,9 @@
 package fr.esipe.way2go.dao;
 
+import fr.esipe.way2go.dao.converter.CalendarConverter;
 import fr.esipe.way2go.dao.converter.StringListConverter;
-import org.hibernate.annotations.Type;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Entity
 @Table(name = "simulation", schema = "public", catalog = "goraphe")
@@ -25,7 +21,7 @@ public class SimulationEntity {
     @JoinColumn(name="user_id", nullable = false)
     private UserEntity user;
 
-    @Column(name = "graph", nullable = false)
+    @Column(name = "graph", nullable = false,  length = 100000)
     private String graph;
 
     @Column(name = "description", nullable = false)
@@ -47,10 +43,12 @@ public class SimulationEntity {
     private String logPath;
 
     @Column(name = "begin_date", nullable = false)
-    private Date beginDate;
+    @Convert(converter = CalendarConverter.class)
+    private Calendar beginDate;
 
     @Column(name = "end_date")
-    private Date endDate;
+    @Convert(converter = CalendarConverter.class)
+    private Calendar endDate;
 
     @Column(name = "share_link", nullable = false, unique = true)
     private String shareLink;
@@ -61,8 +59,7 @@ public class SimulationEntity {
     @OneToMany(mappedBy = "simulation")
     private List<LogEntity> logs;
 
-    public SimulationEntity() {
-    }
+    public SimulationEntity() {}
 
     public SimulationEntity(String name, UserEntity user, String description, String computingScript) {
         this.name = name;
@@ -77,7 +74,7 @@ public class SimulationEntity {
         roadType.add("autoroutes");
         this.logPath = "logPath";
         Random rand = new Random();
-        beginDate = new Date();
+        beginDate = Calendar.getInstance();
         int randomNumber = rand.nextInt(100000) + 1;
         this.shareLink = String.valueOf(randomNumber);
         this.statistics = "statistics";
@@ -201,6 +198,14 @@ public class SimulationEntity {
         return generationDistance;
     }
 
+    public Calendar getBeginDate() {
+        return beginDate;
+    }
+
+    public Calendar getEndDate() {
+        return endDate;
+    }
+
     /**
      * Sets a new generation distance for this simulation.
      *
@@ -318,13 +323,32 @@ public class SimulationEntity {
         this.logs = logs;
     }
 
+    public void setBeginDate(Calendar beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    public void setEndDate(Calendar endDate) {
+        this.endDate = endDate;
+    }
+
     @Override
     public String toString() {
         return "SimulationEntity{" +
                 "simulationId=" + simulationId +
                 ", name='" + name + '\'' +
                 ", user=" + user +
+                ", graph='" + graph + '\'' +
                 ", description='" + description + '\'' +
+                ", computingScript='" + computingScript + '\'' +
+                ", generationDistance=" + generationDistance +
+                ", randomPoints='" + randomPoints + '\'' +
+                ", roadType=" + roadType +
+                ", logPath='" + logPath + '\'' +
+                ", beginDate=" + beginDate +
+                ", endDate=" + endDate +
+                ", shareLink='" + shareLink + '\'' +
+                ", statistics='" + statistics + '\'' +
+                ", logs=" + logs +
                 '}';
     }
 }

@@ -38,7 +38,7 @@ public class JwtUtils {
     public String getUsersFromHeaders(HttpHeaders headers) {
         var bearer = headers.get("Authorization");
         if (bearer == null)
-            return "NOT FOUND";
+            return null;
         var token = bearer.get(0).split(" ")[1];
         return getUserNameFromJwtToken(token);
     }

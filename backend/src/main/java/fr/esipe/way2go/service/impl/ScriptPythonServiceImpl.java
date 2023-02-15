@@ -37,12 +37,14 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
 
         try {
             var process = builder.start();
-
+            var logEntity = logService.createLog(new LogEntity(simulation, nameScript));
             var res = new String(process.getInputStream().readAllBytes());
             int exitCode = process.waitFor();
             var content = readFile(Path.of(pathLog).toString());
             var status = exitCode == 0 ? "SUCCESS" : "ERROR";
-            logService.createLog(new LogEntity(simulation, content, status, nameScript));
+            logEntity.setContent(content);
+            logEntity.setStatus(status);
+            logService.createLog(logEntity);
         } catch (IOException e) {
             throw new RuntimeException();
         } catch (InterruptedException e) {

@@ -1,9 +1,8 @@
 package fr.esipe.way2go.dto.simulation.response;
 
-import fr.esipe.way2go.dao.LogEntity;
 import fr.esipe.way2go.dao.SimulationEntity;
-
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class SimulationResponse {
@@ -38,6 +37,16 @@ public class SimulationResponse {
     private double distance;
 
     /**
+     * Begin date
+     */
+    private Calendar beginDate;
+
+    /**
+     * End date
+     */
+    private Calendar endDate;
+
+    /**
      * List of logs response
      */
     private List<LogResponse> logResponses;
@@ -49,10 +58,13 @@ public class SimulationResponse {
         this.computingScript = simulation.getComputingScript();
         this.roads = simulation.getRoadType();
         this.distance = simulation.getGenerationDistance();
+        this.beginDate = simulation.getBeginDate();
+        this.endDate = simulation.getEndDate();
         this.logResponses = new ArrayList<>();
 
         for (var log : simulation.getLogs()) {
-            logResponses.add(new LogResponse(log.getStatus(), log.getScript(), log.getContent().split("\n")));
+            var content = log.getContent() == null ? new String[]{} : log.getContent().split("\n");
+            logResponses.add(new LogResponse(log.getStatus(), log.getScript(), content));
         }
     }
     public String getDescription() {
@@ -72,6 +84,14 @@ public class SimulationResponse {
 
     public double getDistance() {
         return distance;
+    }
+
+    public Calendar getBeginDate() {
+        return beginDate;
+    }
+
+    public Calendar getEndDate() {
+        return endDate;
     }
 
     public List<LogResponse> getLogResponses() {
@@ -111,5 +131,13 @@ public class SimulationResponse {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setBeginDate(Calendar beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    public void setEndDate(Calendar endDate) {
+        this.endDate = endDate;
     }
 }

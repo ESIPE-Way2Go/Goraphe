@@ -21,18 +21,24 @@ public class LogEntity {
     @Column(name = "script", nullable = false)
     private String script;
 
-    @Column(name = "content", nullable = false, length = 10000)
+    @Column(name = "content", length = 10000)
     private String content;
 
 
     public LogEntity() {
     }
 
+    public LogEntity(SimulationEntity simulation, String script) {
+        this.simulation = simulation;
+        this.status = "EN COURS";
+        this.script = script;
+    }
+
     public LogEntity(SimulationEntity simulation, String content, String status, String script) {
         this.simulation = simulation;
-        this.script = script;
-        this.status = status;
         this.content = content;
+        this.status = status;
+        this.script = script;
     }
 
     /**

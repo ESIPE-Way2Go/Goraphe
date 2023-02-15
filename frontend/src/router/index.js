@@ -17,10 +17,10 @@ const routes = [
         component: () => import('@/views/TestSearch.vue'),
         meta: {requiresAuth: true, layout: 'content'}
     },
-    {   path: '/logs/:id',
-            name: "logsSimulation",
-            component: () => import('@/views/LogSimulation.vue'),
-            meta: {requiresAuth: false, layout: 'content'}
+    {   path: '/simulation/:id',
+            name: "simulation",
+            component: () => import('@/views/SimulationPage.vue'),
+            meta: {requiresAuth: true, layout: 'content'}
      },
     {   path: '/:pathMatch(.*)*',
         name: "error-404",

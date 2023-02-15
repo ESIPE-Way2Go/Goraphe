@@ -1,8 +1,10 @@
 import sys
 import os
-import osmnx as ox
+#import osmnx as ox
 import logging
 from datetime import datetime
+
+import time
 
 # sys.argv[1] : user
 # sys.argv[2] : simulation
@@ -20,6 +22,8 @@ logging.info("Commencement")
 
 logging.debug("La fonction commence")
 
+time.sleep(4)
+
 num = float(sys.argv[3])
 result = num + 10
 logging.debug("Change value")
@@ -29,6 +33,6 @@ try:
     x = a / b
 except Exception as e:
     logging.error("Exception", exc_info=True)
-    exit 1
+    exit(1)
 
 print("LOG_FILENAME", LOG_FILENAME)

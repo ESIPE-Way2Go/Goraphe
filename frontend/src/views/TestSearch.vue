@@ -8,6 +8,7 @@
 <script>
 import L from 'leaflet';
 import 'leaflet-routing-machine';
+import authHeader from "@/services/auth-header";
 
 export default {
   name: 'TestSearch',
@@ -46,9 +47,7 @@ export default {
         //const distance = 100;
         const response = await fetch('/api/simulation/', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: authHeader(),
           body: JSON.stringify({ name })
         });
 
@@ -57,8 +56,8 @@ export default {
         }
 
         const data = await response.json();
-        console.log(data);
-         this.$router.push({name: 'logsSimulation', params: {id: data}});
+        console.log(data['simulationId']);
+         this.$router.push({name: 'simulation', params: {id: data['simulationId']}});
       } catch (error) {
         console.error(error);
       }
