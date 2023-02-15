@@ -95,7 +95,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             logEntity.setStatus(status);
             logService.createLog(logEntity);
             simulation.setEndDate(Calendar.getInstance());
-            simulationService.createSimulation(simulation);
+            simulationService.save(simulation);
         } catch (IOException e) {
             throw new RuntimeException();
         } catch (InterruptedException e) {

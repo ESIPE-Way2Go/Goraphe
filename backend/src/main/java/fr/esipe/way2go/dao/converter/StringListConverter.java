@@ -1,7 +1,5 @@
 package fr.esipe.way2go.dao.converter;
 
-import org.python.google.common.base.Joiner;
-
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.ArrayList;

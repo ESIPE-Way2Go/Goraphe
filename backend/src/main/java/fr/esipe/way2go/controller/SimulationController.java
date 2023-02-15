@@ -15,15 +15,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.PermitAll;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/api/simulation")
 public class SimulationController {
+    private static final int NB_THREADS = 1;
+    private static final ExecutorService POOL = Executors.newFixedThreadPool(NB_THREADS);
     private final SimulationService simulationService;
     private final UserService userService;
     private final ScriptPythonService scriptPythonService;
-
     private final JwtUtils jwtUtils;
 
     @Autowired
@@ -43,7 +48,7 @@ public class SimulationController {
      */
 
     @PostMapping
-    public ResponseEntity<SimulationIdResponse> createSimulation(@RequestHeader HttpHeaders headers, @RequestBody SimulationRequest simulationRequest) throws InterruptedException {
+    public ResponseEntity<SimulationIdResponse> createSimulation(@RequestHeader HttpHeaders headers, @RequestBody SimulationRequest simulationRequest) {
         var userName = jwtUtils.getUsersFromHeaders(headers);
         var userOptional = userService.getUser(userName);
         if (userOptional.isEmpty())
@@ -54,8 +59,10 @@ public class SimulationController {
         var midPoint= MapController.Point.midPoint(new MapController.Point(simulationRequest.getStartX(), simulationRequest.getStartY()),
                 new MapController.Point(simulationRequest.getEndX(),simulationRequest.getEndY()));
 
-       new Thread(() -> scriptPythonService.executeScript(user, simulationSave, midPoint,simulationRequest.getDistance(),simulationRequest.getDesc())).start();
-
+        POOL.execute(() -> {
+            simulationSave.setBeginDate(Calendar.getInstance());
+            scriptPythonService.executeScript(user, simulationSave, midPoint,simulationRequest.getDistance(),simulationRequest.getDesc());
+        });
         return new ResponseEntity<>(new SimulationIdResponse(simulationSave.getSimulationId()), HttpStatus.ACCEPTED);
     }
 
@@ -98,21 +105,20 @@ public class SimulationController {
         return new ResponseEntity<>(new SimulationResponse(simulation), HttpStatus.OK);
     }
 
-    @PermitAll
-    @GetMapping("/allo")
-    public void test() {
-       /* ThreadGroup rootGroup = Thread.currentThread().getThreadGroup().getParent();
-        while (rootGroup.getParent() != null) {
-            rootGroup = rootGroup.getParent();
-        }
-
-        Thread[] threads = new Thread[rootGroup.activeCount()];
-        rootGroup.enumerate(threads);
-
-        for (Thread thread : threads) {
-            System.out.println(thread.getName());
-        }*/
-        for (var t :Thread.getAllStackTraces().keySet())
-            System.out.println(t.getName());
+    /**
+     * Get all simulations of users
+     * @param headers : token
+     * @return list of simulation for the front
+     */
+    @GetMapping
+    public ResponseEntity<List<SimulationHomeResponse>> getSimulations(@RequestHeader HttpHeaders headers) {
+        var userEntityOptional = userService.getUser(jwtUtils.getUsersFromHeaders(headers));
+        if (userEntityOptional.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        var user = userEntityOptional.get();
+        var simulations = simulationService.getSimulationsOfUser(user);
+        var simulationsResponse = new ArrayList<SimulationHomeResponse>();
+        simulations.stream().forEach(simulation -> simulationsResponse.add(new SimulationHomeResponse(simulation)));
+        return new ResponseEntity<>(simulationsResponse, HttpStatus.OK);
     }
 }

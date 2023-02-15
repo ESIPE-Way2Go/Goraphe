@@ -1,10 +1,8 @@
 package fr.esipe.way2go.dao.converter;
 
 import javax.persistence.AttributeConverter;
-import java.time.ZoneId;
 import java.util.Calendar;
 import java.sql.Date;
-import java.util.TimeZone;
 
 public class CalendarConverter implements AttributeConverter<Calendar, Date> {
     @Override
