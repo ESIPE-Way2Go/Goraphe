@@ -28,7 +28,6 @@ export default {
     loading:false
   }),
   methods: {
-    //TODO requete pour trouver l'utilsateur VOIR QUOI FAIRE APRES
     onClick () {
       this.loading = true
 
@@ -41,7 +40,3 @@ export default {
 }
 
 </script>
-
-<style scoped>
-
-</style>

@@ -56,10 +56,10 @@ export default {
     },
     showUserRole(role){
       switch (role) {
-        case "ROLE_ADVISOR" :
-          return "Conseiller"
+        case "ROLE_ADMIN" :
+          return "Admin"
         default :
-          return "Client"
+          return "User"
       }
     }
   },
@@ -74,7 +74,3 @@ export default {
 
 
 </script>
-
-<style scoped>
-
-</style>
