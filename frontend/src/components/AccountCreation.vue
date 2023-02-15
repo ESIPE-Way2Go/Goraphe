@@ -1,9 +1,7 @@
 <template>
 
   <div class="d-flex flex-column justify-center align-center h-100">
-
     <h3 class="display-6 text-grey" > Creation d'un compte pour le client {{user.firstName}} {{user.lastName}} </h3>
-<!--    <p class="text-muted mb-4">Le compte serra vide</p>-->
   <v-card elevation="3" max-width="1000" class="w-100 p-2">
   <v-form
       ref="form"
@@ -45,7 +43,7 @@
 </template>
 
 <script>
-//import CreateCustomer from "@/services/customer.create";
+
 import authHeader from "@/services/auth-header";
 import { useToast } from "vue-toastification";
 
@@ -83,7 +81,6 @@ export default {
          const account = this.$data.account
          account.id_advisor = this.$store.state.auth.user.id;
          account.id_owner = this.user.userId;
-         //await CreateCustomer.create(myCustomer)
          const API_URL = '/api/account/create';
         try {
           const response =  await fetch(`${API_URL}`,{
@@ -94,7 +91,6 @@ export default {
           const result = await response.json();
           if (result!==null){
             this.toast.success("Création du compte réussi");
-            //this.$router.push("dashboard");
             this.$emit("close");
           }
         }catch(error){
@@ -107,11 +103,8 @@ export default {
     clear(){
       this.$refs.form.reset()
     }
-  //  TODO handle invalid of submit
   }
 }
-
-
 </script>
 
 <style scoped>

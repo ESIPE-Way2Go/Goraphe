@@ -96,7 +96,7 @@
 </template>
 
 <script>
-//import CreateCustomer from "@/services/customer.create";
+
 import authHeader from "@/services/auth-header";
 import { useToast } from "vue-toastification";
 
@@ -142,7 +142,6 @@ export default {
        if(this.$refs.form.validate()){
          const myCustomer = this.$data.customer
          myCustomer.advisorId = this.$store.state.auth.user.id;
-         //await CreateCustomer.create(myCustomer)
          const API_URL = '/api/user/customer/create';
         try {
           const response =  await fetch(`${API_URL}`,{
@@ -154,7 +153,6 @@ export default {
 
           if (result!==null){
             this.toast.success("Création du client réussi");
-            //this.$router.push("dashboard");
             this.$emit("close");
           }
         }catch(error){
@@ -167,16 +165,13 @@ export default {
     clear(){
       this.$refs.form.reset()
     }
-  //  TODO handle invalid of submit
   }
 }
 
 
 </script>
-
 <style scoped>
 .userInfo{
   width: 50%;
 }
-
 </style>
