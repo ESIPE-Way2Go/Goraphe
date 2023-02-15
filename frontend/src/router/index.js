@@ -15,7 +15,7 @@ const routes = [
     {   path: '/',
         name: "map",
         component: () => import('@/views/TestSearch.vue'),
-        meta: {requiresAuth: true, layout: 'content'}
+        meta: {requiresAuth: false, layout: 'content'}
     },
     {   path: '/logs/:id',
             name: "logsSimulation",

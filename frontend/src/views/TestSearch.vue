@@ -1,10 +1,28 @@
 <template>
-  <div id="map" class="map"></div>
-  <div>
-    <v-text-field v-model="name" label="Name"></v-text-field>
-    <v-text-field v-model="desc" label="Description"></v-text-field>
-    <button @click="makePostRequest()"> SEND</button>
-  </div>
+  <v-container fluid>
+    <v-row>
+      <v-col cols="10">
+        <div id="map" class="map"></div>
+      </v-col>
+      <v-col cols="2">
+        <v-form @submit.prevent="makePostRequest">
+          <v-text-field v-model="name" label="Name"></v-text-field>
+          <v-text-field v-model="desc" label="Description"></v-text-field>
+          <v-text-field v-model.number="dist" label="Distance" type="number" min="100" max="10000" step="10"></v-text-field>
+          <v-select
+              chips
+              label="Select road types"
+              :items=roadTypes
+              v-model="selectedRoadTypes"
+              multiple
+          ></v-select>
+          <v-text-field v-model="script" label="Computing Script"></v-text-field>
+          <v-btn type="submit" color="primary">SEND</v-btn>
+        </v-form>
+      </v-col>
+    </v-row>
+  </v-container>
+
 </template>
 <script>
 import L from 'leaflet';
@@ -28,7 +46,11 @@ export default {
       name: "",
       desc: "",
       map: null,
-      waypoints: []
+      waypoints: [],
+      roadTypes: ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'residential', 'service'],
+      selectedRoadTypes: [],
+      dist : 100,
+      script: "",
     };
   },
   mounted() {
@@ -109,11 +131,11 @@ export default {
 </script>
 
 <style>
-.map {
+#map {
+  position: relative;
+  height: 100vh;
   width: 100%;
-  height: 70%;
 }
-
 .leaflet-routing-container {
   display: none !important;
 }
