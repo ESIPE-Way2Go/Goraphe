@@ -1,34 +1,57 @@
+import argparse
 import sys
 import os
 import osmnx as ox
 import logging
-from datetime import datetime
+import time
 
-# sys.argv[1] : user
-# sys.argv[2] : simulation
+sys.path.append("/mnt/d/Cours/S5/LastProject/GoRaphe/frontend")
+parser = argparse.ArgumentParser()
+
+# generation distance for the graph
+parser.add_argument("--dist", type=int, required=True)
+# middle coordinates of the two points
+parser.add_argument("--coords", type=lambda x: tuple(map(float, x.split(','))), required=True)
+# user name
+parser.add_argument("--user", type=str, required=True)
+# simulation
+parser.add_argument("--sim", type=str, required=True)
+# description
+parser.add_argument("--desc", type=str, required=True)
+# Parse the command-line arguments
+args = parser.parse_args()
+
+dist = args.dist
+coords = args.coords
+user = args.user
+sim = args.sim
+desc = args.desc
 
 # Build the directory of log
-os.makedirs( "scripts/" + sys.argv[1], exist_ok=True)
+os.makedirs("scripts/" + user, exist_ok=True)
 
-LOG_FILENAME = os.getcwd()+ "/scripts/" + sys.argv[1] + "/" + sys.argv[2] + "_1.log";
+LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_1.log";
 logging.basicConfig(level=logging.DEBUG,
                     filename=LOG_FILENAME,
                     filemode="a+",
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-logging.info("Commencement")
+logging.info("Start")
+logging.debug(f"User : {user}")
+logging.debug(f"Simulation name : {sim}")
+logging.debug(f"Description : {desc}")
+logging.debug(f"Coordinates used : {coords}")
+logging.debug(f"Generation distance used : {dist}")
+logging.debug("\nStarting timer...")
+time_start = time.perf_counter()
 
-logging.debug("La fonction commence")
+# create the graph
+G = ox.graph_from_point(coords, dist, network_type='drive', simplify=True)
 
-num = float(sys.argv[3])
-result = num + 10
-logging.debug("Change value")
-a = 5
-b = 0
-try:
-    x = a / b
-except Exception as e:
-    logging.error("Exception", exc_info=True)
-    exit 1
+edges = ox.graph_to_gdfs(G, nodes=False, edges=True)
 
 print("LOG_FILENAME", LOG_FILENAME)
+print(edges.to_json())
+
+time_elapsed = (time.perf_counter() - time_start)
+logging.info("Filtering time : " + str(time_elapsed))

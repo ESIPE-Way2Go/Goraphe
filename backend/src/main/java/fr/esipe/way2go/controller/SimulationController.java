@@ -39,16 +39,12 @@ public class SimulationController {
      */
 
     @PostMapping
-    public ResponseEntity<SimulationIdResponse> createSimulation(@RequestHeader HttpHeaders headers, @RequestBody SimulationRequest simulationRequest) {
-        var userName = jwtUtils.getUsersFromHeaders(headers);
-        var userOptional = userService.getUser(userName);
-        if (userOptional.isEmpty())
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        var user = userOptional.get();
-        var simulation = new SimulationEntity(simulationRequest.getName(), user, "Hello world", "test");
+    public ResponseEntity<Long> createSimulation(@RequestBody SimulationRequest simulationRequest) {
+        var user = userService.getUser("jeremy");
+        var simulation = new SimulationEntity(simulationRequest.getName(), user.get(), "Hello world");
         var simulationSave = simulationService.createSimulation(simulation);
-        scriptPythonService.executeScript(user, simulationSave, "test");
-        return new ResponseEntity<>(new SimulationIdResponse(simulationSave.getSimulationId()), HttpStatus.ACCEPTED);
+        scriptPythonService.executeScript(user.get(), simulationSave, "test");
+        return new ResponseEntity<>(simulationSave.getSimulationId(), HttpStatus.ACCEPTED);
     }
 
     /**
@@ -58,6 +54,19 @@ public class SimulationController {
      * @return
      */
     @GetMapping(value = "/{id}")
+    public ResponseEntity<LogResponse> getLogs(@PathVariable Long id) {
+        var simulation = simulationService.find(id);
+        if (simulation.isEmpty())
+            return new ResponseEntity<>(new LogResponse(), HttpStatus.NOT_FOUND);
+
+        var logs = new StringBuilder();
+        simulation.get().getLogs().forEach(x -> logs.append(x.getContent()).append("\n"));
+        var log = simulation.get().getLogs().get(0);
+        var t = log.getContent().split("\n");
+        var test = new LogResponse();
+        test.setContent(t);
+        return new ResponseEntity<>(test, HttpStatus.OK);
+    }
     public ResponseEntity<SimulationResponse> getSimulation(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
         var simulationEntityOptional = simulationService.find(id);
         if (simulationEntityOptional.isEmpty()) {
