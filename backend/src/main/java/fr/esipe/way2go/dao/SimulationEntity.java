@@ -42,7 +42,7 @@ public class SimulationEntity {
     @Column(name = "log_path", nullable = false)
     private String logPath;
 
-    @Column(name = "begin_date", nullable = false)
+    @Column(name = "begin_date")
     @Convert(converter = CalendarConverter.class)
     private Calendar beginDate;
 
@@ -56,7 +56,7 @@ public class SimulationEntity {
     @Column(name = "statistics", nullable = false)
     private String statistics;
 
-    @OneToMany(mappedBy = "simulation")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "simulation")
     private List<LogEntity> logs;
 
     public SimulationEntity() {}
@@ -74,7 +74,6 @@ public class SimulationEntity {
         roadType.add("autoroutes");
         this.logPath = "logPath";
         Random rand = new Random();
-        beginDate = Calendar.getInstance();
         int randomNumber = rand.nextInt(100000) + 1;
         this.shareLink = String.valueOf(randomNumber);
         this.statistics = "statistics";
