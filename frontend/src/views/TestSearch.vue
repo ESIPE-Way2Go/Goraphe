@@ -1,9 +1,9 @@
 <template>
   <div id="map" class="map"></div>
-   <div>
-         <v-text-field v-model="name" label="Name"></v-text-field>
-        <button @click="makePostRequest()"> SEND</button>
-   </div>
+  <div>
+    <v-text-field v-model="name" label="Name"></v-text-field>
+    <button @click="makePostRequest()"> SEND</button>
+  </div>
 </template>
 <script>
 import L from 'leaflet';
@@ -57,19 +57,14 @@ export default {
 
         const data = await response.json();
         console.log(data['simulationId']);
-         this.$router.push({name: 'simulation', params: {id: data['simulationId']}});
+        this.$router.push({ name: 'simulation', params: { id: data['simulationId'] } });
       } catch (error) {
         console.error(error);
       }
     }
+  
   }
 };
-
 </script>
 
-<style>
-.map {
-  width: 100%;
-  height: 95%;
-}
-</style>
+

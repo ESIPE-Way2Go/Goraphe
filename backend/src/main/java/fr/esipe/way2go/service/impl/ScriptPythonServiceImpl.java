@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 @Service
 public class ScriptPythonServiceImpl implements ScriptPythonService {
@@ -45,6 +46,8 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             logEntity.setContent(content);
             logEntity.setStatus(status);
             logService.createLog(logEntity);
+            simulation.setEndDate(Calendar.getInstance());
+            simulationService.createSimulation(simulation);
         } catch (IOException e) {
             throw new RuntimeException();
         } catch (InterruptedException e) {
