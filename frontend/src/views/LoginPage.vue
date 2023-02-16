@@ -6,8 +6,6 @@
 
       <div class="col-md-6">
         <div class="login d-flex align-items-center py-5">
-
-
           <div class="container">
             <div class="row">
               <div class="col-lg-10 col-xl-7 mx-auto">

@@ -1,10 +1,11 @@
 <template>
-  <div class="mx-auto" width="80%">
+  <div class="mx-auto w-75">
     <v-card class="mb-10">
       <div class="d-flex">
         <div class="flex-column">
           <h2 class="ma-2 pa-1">Status</h2>
-          <v-sheet class="ma-2 pa-1 px-10 bg-light-blue rounded-pill">{{ status }}</v-sheet>
+          <v-sheet class="ma-2 pa-1 px-10 rounded-pill"
+            :style="{ 'backgroundColor': status === 'ERROR' ? '#F04438' : 'green' }">{{ status }}</v-sheet>
         </div>
         <div class="flex-column">
           <h2 class="ma-2 pa-1">Duration</h2>
@@ -30,7 +31,15 @@
         </div>
       </div>
     </v-card>
-    <v-card class="mx-auto" width="80%">
+
+    <v-progress-linear :model-value=progession color="light-blue" height="20" :striped='progession != 100'
+      class="mb-10">
+      <template v-slot:default="{ value }">
+        <strong>{{ Math.ceil(value) }}%</strong>
+      </template>
+    </v-progress-linear>
+
+    <v-card class="mx-auto">
       <template v-slot:title>
         Logs
       </template>
@@ -38,16 +47,24 @@
         <div>
           <div class="text-center d-flex pb-4">
             <v-btn class="ma-2" @click="all">
-              All
+              Afficher tous
             </v-btn>
             <v-btn class="ma-2" @click="none">
-              None
+              Cacher tous
             </v-btn>
           </div>
           <v-expansion-panels v-model="panel" multiple>
-            <v-expansion-panel v-for="log in logs" :key="log.script" :title=log.script :value=log.script>
+            <v-expansion-panel v-for="log in logs" :key="log.script" :value=log.script>
+              <template v-slot:title>
+                <div class="mr-2">
+                  <v-icon icon="mdi-check" class="bg-green" v-if="log.status === 'SUCCESS'"></v-icon>
+                  <v-icon icon="mdi-close" class="bg-red" v-if="log.status === 'ERROR'"></v-icon>
+                  <v-icon icon="mdi-check" class="bg-green" v-else></v-icon>
+                </div>
+                <div>{{ log.script }}</div>
+              </template>
               <template v-slot:text>
-                <h5>{{  log.status }}</h5>
+                <h5>{{ log.status }}</h5>
                 <div v-for="content in log.content" :key=content>
                   {{ content }}
                 </div>
@@ -69,19 +86,19 @@ export default {
       panel: [],
       allLog: [],
       test: 0,
-      status: "",
-      duration: "",
+      status: "NOT LAUNCH",
+      duration: "0",
       computingScript: "",
       distance: "",
       roads: [],
       logs: [],
+      progession: 0,
       id: this.$route.params.id
     }
   },
 
   methods: {
     all() {
-      console.log("test ", this.allLog)
       this.panel = this.allLog
     },
     none() {
@@ -96,31 +113,56 @@ export default {
         .then(data => {
           this.name = data['name']
           this.description = data['description']
-          this.computingScript = data['computingScript']      
-          this.roads = data['roads']          
+          this.computingScript = data['computingScript']
+          this.roads = data['roads']
           this.distance = data['distance']
-
-          var endDate = data['endDate']
-          if (endDate === null) {
-            this.duration = new Date(data['beginDate']) - Date.now()
-          }
-          else {
-            this.duration = new Date(data['endDate']) - new Date(data['beginDate'])
-          }
-          // Result in minutes
-          this.duration = this.duration / 1000 / 60
-          this.allLog = [];
-          this.logs = [];
+          this.getDuration(data)
+          this.allLog = []
+          this.logs = []
           data['logResponses'].forEach(elt => {
             this.logs.push({ script: elt['scriptName'], status: elt['status'], content: elt['content'] })
             this.allLog.push(elt['scriptName'])
             this.status = elt['status']
-          });       
-        })
+          });
+          if (this.logs !== []) {
+            this.progession = this.logs.length / 3 * 100
+          }
+        });
     },
+    getDuration(data) {
+      if (data['beginDate'] === null) {      
+        return;
+      }
+      var endDate = data['endDate']
+      var duration = 0
+      if (endDate === null) {
+        duration = Date.now() - new Date(data['beginDate'])
+      }
+      else {
+        duration = new Date(data['endDate']) - new Date(data['beginDate'])
+      }
+      // Result in minutes
+      this.duration = this.secondsToTimeString(duration)
+    },
+    secondsToTimeString(seconds) {
+      seconds /= 1000;
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds - hours * 3600) / 60);
+      const remainingSeconds = Math.round(seconds - hours * 3600 - minutes * 60);
+      var parts = "";
+      if (hours > 0) {
+        parts += hours.toString().padStart(2, '0') + " h ";
+      }
+      if (minutes > 0 || hours > 0) {
+        parts += minutes.toString().padStart(2, '0') + " m ";
+      }
+      parts += remainingSeconds.toString().padStart(2, '0') + " s ";
+      return parts;
+    }
   },
   mounted() {
-    setInterval( this.getLogs(), 10000)   
+      this.getLogs()
+      setInterval(this.getLogs, 1000)
+    }
   }
-}
 </script>

@@ -117,15 +117,13 @@ export default {
         }
 
         const data = await response.json();
-        console.log(data);
-        // this.$router.push({name: 'logsSimulation', params: {id: data}});
+        console.log(data['simulationId']);
+        this.$router.push({ name: 'simulation', params: { id: data['simulationId'] } });
       } catch (error) {
         console.error(error);
       }
     }
-  },
-
-
+  }
 };
 
 </script>

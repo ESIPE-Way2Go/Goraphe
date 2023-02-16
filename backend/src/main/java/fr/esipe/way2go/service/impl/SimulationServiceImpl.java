@@ -1,11 +1,14 @@
 package fr.esipe.way2go.service.impl;
 
 import fr.esipe.way2go.dao.SimulationEntity;
+import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.repository.SimulationRepository;
 import fr.esipe.way2go.service.SimulationService;
+import io.swagger.annotations.Example;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,7 +20,7 @@ public class SimulationServiceImpl implements SimulationService {
         this.simulationRepository = simulationRepository;
     }
     @Override
-    public SimulationEntity createSimulation(SimulationEntity simulationEntity) {
+    public SimulationEntity save(SimulationEntity simulationEntity) {
         return simulationRepository.save(simulationEntity);
     }
 
@@ -25,4 +28,16 @@ public class SimulationServiceImpl implements SimulationService {
     public Optional<SimulationEntity> find(Long id) {
         return simulationRepository.findById(id);
     }
+
+    @Override
+    public List<SimulationEntity> getSimulationsOfUser(UserEntity userEntity) {
+        return simulationRepository.getSimulationFromUser(userEntity);
+    }
+
+    @Override
+    public void deleteSimulation(SimulationEntity simulation) {
+        simulationRepository.delete(simulation);
+    }
+
+
 }
