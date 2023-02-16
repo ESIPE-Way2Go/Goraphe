@@ -13,6 +13,12 @@ const routes = [
         meta: { requiresAuth: true, layout: 'content' }
     },
     {
+        path: '/map',
+        name: "map",
+        component: () => import('@/views/TestSearch.vue'),
+        meta: { requiresAuth: true, layout: 'content' }
+    },
+    {
         path: '/login',
         name: "login",
         component: () => import('@/views/LoginPage.vue'),
