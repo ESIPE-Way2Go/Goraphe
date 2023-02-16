@@ -46,11 +46,8 @@ export default {
       name: "",
       desc: "",
       map: null,
-      waypoints: [],
-      roadTypes: ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'residential', 'service'],
-      selectedRoadTypes: [],
-      dist : 100,
-      script: "",
+      waypoints: []
+
     };
   },
   mounted() {
@@ -92,7 +89,6 @@ export default {
           this.y = y;
         }
       }
-
       try {
         let coordinates = this.waypoints.map(coord => new Point(coord[0], coord[1]));
         const name = this.$data.name;
@@ -134,6 +130,7 @@ export default {
   height: 100vh;
   width: 100%;
 }
+
 .leaflet-routing-container {
   display: none !important;
 }
