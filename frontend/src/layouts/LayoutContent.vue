@@ -1,18 +1,18 @@
 <template>
   <v-app :theme="myCustomLightTheme">
     <v-app-bar>
-      <v-btn v-if=can("user") class="mx-2 rounded-pill" @click="home">
+      <v-btn v-if="can('user')" class="mx-2 rounded-pill" @click="home">
         <v-img :src="Goraphe" cover width="45"></v-img>
       </v-btn>
       <v-col v-else cols="1">
         <v-img :src="Goraphe" class="mx-3" width="45"></v-img>
       </v-col>
       <v-spacer></v-spacer>
-      <v-btn v-if=can("user") class="text-capitalize mx-2 rounded-pill bg-blue-lighten-1" @click="newSimulation">
+      <v-btn v-if="can('user')" class="text-capitalize mx-2 rounded-pill bg-blue-lighten-1" @click="newSimulation">
         <v-icon class="mr-2" icon="mdi-plus-circle"></v-icon>
         Nouvelle simulation
       </v-btn>
-      <v-btn v-if=can("admin") class="text-capitalize mx-2 rounded-pill" @click="administration">
+      <v-btn v-if="can('admin')" class="text-capitalize mx-2 rounded-pill" @click="administration">
         <v-icon class="mr-2" icon="mdi-account-group"></v-icon>
         Administration
       </v-btn>
@@ -24,7 +24,7 @@
           :icon="theme.global.name.value === 'myCustomLightTheme' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
           class="mx-2 rounded-circle" @click="toggleTheme"
       ></v-btn>
-      <v-btn v-if=can("user") class="mx-2 rounded-circle" icon="mdi-logout-variant" @click="logOut"></v-btn>
+      <v-btn v-if="can('user')" class="mx-2 rounded-circle" icon="mdi-logout-variant" @click="logOut"></v-btn>
     </v-app-bar>
     <v-main>
       <slot></slot>
