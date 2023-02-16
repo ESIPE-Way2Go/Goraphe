@@ -1,5 +1,35 @@
 <template>
-    <v-container class="bg-surface-variant">
+    <v-container class="bg-green" >
+        <h2 align-center>En cours</h2>
+        <div v-if="simulationsInLoad.length == 0">
+            <v-alert type="info" title="Info"
+                text="Pas de simulation en cours"></v-alert>
+        </div>
+        <v-row no-gutters>
+            <v-col v-for="simulation in simulationsInLoad" :key=simulation.id cols="12" sm="3" lg="2">
+                <v-card class="ma-2">
+                    <v-img class="align-end text-white" height="200" :src=imageTest cover>
+                    </v-img>
+                    <v-card-title class="pt-4">
+                        {{ simulation.title }}
+                    </v-card-title>
+                    <v-card-subtitle> {{ simulation.date }}</v-card-subtitle>
+                    <v-card-actions class="justify-space-between">
+                        <v-btn color="orange" @click="goSimulation(simulation.id)">
+                            Détails
+                        </v-btn>
+                        <v-btn icon="mdi-trash-can-outline" @click="deleteSimulationDialog(simulation)"></v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-col>
+        </v-row>
+    </v-container>
+    <v-container class="bg-light-blue">
+        <h2>Terminé</h2>
+        <div v-if="simulationsInLoad.length == 0">
+            <v-alert type="info" title="Info"
+                text="Aucune simulation"></v-alert>
+        </div>
         <v-row no-gutters>
             <v-col v-for="simulation in simulations" :key=simulation.id cols="12" sm="3" lg="2">
                 <v-card class="ma-2">
@@ -35,7 +65,7 @@
 
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="green" @click="deleteDialog = false">Annuler</v-btn>
+                <v-btn color="grey" @click="deleteDialog = false">Annuler</v-btn>
                 <v-btn color="danger" variant="text" @click="deleteSimulation(simulationId)">
                     Supprimer
                 </v-btn>
@@ -82,6 +112,7 @@ export default {
                             this.simulations.push(elt)
                     });
                 });
+
         },
         goSimulation(id) {
             this.$router.push({ name: 'simulation', params: { id: id } });
