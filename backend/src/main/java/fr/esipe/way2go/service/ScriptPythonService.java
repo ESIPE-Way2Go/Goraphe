@@ -4,6 +4,7 @@ package fr.esipe.way2go.service;
 import fr.esipe.way2go.controller.MapController;
 import fr.esipe.way2go.dao.SimulationEntity;
 import fr.esipe.way2go.dao.UserEntity;
+import fr.esipe.way2go.dto.simulation.request.SimulationRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -13,7 +14,7 @@ import java.io.IOException;
 @Service
 public interface ScriptPythonService {
 
-    void executeScript(UserEntity user, SimulationEntity simulation, MapController.Point coords, int dist, String desc);
+    void executeScript(UserEntity user, SimulationEntity simulation, MapController.Point coords, SimulationRequest simulationRequest);
 
     /**
      * Get the content of the files

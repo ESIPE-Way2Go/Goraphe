@@ -16,6 +16,7 @@
               v-model="selectedRoadTypes"
               multiple
           ></v-select>
+          <v-btn @click="uncheckRoadTypes" color="accent">Uncheck</v-btn>
           <v-text-field v-model="script" label="Computing Script"></v-text-field>
           <v-btn type="submit" color="primary">SEND</v-btn>
         </v-form>
@@ -29,14 +30,17 @@ import L from 'leaflet';
 import 'leaflet-routing-machine';
 import authHeader from "@/services/auth-header";
 import {useTheme} from "vuetify";
+import {useToast} from "vue-toastification";
 
 
 export default {
   setup() {
     const theme = useTheme();
+    const toast = useToast();
     return {
       theme,
       toggleTheme: () => theme.global.name.value = theme.global.current.value.dark ? 'myCustomLightTheme' : 'dark',
+      toast
     }
   },
 
@@ -48,7 +52,7 @@ export default {
       map: null,
       waypoints: [],
       roadTypes: ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'residential', 'service'],
-      selectedRoadTypes: [],
+      selectedRoadTypes: ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'residential', 'service'],
       dist : 100,
       script: "",
     };
@@ -85,7 +89,14 @@ export default {
     });
   },
   methods: {
+    uncheckRoadTypes() {
+      this.selectedRoadTypes = [];
+    },
     async makePostRequest() {
+      if (!this.name) {
+        this.toast.error("Simulation name cannot be empty");
+        return;
+      }
       class Point {
         constructor(x, y) {
           this.x = x;
