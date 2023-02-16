@@ -1,5 +1,5 @@
 <template>
-    <v-container class="bg-green" >
+    <v-container class="bg-blue-grey-lighten-5" >
         <h2 align-center>En cours</h2>
         <div v-if="simulationsInLoad.length == 0">
             <v-alert type="info" title="Info"
@@ -18,13 +18,12 @@
                         <v-btn color="orange" @click="goSimulation(simulation.id)">
                             Détails
                         </v-btn>
-                        <v-btn icon="mdi-trash-can-outline" @click="deleteSimulationDialog(simulation)"></v-btn>
                     </v-card-actions>
                 </v-card>
             </v-col>
         </v-row>
     </v-container>
-    <v-container class="bg-light-blue">
+    <v-container class="bg-light-green-accent-1">
         <h2>Terminé</h2>
         <div v-if="simulationsInLoad.length == 0">
             <v-alert type="info" title="Info"
