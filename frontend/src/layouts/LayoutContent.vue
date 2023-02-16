@@ -1,15 +1,9 @@
 <template>
   <v-app :theme="myCustomLightTheme">
-
     <v-app-bar>
-
-
       <v-app-bar-title class="font-weight-bold">GoRaphe</v-app-bar-title>
-
       <v-spacer></v-spacer>
-
       <CustomerCreationModal v-if="can('advisor')"></CustomerCreationModal>
-
         <v-col cols = auto>
           <v-row dense class="font-weight-bold text-lg-subtitle-1 text-sm-subtitle-3"> {{user.username}} </v-row>
         </v-col>
@@ -17,11 +11,8 @@
             :prepend-icon="theme.global.name.value === 'myCustomLightTheme' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
             @click="toggleTheme"
         ></v-btn>
-
         <v-btn icon="mdi-logout" @click="logOut"></v-btn>
-
     </v-app-bar>
-
     <v-main>
       <slot></slot>
     </v-main>
@@ -56,10 +47,10 @@ export default {
     },
     showUserRole(role){
       switch (role) {
-        case "ROLE_ADVISOR" :
-          return "Conseiller"
+        case "ROLE_ADMIN" :
+          return "Admin"
         default :
-          return "Client"
+          return "User"
       }
     }
   },
@@ -74,7 +65,3 @@ export default {
 
 
 </script>
-
-<style scoped>
-
-</style>

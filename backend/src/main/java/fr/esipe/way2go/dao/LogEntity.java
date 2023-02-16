@@ -12,14 +12,34 @@ public class LogEntity {
     private Long logId;
 
     @ManyToOne
-    @JoinColumn(name="simulation_id", nullable = false)
+    @JoinColumn(name="simulation", nullable = false)
     private SimulationEntity simulation;
 
     @Column(name = "status", nullable = false)
     private String status;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "script", nullable = false)
+    private String script;
+
+    @Column(name = "content", length = 10000)
     private String content;
+
+
+    public LogEntity() {
+    }
+
+    public LogEntity(SimulationEntity simulation, String script) {
+        this.simulation = simulation;
+        this.status = "EN COURS";
+        this.script = script;
+    }
+
+    public LogEntity(SimulationEntity simulation, String content, String status, String script) {
+        this.simulation = simulation;
+        this.content = content;
+        this.status = status;
+        this.script = script;
+    }
 
     /**
      * Returns this log's ID.
@@ -91,5 +111,13 @@ public class LogEntity {
      */
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
     }
 }
