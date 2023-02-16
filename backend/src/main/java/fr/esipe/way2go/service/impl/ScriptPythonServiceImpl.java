@@ -34,7 +34,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
      * @param user              : User generating the simulation.
      * @param simulation        : Simulation generated.
      * @param coords            : Coordinates of the center point of the graph.
-     * @param simulationRequest :contains parameters of the simulation such as the distance and the description, and the road types selected.
+     * @param simulationRequest : contains parameters of the simulation such as the distance and the description, and the road types selected.
      */
     public void executeScript(UserEntity user, SimulationEntity simulation, MapController.Point coords, SimulationRequest simulationRequest) {
         var sep = System.getProperty("file.separator");
