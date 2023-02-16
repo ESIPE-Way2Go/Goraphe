@@ -8,7 +8,7 @@ const routes = [
         path: '/',
         name: "home",
         component: () => import('@/views/SimulationsPage.vue'),
-        meta: { requiresAuth: false, layout: 'content' }
+        meta: { requiresAuth: true, layout: 'content' }
     },
     {
         path: '/login',
@@ -20,7 +20,7 @@ const routes = [
         path: '/simulation/:id',
         name: "simulation",
         component: () => import('@/views/SimulationPage.vue'),
-        meta: { requiresAuth: false, layout: 'content' }
+        meta: { requiresAuth: true, layout: 'content' }
     },
     {
         path: '/:pathMatch(.*)*',
