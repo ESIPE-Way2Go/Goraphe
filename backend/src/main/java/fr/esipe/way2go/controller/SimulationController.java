@@ -3,7 +3,7 @@ package fr.esipe.way2go.controller;
 import fr.esipe.way2go.configuration.jwt.JwtUtils;
 import fr.esipe.way2go.dao.SimulationEntity;
 import fr.esipe.way2go.dto.simulation.request.SimulationRequest;
-import fr.esipe.way2go.dto.simulation.response.LogResponse;
+import fr.esipe.way2go.dto.simulation.response.SimulationHomeResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationIdResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationResponse;
 import fr.esipe.way2go.service.ScriptPythonService;
@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 @RestController
 @RequestMapping("/api/simulation")
 public class SimulationController {
-    private static final int NB_THREADS = 1;
+    private static final int NB_THREADS = 10;
     private static final ExecutorService POOL = Executors.newFixedThreadPool(NB_THREADS);
     private final SimulationService simulationService;
     private final UserService userService;
@@ -54,8 +54,8 @@ public class SimulationController {
         if (userOptional.isEmpty())
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         var user = userOptional.get();
-        var simulation = new SimulationEntity(simulationRequest.getName(), user, "Hello world", "test");
-        var simulationSave = simulationService.createSimulation(simulation);
+        var simulation = new SimulationEntity(simulationRequest.getName(), user, "Hello world", "test",new ArrayList<>());
+        var simulationSave = simulationService.save(simulation);
         var midPoint= MapController.Point.midPoint(new MapController.Point(simulationRequest.getStartX(), simulationRequest.getStartY()),
                 new MapController.Point(simulationRequest.getEndX(),simulationRequest.getEndY()));
 
@@ -74,19 +74,6 @@ public class SimulationController {
      * @return
      */
     @GetMapping(value = "/{id}")
-    public ResponseEntity<LogResponse> getLogs(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
-        var simulation = simulationService.find(id);
-        if (simulation.isEmpty())
-            return new ResponseEntity<>(new LogResponse(), HttpStatus.NOT_FOUND);
-
-        var logs = new StringBuilder();
-        simulation.get().getLogs().forEach(x -> logs.append(x.getContent()).append("\n"));
-        var log = simulation.get().getLogs().get(0);
-        var t = log.getContent().split("\n");
-        var test = new LogResponse();
-        test.setContent(t);
-        return new ResponseEntity<>(test, HttpStatus.OK);
-    }
     public ResponseEntity<SimulationResponse> getSimulation(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
         var simulationEntityOptional = simulationService.find(id);
         if (simulationEntityOptional.isEmpty()) {
@@ -118,7 +105,7 @@ public class SimulationController {
         var user = userEntityOptional.get();
         var simulations = simulationService.getSimulationsOfUser(user);
         var simulationsResponse = new ArrayList<SimulationHomeResponse>();
-        simulations.stream().forEach(simulation -> simulationsResponse.add(new SimulationHomeResponse(simulation)));
+        simulations.forEach(simulation -> simulationsResponse.add(new SimulationHomeResponse(simulation)));
         return new ResponseEntity<>(simulationsResponse, HttpStatus.OK);
     }
 

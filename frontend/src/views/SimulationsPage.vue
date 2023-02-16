@@ -25,7 +25,7 @@
     </v-container>
     <v-container class="bg-light-green-accent-1">
         <h2>Terminé</h2>
-        <div v-if="simulationsInLoad.length == 0">
+        <div v-if="simulations.length == 0">
             <v-alert type="info" title="Info"
                 text="Aucune simulation"></v-alert>
         </div>
@@ -104,7 +104,7 @@ export default {
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(element => {
-                        var elt = { id: element['id'], title: element['title'], date: this.getFormatDate(element['beginDate']) };
+                        let elt = { id: element['id'], title: element['title'], date: this.getFormatDate(element['beginDate']) };
                         if (element['endDate'] === null)
                             this.simulationsInLoad.push(elt)
                         else
@@ -117,7 +117,7 @@ export default {
             this.$router.push({ name: 'simulation', params: { id: id } });
         },
         getFormatDate(date) {
-            var d = new Date(date);
+            let d = new Date(date);
             const year = d.getFullYear();
             const month = d.getMonth() + 1;
             const day = d.getDate();
@@ -138,6 +138,7 @@ export default {
                 .then(data => {
                     if (data === true) {
                         this.toast.success(`Suppression de la simulation réussi`)
+                        this.simulations=[]
                         this.getSimuations()
                     } else {
                         this.toast.error(`Suppression de la simulation pas réussi`)

@@ -6,7 +6,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
     {
         path: '/',
-        name: "map",
+        name: "home",
         component: () => import('@/views/SimulationsPage.vue'),
         meta: { requiresAuth: true, layout: 'content' }
     },

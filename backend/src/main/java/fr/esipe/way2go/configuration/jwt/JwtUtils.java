@@ -1,6 +1,7 @@
 package fr.esipe.way2go.configuration.jwt;
 
-import fr.esipe.way2go.configuration.services.UserDetailsImpl;
+import fr.esipe.way2go.configuration.services
+        .UserDetailsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

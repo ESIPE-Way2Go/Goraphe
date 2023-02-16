@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(
@@ -42,7 +45,7 @@ class SimulationServiceImplTest {
     }
     @Test
     void saveSimulation() {
-        var simulation = new SimulationEntity("simulationTest", user, "Description de la simulation de test", "default");
+        var simulation = new SimulationEntity("simulationTest", user, "Description de la simulation de test", "default",new ArrayList<>());
         var simulationSave = simulationService.save(simulation);
         System.out.println(simulationSave);
         assertEquals(simulation, simulationSave);
