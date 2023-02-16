@@ -8,7 +8,13 @@ const routes = [
         path: '/',
         name: "home",
         component: () => import('@/views/SimulationsPage.vue'),
-        meta: { requiresAuth: true, layout: 'content' }
+        meta: { requiresAuth: false, layout: 'content' }
+    },
+    {
+        path: '/map',
+        name: "map",
+        component: () => import('@/views/TestSearch.vue'),
+        meta: { requiresAuth: false, layout: 'content' }
     },
     {
         path: '/login',
@@ -20,7 +26,7 @@ const routes = [
         path: '/simulation/:id',
         name: "simulation",
         component: () => import('@/views/SimulationPage.vue'),
-        meta: { requiresAuth: true, layout: 'content' }
+        meta: { requiresAuth: false, layout: 'content' }
     },
     {
         path: '/:pathMatch(.*)*',
