@@ -2,6 +2,7 @@ package fr.esipe.way2go.dao;
 
 import fr.esipe.way2go.dao.converter.CalendarConverter;
 import fr.esipe.way2go.dao.converter.StringListConverter;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -18,10 +19,10 @@ public class SimulationEntity {
     private String name;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @Column(name = "graph", nullable = false,  length = 100000)
+    @Column(name = "graph", nullable = false, length = 100000)
     private String graph;
 
     @Column(name = "description", nullable = false)
@@ -59,9 +60,10 @@ public class SimulationEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "simulation")
     private List<LogEntity> logs;
 
-    public SimulationEntity() {}
+    public SimulationEntity() {
+    }
 
-    public SimulationEntity(String name, UserEntity user, String description, String computingScript) {
+    public SimulationEntity(String name, UserEntity user, String description, String computingScript, List<String> roadTypes) {
         this.name = name;
         this.user = user;
         this.graph = "graph";
@@ -69,15 +71,12 @@ public class SimulationEntity {
         this.computingScript = computingScript;
         this.generationDistance = 5.2;
         this.randomPoints = "randomPoints";
-        this.roadType = new ArrayList<>();
-        roadType.add("motorway");
-        roadType.add("autoroutes");
+        this.roadType = roadTypes;
         this.logPath = "logPath";
         Random rand = new Random();
         int randomNumber = rand.nextInt(100000) + 1;
         this.shareLink = String.valueOf(randomNumber);
         this.statistics = "statistics";
-        this.logs = new ArrayList<>();
     }
 
     /**

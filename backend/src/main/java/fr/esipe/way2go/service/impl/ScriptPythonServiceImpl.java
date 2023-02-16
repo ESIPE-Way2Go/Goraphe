@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 @Service
@@ -38,7 +37,6 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
     public void executeScript(UserEntity user, SimulationEntity simulation, MapController.Point coords, int dist, String desc) {
         var sep=System.getProperty("file.separator");
         var pathGeneric = System.getProperty("user.dir") + sep+ "scripts" + sep;
-        var path = pathGeneric  + "test.py";
         var pathLog = pathGeneric + user.getUsername() + sep + simulation.getName() + "_1.log";
 
         var builder = new ProcessBuilder("python3", pathGeneric+"test.py",
@@ -47,53 +45,17 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
                 "--user", user.getUsername(),
                 "--sim", simulation.getName(),
                 "--desc", desc);
-        System.out.println(pathGeneric);
 
 
         try {
             var process = builder.start();
-            var error = new String(process.getErrorStream().readAllBytes());
-            System.out.println("error: " + error);
-            var res = new String(process.getInputStream().readAllBytes());
-            int exitCode = process.waitFor();
-            var content = readFile(Path.of(pathLog).toString());
-
-            var listLog = new ArrayList<LogEntity>();
-            listLog.add(new LogEntity(simulation, content,"STARTED","test.py"));
-            simulation.setLogs(listLog);
-            logService.createLog(listLog.get(0));
-        } catch (IOException e) {
-            throw new RuntimeException();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void main(String[] args) {
-        var dist = 100;
-        var coords ="48.8397252449997,2.5860595253148726";
-        var pathGeneric = System.getProperty("user.dir") + System.getProperty("file.separator")+ "scripts" + System.getProperty("file.separator");
-        var path = pathGeneric  + "test.py";
-        var pathLog = pathGeneric + "admin" + System.getProperty("file.separator") + "test" + "_1.log";
-
-        var builder = new ProcessBuilder("python3", pathGeneric+"test.py",
-                "--dist", Integer.toString(dist),
-                "--coords", coords,
-                "--user", "admin",
-                "--sim", "test",
-                "--desc", "hahaha");
-        try {
-            var process = builder.start();
-            var error = new String(process.getErrorStream().readAllBytes());
-            System.out.println("error: " + error);
-            var logEntity = logService.createLog(new LogEntity(simulation, nameScript));
-            var res = new String(process.getInputStream().readAllBytes());
+            var logEntity = logService.save(new LogEntity(simulation, "test.py"));
             int exitCode = process.waitFor();
             var content = readFile(Path.of(pathLog).toString());
             var status = exitCode == 0 ? "SUCCESS" : "ERROR";
             logEntity.setContent(content);
             logEntity.setStatus(status);
-            logService.createLog(logEntity);
+            logService.save(logEntity);
             simulation.setEndDate(Calendar.getInstance());
             simulationService.save(simulation);
         } catch (IOException e) {

@@ -55,7 +55,7 @@ export default {
     handleLogin(){
         this.$store.dispatch("auth/login", this.form).then((response) => {
               if(response.email) {
-                this.$router.push({name: 'map'});
+                this.$router.push({name: 'home'});
                 return;
               }
               this.toast.error(response.message)
