@@ -3,7 +3,7 @@ DROP DATABASE IF EXISTS goraphe;
   -- Name: goraphe; Type: DATABASE; Schema: -; Owner: postgres
   --
 
-  CREATE DATABASE goraphe WITH TEMPLATE = template0 ENCODING = 'UTF8';
+  CREATE DATABASE goraphe WITH TEMPLATE=template0 ENCODING = 'UTF8';
 
 
   ALTER DATABASE goraphe OWNER TO postgres;
@@ -48,3 +48,4 @@ ALTER TABLE ONLY public."user" ADD CONSTRAINT "User_pkey" PRIMARY KEY (user_id);
 
 INSERT INTO public."user"(username, password, email, role)
 VALUES ('admin', '{bcrypt}$2a$10$VCIeTiINf5oL9grYi/cnN.W7xssZjHgzDBK7F8oD14ndZUVifhjTK', 'admin@admin.fr', 'ROLE_ADMIN');
+

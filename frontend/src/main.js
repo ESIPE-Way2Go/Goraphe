@@ -22,13 +22,13 @@ const myCustomLightTheme = {
     colors: {
         background: '#FFFFFF',
         surface: '#FFFFFF',
-        primary: '#3f51b5',
-        secondary: '#607d8b',
-        accent: '#4caf50',
-        error: '#f44336',
-        warning: '#ff9800',
+        primary: '#2E90FA',
+        secondary: '#9E77ED',
+        accent: '#667085',
+        error: '#F04438',
+        warning: '#F79009',
         info: '#00bcd4',
-        success: '#8bc34a'
+        success: '#12B76A'
     }
 }
 

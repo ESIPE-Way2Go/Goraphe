@@ -1,7 +1,10 @@
 package fr.esipe.way2go.dao;
 
+import fr.esipe.way2go.dao.converter.CalendarConverter;
+import fr.esipe.way2go.dao.converter.StringListConverter;
+
 import javax.persistence.*;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "simulation", schema = "public", catalog = "goraphe")
@@ -15,11 +18,11 @@ public class SimulationEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @Column(name = "graph", nullable = false)
+    @Column(name = "graph", nullable = false, length = 100000)
     private String graph;
 
     @Column(name = "description", nullable = false)
@@ -33,12 +36,20 @@ public class SimulationEntity {
 
     @Column(name = "random_points", nullable = false)
     private String randomPoints;
-
     @Column(name = "road_type", nullable = false)
-    private String roadType;
+    @Convert(converter = StringListConverter.class)
+    private List<String> roadType;
 
     @Column(name = "log_path", nullable = false)
     private String logPath;
+
+    @Column(name = "begin_date")
+    @Convert(converter = CalendarConverter.class)
+    private Calendar beginDate;
+
+    @Column(name = "end_date")
+    @Convert(converter = CalendarConverter.class)
+    private Calendar endDate;
 
     @Column(name = "share_link", nullable = false, unique = true)
     private String shareLink;
@@ -46,9 +57,27 @@ public class SimulationEntity {
     @Column(name = "statistics", nullable = false)
     private String statistics;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "logs", nullable = false)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "simulation")
     private List<LogEntity> logs;
+
+    public SimulationEntity() {
+    }
+
+    public SimulationEntity(String name, UserEntity user, String description, String computingScript, List<String> roadTypes) {
+        this.name = name;
+        this.user = user;
+        this.graph = "graph";
+        this.description = description;
+        this.computingScript = computingScript;
+        this.generationDistance = 5.2;
+        this.randomPoints = "randomPoints";
+        this.roadType = roadTypes;
+        this.logPath = "logPath";
+        Random rand = new Random();
+        int randomNumber = rand.nextInt(100000) + 1;
+        this.shareLink = String.valueOf(randomNumber);
+        this.statistics = "statistics";
+    }
 
     /**
      * Returns this simulation's ID.
@@ -167,6 +196,14 @@ public class SimulationEntity {
         return generationDistance;
     }
 
+    public Calendar getBeginDate() {
+        return beginDate;
+    }
+
+    public Calendar getEndDate() {
+        return endDate;
+    }
+
     /**
      * Sets a new generation distance for this simulation.
      *
@@ -199,7 +236,7 @@ public class SimulationEntity {
      *
      * @return roadType This simulation's road type. (String)
      */
-    public String getRoadType() {
+    public List<String> getRoadType() {
         return roadType;
     }
 
@@ -208,7 +245,7 @@ public class SimulationEntity {
      *
      * @param roadType This simulation's new road type. (String)
      */
-    public void setRoadType(String roadType) {
+    public void setRoadType(List<String> roadType) {
         this.roadType = roadType;
     }
 
@@ -282,5 +319,34 @@ public class SimulationEntity {
      */
     public void setLogs(List<LogEntity> logs) {
         this.logs = logs;
+    }
+
+    public void setBeginDate(Calendar beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    public void setEndDate(Calendar endDate) {
+        this.endDate = endDate;
+    }
+
+    @Override
+    public String toString() {
+        return "SimulationEntity{" +
+                "simulationId=" + simulationId +
+                ", name='" + name + '\'' +
+                ", user=" + user +
+                ", graph='" + graph + '\'' +
+                ", description='" + description + '\'' +
+                ", computingScript='" + computingScript + '\'' +
+                ", generationDistance=" + generationDistance +
+                ", randomPoints='" + randomPoints + '\'' +
+                ", roadType=" + roadType +
+                ", logPath='" + logPath + '\'' +
+                ", beginDate=" + beginDate +
+                ", endDate=" + endDate +
+                ", shareLink='" + shareLink + '\'' +
+                ", statistics='" + statistics + '\'' +
+                ", logs=" + logs +
+                '}';
     }
 }
