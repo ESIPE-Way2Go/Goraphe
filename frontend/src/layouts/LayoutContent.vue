@@ -1,6 +1,7 @@
 <template>
   <v-app :theme="myCustomLightTheme">
     <v-app-bar>
+
       <v-btn v-if="user.role === 'ROLE_ADMIN' || user.role === 'ROLE_USER'" class="mx-2 rounded-pill" @click="home">
         <v-img :src="Goraphe" cover width="45"></v-img>
       </v-btn>
@@ -28,8 +29,8 @@
       ></v-btn>
       <v-btn v-if="user.role === 'ROLE_ADMIN' || user.role === 'ROLE_USER'" class="mx-2 rounded-circle"
              icon="mdi-logout-variant" @click="logOut"></v-btn>
-    </v-app-bar>
 
+    </v-app-bar>
     <v-main>
       <slot></slot>
     </v-main>
@@ -79,6 +80,7 @@ export default {
           return "Utilisateur"
         default :
           return "Invité"
+
       }
     }
   },
@@ -92,4 +94,4 @@ export default {
     }
   },
 }
-</script>
+
