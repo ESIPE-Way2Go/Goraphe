@@ -46,8 +46,11 @@ export default {
       name: "",
       desc: "",
       map: null,
-      waypoints: []
-
+      waypoints: [],
+      roadTypes: ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'residential', 'service'],
+      selectedRoadTypes: [],
+      dist : 100,
+      script: "",
     };
   },
   mounted() {
@@ -91,8 +94,8 @@ export default {
       }
       try {
         let coordinates = this.waypoints.map(coord => new Point(coord[0], coord[1]));
-        const name = this.$data.name;
-        const desc = this.$data.desc;
+        let name = this.$data.name;
+        let desc = this.$data.desc;
         let start = coordinates.pop();
         let startX = start.x;
         let startY = start.y;
@@ -100,8 +103,10 @@ export default {
         let end = coordinates.pop();
         let endX = end.x;
         let endY = end.y;
-        const distance = 100;
-        let body = JSON.stringify({startX, startY, endX, endY, distance, name,desc});
+        let distance = 100;
+        let roadTypes = this.$data.selectedRoadTypes;
+        let script=this.$data.script;
+        let body = JSON.stringify({startX, startY, endX, endY, distance, name,desc,roadTypes,script});
         const response = await fetch('/api/simulation', {
           method: 'POST',
           headers: authHeader(),

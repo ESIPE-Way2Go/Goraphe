@@ -18,10 +18,12 @@ const routes = [
         component: () => import('@/views/LoginPage.vue'),
         meta: {requiresAuth: false, layout: 'blank'}
     },
-    {   path: '/map',
+    {
+        path: '/map',
         name: "map",
         component: () => import('@/views/TestSearch.vue'),
         meta: {requiresAuth: true, layout: 'content'}
+    },
     {
         path: '/simulation/:id',
         name: "simulation",

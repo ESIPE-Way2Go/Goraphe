@@ -1,5 +1,7 @@
 package fr.esipe.way2go.dto.simulation.request;
 
+import java.util.List;
+
 public class SimulationRequest {
 
     String name;
@@ -9,6 +11,9 @@ public class SimulationRequest {
     double endY;
     int distance;
     String desc;
+    String script;
+    List<String> roadTypes;
+
 
     public int getDistance() {
         return distance;

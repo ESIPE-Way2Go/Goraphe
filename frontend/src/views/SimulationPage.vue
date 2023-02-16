@@ -58,7 +58,7 @@
               <template v-slot:title>
                 <div class="mr-2">
                   <v-icon icon="mdi-check" class="bg-green" v-if="log.status === 'SUCCESS'"></v-icon>
-                  <v-icon icon="mdi-close" class="bg-red" v-if="log.status === 'ERROR'"></v-icon>
+                  <v-icon icon="mdi-close" class="bg-red" v-else-if="log.status === 'ERROR'"></v-icon>
                   <v-icon icon="mdi-check" class="bg-green" v-else></v-icon>
                 </div>
                 <div>{{ log.script }}</div>
