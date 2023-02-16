@@ -17,4 +17,8 @@ public interface SimulationService {
 
 
     List<SimulationEntity> getSimulationsOfUser(UserEntity userEntity);
+
+    void deleteSimulation(SimulationEntity simulation);
+
+
 }

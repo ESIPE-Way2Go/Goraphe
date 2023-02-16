@@ -33,4 +33,11 @@ public class SimulationServiceImpl implements SimulationService {
     public List<SimulationEntity> getSimulationsOfUser(UserEntity userEntity) {
         return simulationRepository.getSimulationFromUser(userEntity);
     }
+
+    @Override
+    public void deleteSimulation(SimulationEntity simulation) {
+        simulationRepository.delete(simulation);
+    }
+
+
 }

@@ -121,4 +121,23 @@ public class SimulationController {
         simulations.stream().forEach(simulation -> simulationsResponse.add(new SimulationHomeResponse(simulation)));
         return new ResponseEntity<>(simulationsResponse, HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Boolean> deleteSimulation(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
+        var simulationEntityOptional = simulationService.find(id);
+        if (simulationEntityOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        var simulation = simulationEntityOptional.get();
+        var userEntityOptional = userService.getUser(jwtUtils.getUsersFromHeaders(headers));
+        if (userEntityOptional.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        var user = userEntityOptional.get();
+        if (!simulation.getUser().equals(user)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        simulationService.deleteSimulation(simulation);
+        return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
 }
