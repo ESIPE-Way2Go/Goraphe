@@ -5,7 +5,8 @@
         <div class="flex-column">
           <h2 class="ma-2 pa-1">Status</h2>
           <v-sheet class="ma-2 pa-1 px-10 rounded-pill"
-            :style="{ 'backgroundColor': status === 'ERROR' ? '#F04438' : 'green' }">{{ status }}</v-sheet>
+                   :style="{ 'backgroundColor': status === 'ERROR' ? '#F04438' : 'green' }">{{ status }}
+          </v-sheet>
         </div>
         <div class="flex-column">
           <h2 class="ma-2 pa-1">Duration</h2>
@@ -33,7 +34,7 @@
     </v-card>
 
     <v-progress-linear :model-value=progession color="light-blue" height="20" :striped='progession != 100'
-      class="mb-10">
+                       class="mb-10">
       <template v-slot:default="{ value }">
         <strong>{{ Math.ceil(value) }}%</strong>
       </template>
@@ -58,7 +59,7 @@
               <template v-slot:title>
                 <div class="mr-2">
                   <v-icon icon="mdi-check" class="bg-green" v-if="log.status === 'SUCCESS'"></v-icon>
-                  <v-icon icon="mdi-close" class="bg-red" v-if="log.status === 'ERROR'"></v-icon>
+                  <v-icon icon="mdi-close" class="bg-red" v-else-if="log.status === 'ERROR'"></v-icon>
                   <v-icon icon="mdi-check" class="bg-green" v-else></v-icon>
                 </div>
                 <div>{{ log.script }}</div>
@@ -93,7 +94,8 @@ export default {
       roads: [],
       logs: [],
       progession: 0,
-      id: this.$route.params.id
+      id: this.$route.params.id,
+      intervalIds: [], // array to hold interval IDs
     }
   },
 
@@ -109,37 +111,37 @@ export default {
         method: "GET",
         headers: authHeader(),
       })
-        .then(response => response.json())
-        .then(data => {
-          this.name = data['name']
-          this.description = data['description']
-          this.computingScript = data['computingScript']
-          this.roads = data['roads']
-          this.distance = data['distance']
-          this.getDuration(data)
-          this.allLog = []
-          this.logs = []
-          data['logResponses'].forEach(elt => {
-            this.logs.push({ script: elt['scriptName'], status: elt['status'], content: elt['content'] })
-            this.allLog.push(elt['scriptName'])
-            this.status = elt['status']
+          .then(response => response.json())
+          .then(data => {
+            this.name = data['name']
+            this.description = data['description']
+            this.computingScript = data['computingScript']
+            this.roads = data['roads']
+            this.distance = data['distance']
+            this.getDuration(data)
+            this.allLog = []
+            this.logs = []
+            data['logResponses'].forEach(elt => {
+              this.logs.push({script: elt['scriptName'], status: elt['status'], content: elt['content']})
+              this.allLog.push(elt['scriptName'])
+              this.status = elt['status']
+            });
+            if (this.logs !== []) {
+              this.progession = this.logs.length / 3 * 100
+            }
           });
-          if (this.logs !== []) {
-            this.progession = this.logs.length / 3 * 100
-          }
-        });
     },
     getDuration(data) {
-      if (data['beginDate'] === null) {      
+      if (data['beginDate'] === null) {
         return;
       }
       var endDate = data['endDate']
       var duration = 0
       if (endDate === null) {
         duration = Date.now() - new Date(data['beginDate'])
-      }
-      else {
+      } else {
         duration = new Date(data['endDate']) - new Date(data['beginDate'])
+        this.intervalIds.forEach((id) => clearInterval(id));
       }
       // Result in minutes
       this.duration = this.secondsToTimeString(duration)
@@ -161,8 +163,12 @@ export default {
     }
   },
   mounted() {
-      this.getLogs()
-      setInterval(this.getLogs, 1000)
-    }
-  }
+    this.getLogs()
+    this.intervalIds.push(setInterval(this.getLogs, 1000));
+  },
+  beforeUnmount() {
+    // clear all intervals before unmounting the component
+    this.intervalIds.forEach((id) => clearInterval(id));
+  },
+}
 </script>
