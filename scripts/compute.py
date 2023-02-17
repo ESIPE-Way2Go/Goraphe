@@ -5,27 +5,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import math
 import time
-import argparse
 import openpyxl
-
+import random_nodes
 
 def compute(graph_proj, nodes_proj, edges_proj):
-    random_nodes = [4805558775, 2411236822, 2411236813, 10004464578, 250836394, 4805558771]
-    #random_nodes = [289455025, 988941419, 2093962711, 3717146176, 4448101620, 4561569022]
-    # colour and size list to plot random nodes on the network graph
-    # nc = ['b' if osmid in random_nodes
-    #       else 'grey' for osmid in graph_proj.nodes()]
-    #
-    # ns = [100 if osmid in random_nodes
-    #       else 1 for osmid in graph_proj.nodes()]
 
-    # fig, ax = ox.plot_graph(graph_proj,figsize=(30,30), bgcolor='w',
-    #                       show=False, save=True, close=True,
-    #                      filepath=r"C:\Users\silvi\Desktop\PostDoc_PANOPTIS\Complex Network_RI\new_script\Set_37\images\Graph_random_nodes.png",
-    #                     dpi=300, node_color=nc, node_edgecolor='grey',
-    #                    node_size=ns, node_zorder=3)
-
-    #########################################
+    rand_nodes = random_nodes.random_nodes();
 
     time_start = time.perf_counter()
 
@@ -49,14 +34,14 @@ def compute(graph_proj, nodes_proj, edges_proj):
     def edge_to_str(item):
         return str(item[0]) + "_" + str(item[1]) + "_" + str(item[2])
 
-    for origin in random_nodes:
+    for origin in rand_nodes:
 
         routes_traveltimes[origin] = dict([])
         timetravel_shortest_paths[origin] = dict([])
         length_SPtraveltime_paths[origin] = dict([])
         essential_mw_edges[origin] = dict([])
 
-        for destination in random_nodes:
+        for destination in rand_nodes:
 
             # Calculate the shortest path
             #TODO
@@ -101,8 +86,9 @@ def compute(graph_proj, nodes_proj, edges_proj):
             #
             indMW = []
             for k, v in roads_traveltimesSP.items():
-                print(k, v)
+                #print(k, v[0]['highway'])
                 if v[0]['highway'] == 'motorway':
+                    #print("motorway!")
                     indMW.append(k)
 
             for k in indMW:
@@ -198,8 +184,8 @@ def compute(graph_proj, nodes_proj, edges_proj):
             edge_name = edge_to_str(edge)
 
             # if (edge in impactful_mw_edges):
-            for origin in random_nodes:
-                for destination in random_nodes:
+            for origin in rand_nodes:
+                for destination in rand_nodes:
                     if (origin in essential_mw_edges and destination in essential_mw_edges[origin] and edge in
                             essential_mw_edges[origin][destination]):
                         nbp += 1
@@ -226,11 +212,11 @@ def compute(graph_proj, nodes_proj, edges_proj):
             results[edge_name]["traveltimes ratio (ref)"] = ref_ratio_traveltimes
             results[edge_name]["evi_local"] = evi_local
             results[edge_name]["evi_average_nip"] = evi_average_nip
-
+        print("\nResults : \n"+str(results))
         # transform results dicionary in dataframes to save as xlsx file
-        #TODO
-        #df_Results = pd.DataFrame.from_dict(results, orient='columns')
-        df_Results = pd.DataFrame.from_dict(results, orient='index')
+        #TODO add return of graph and indices de résilience then see if we want to export excel using python or java
+        df_Results = pd.DataFrame.from_dict(results, orient='columns')
+        #df_Results = pd.DataFrame.from_dict(results, orient='index')
         df_Results.to_excel("Set_extremenodes_EVIs_test1.xlsx")
 
         df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
