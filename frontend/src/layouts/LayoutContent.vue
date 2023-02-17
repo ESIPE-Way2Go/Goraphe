@@ -18,7 +18,7 @@
       </v-btn>
       <v-col class="mx-2" cols=auto>
         <v-row class="font-weight-bold v-row--dense justify-center">{{ user.username }}</v-row>
-        <v-row class="v-row--dense justify-center">{{ showUserRole() }}</v-row>
+        <v-row class="v-row--dense justify-center">{{ showUserRole(user.role) }}</v-row>
       </v-col>
       <v-btn
           :icon="theme.global.name.value === 'myCustomLightTheme' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
