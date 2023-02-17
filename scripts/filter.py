@@ -251,7 +251,7 @@ nx.set_edge_attributes(g, fixedmaxspeed, 'fixedmaxspeed')
 nx.set_edge_attributes(g, traveltimes, 'traveltimes')
 
 # highlighted_roads = []
-
+#
 # Create a new column "highlight" in the edges GeoDataFrame
 # edges['highlight'] = edges['osmid'].isin(highlighted_roads)
 
