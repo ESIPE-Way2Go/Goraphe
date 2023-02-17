@@ -6,22 +6,40 @@ import { createRouter, createWebHistory } from 'vue-router'
 // Each route should map to a component.
 // We'll talk about nested routes later.
 const routes = [
-
-    {   path: '/login',
+    {
+        path: '/',
+        name: "home",
+        component: () => import('@/views/SimulationsPage.vue'),
+        meta: { requiresAuth: true, layout: 'content' }
+    },
+    {
+        path: '/map',
+        name: "map",
+        component: () => import('@/views/TestSearch.vue'),
+        meta: { requiresAuth: true, layout: 'content' }
+    },
+    {
+        path: '/login',
         name: "login",
         component: () => import('@/views/LoginPage.vue'),
         meta: {requiresAuth: false, layout: 'blank'}
     },
-    {   path: '/',
+    {
+        path: '/map',
         name: "map",
         component: () => import('@/views/TestSearch.vue'),
         meta: {requiresAuth: true, layout: 'content'}
     },
-
+    {
+        path: '/simulation/:id',
+        name: "simulation",
+        component: () => import('@/views/SimulationPage.vue'),
+        meta: { requiresAuth: true, layout: 'content' }
+    },
     {   path: '/:pathMatch(.*)*',
         name: "error-404",
         component: () => import('@/views/Error404.vue'),
-        meta: {requiresAuth: false, layout: 'blank'}
+        meta: { requiresAuth: false, layout: 'blank' }
     },
 ]
 
@@ -34,22 +52,22 @@ const router = createRouter({
     routes, // short for `routes: routes`
 })
 
-router.beforeEach((to,from,next)=>{
+router.beforeEach((to, from, next) => {
 
     const loggedIn = localStorage.getItem('user');
-    const isLogged = loggedIn !==null;
-    if(!to.meta.requiresAuth){
+    const isLogged = loggedIn !== null;
+    if (!to.meta.requiresAuth) {
         next();
         //nedd to be logged
-    } else if(!isLogged){
-        next({name: "login"});
-    //token expire
-    }else if(parseJwt(JSON.parse(loggedIn).accessToken).exp< Date.now()/1000) {
+    } else if (!isLogged) {
+        next({ name: "login" });
+        //token expire
+    } else if (parseJwt(JSON.parse(loggedIn).accessToken).exp < Date.now() / 1000) {
         localStorage.removeItem('user');
-        next({name: "login"})
-    } else if(to.name ==="login"){
-            next({name: from.name})
-    }else{
+        next({ name: "login" })
+    } else if (to.name === "login") {
+        next({ name: from.name })
+    } else {
         next()
     }
 })

@@ -1,9 +1,11 @@
 package fr.esipe.way2go.configuration.jwt;
 
-import fr.esipe.way2go.configuration.services.UserDetailsImpl;
+import fr.esipe.way2go.configuration.services
+        .UserDetailsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +34,14 @@ public class JwtUtils {
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
+    }
+
+    public String getUsersFromHeaders(HttpHeaders headers) {
+        var bearer = headers.get("Authorization");
+        if (bearer == null)
+            return null;
+        var token = bearer.get(0).split(" ")[1];
+        return getUserNameFromJwtToken(token);
     }
 
     public String getUserNameFromJwtToken(String token) {
