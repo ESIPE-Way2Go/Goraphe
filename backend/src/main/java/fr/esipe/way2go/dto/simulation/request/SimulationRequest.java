@@ -1,5 +1,7 @@
 package fr.esipe.way2go.dto.simulation.request;
 
+import java.util.List;
+
 public class SimulationRequest {
 
     String name;
@@ -9,6 +11,9 @@ public class SimulationRequest {
     double endY;
     int distance;
     String desc;
+    String script;
+    List<String> roadTypes;
+
 
     public int getDistance() {
         return distance;
@@ -66,15 +71,34 @@ public class SimulationRequest {
         this.desc = desc;
     }
 
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
+    }
+
+    public List<String> getRoadTypes() {
+        return roadTypes;
+    }
+
+    public void setRoadTypes(List<String> roadTypes) {
+        this.roadTypes = roadTypes;
+    }
+
     @Override
     public String toString() {
-        return "DemoPayload{" +
-                "startX=" + startX +
+        return "SimulationRequest{" +
+                "name='" + name + '\'' +
+                ", startX=" + startX +
                 ", startY=" + startY +
                 ", endX=" + endX +
                 ", endY=" + endY +
                 ", distance=" + distance +
+                ", desc='" + desc + '\'' +
+                ", script='" + script + '\'' +
+                ", roadTypes=" + roadTypes +
                 '}';
     }
-
 }
