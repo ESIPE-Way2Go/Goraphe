@@ -18,6 +18,11 @@ public class UserServicesImpl implements UserService {
     }
 
     @Override
+    public Optional<UserEntity> getUserById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
     public Optional<UserEntity> getUser(String userId) {
         return userRepository.findByUsername(userId);
     }
@@ -25,5 +30,10 @@ public class UserServicesImpl implements UserService {
     @Override
     public UserEntity saveUser(UserEntity user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public Optional<UserEntity> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

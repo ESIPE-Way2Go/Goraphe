@@ -1,7 +1,11 @@
 package fr.esipe.way2go.dao;
 
+import fr.esipe.way2go.dao.converter.CalendarConverter;
+import org.apache.catalina.User;
+
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.Calendar;
 
 @Entity
 @Table(name = "invite", schema = "public", catalog = "goraphe")
@@ -16,20 +20,34 @@ public class InviteEntity {
     @JoinColumn(name="user_id", nullable = false)
     private UserEntity user;
 
-    @Column(name = "target_email", nullable = false)
+    @Column(name = "target_email")
     private String targetEmail;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     private String status;
 
-    @Column(name = "first_mail_sent", nullable = false)
-    private Date firstMailSent;
+    @Column(name = "first_mail_sent")
+    @Convert(converter = CalendarConverter.class)
+    private Calendar firstMailSent;
 
-    @Column(name = "last_mail_sent", nullable = false)
+    @Column(name = "last_mail_sent")
     private Date lastMailSent;
 
     @Column(name = "mail_count", nullable = false)
-    private Integer mailCount ;
+    private Integer mailCount = 0;
+
+    @Column(name = "token", nullable = false)
+    private String token;
+
+    public InviteEntity() {
+    }
+
+    public InviteEntity(UserEntity userEntity, String token) {
+        this.user = userEntity;
+        this.token = token;
+        firstMailSent = Calendar.getInstance();
+        this.mailCount += 1;
+    }
 
     /**
      * Returns this invite's ID.
@@ -76,6 +94,14 @@ public class InviteEntity {
         return targetEmail;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     /**
      * Sets a new targeted email for this invite.
      *
@@ -108,7 +134,7 @@ public class InviteEntity {
      *
      * @return firstMailSent This invite's first mail sent date. (Date)
      */
-    public Date getFirstMailSent() {
+    public Calendar getFirstMailSent() {
         return firstMailSent;
     }
 
@@ -117,7 +143,7 @@ public class InviteEntity {
      *
      * @param firstMailSent The new date for this invite's first mail sent. (Date)
      */
-    public void setFirstMailSent(Date firstMailSent) {
+    public void setFirstMailSent(Calendar firstMailSent) {
         this.firstMailSent = firstMailSent;
     }
 

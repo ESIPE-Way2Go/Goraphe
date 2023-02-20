@@ -1,5 +1,7 @@
 package fr.esipe.way2go.exception;
 
+import fr.esipe.way2go.exception.user.UserNotFoundException;
+import fr.esipe.way2go.exception.user.UsernameExistAlreadyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -41,5 +43,12 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(UsernameExistAlreadyException.class)
+    public ResponseEntity<Object> handleUsernameAlreadyExists(UsernameExistAlreadyException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
 
 }

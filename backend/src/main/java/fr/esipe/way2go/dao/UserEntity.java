@@ -1,5 +1,7 @@
 package fr.esipe.way2go.dao;
 
+import fr.esipe.way2go.exception.UserEmailFound;
+import org.apache.catalina.User;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -15,10 +17,10 @@ public class UserEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(name = "username", unique = true)
     private String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -32,6 +34,11 @@ public class UserEntity {
     private List<SimulationEntity> simulations;
 
     public UserEntity() {
+    }
+
+    public UserEntity(String email, String role) {
+        this.email = email;
+        this.role = role;
     }
 
     public UserEntity(String username, String password, String email, String role) {
