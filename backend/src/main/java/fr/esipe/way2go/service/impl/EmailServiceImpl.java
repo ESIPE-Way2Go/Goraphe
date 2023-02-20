@@ -35,7 +35,7 @@ public class EmailServiceImpl implements EmailService {
                                 
                 Cordialement,
                 L'équipe Goraphe
-                """
+                """;
         mailSender.send(createEmail(email, subject, content));
     }
 
