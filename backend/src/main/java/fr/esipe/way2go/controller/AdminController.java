@@ -60,7 +60,7 @@ public class AdminController {
         );
 
         var saveInvite = inviteService.save(inviteEntity);
-        emailSenderService.sendInvitation(request, email, saveInvite);
+        emailSenderService.sendInvitation(email, saveInvite);
     }
 
 
@@ -92,7 +92,7 @@ public class AdminController {
 
         var userSave = userService.getUserByEmail(userRequest.getEmail());
         if (userSave.isEmpty())
-            throw new UserNotFoundException((long) 0);
+            throw new UserNotFoundException();
         var userGet = userSave.get();
 
         var passwordEncoder = webSecurityConfiguration.passwordEncoder();
@@ -102,6 +102,17 @@ public class AdminController {
         userService.saveUser(userGet);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PermitAll
+    @PostMapping("/forgetPassword/{email}")
+    public void sendForgotPassword(@PathVariable String email) {
+        var userOptional = userService.getUserByEmail(email);
+        if (userOptional.isEmpty())
+            throw new UserNotFoundException();
+        var user = userOptional.get();
+
+
     }
 
     @PermitAll

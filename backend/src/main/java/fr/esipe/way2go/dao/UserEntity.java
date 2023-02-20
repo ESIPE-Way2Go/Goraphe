@@ -29,6 +29,9 @@ public class UserEntity {
     @Column(name = "role", nullable = false)
     private String role;
 
+    @Column(name = "token", unique = true)
+    private String token;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private List<SimulationEntity> simulations;
@@ -93,6 +96,10 @@ public class UserEntity {
         return password;
     }
 
+    public String getToken() {
+        return token;
+    }
+
     /**
      * Sets a new password for this user.
      *
@@ -154,6 +161,10 @@ public class UserEntity {
      */
     public void setSimulation(List<SimulationEntity> simulations) {
         this.simulations = simulations;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     @Override
