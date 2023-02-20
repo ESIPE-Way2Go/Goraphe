@@ -2,6 +2,7 @@ package fr.esipe.way2go.service;
 
 import fr.esipe.way2go.dao.UserEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
@@ -9,4 +10,6 @@ public interface UserService {
     Optional<UserEntity> getUser(String username);
     Optional<UserEntity> getUserByEmail(String email);
     UserEntity saveUser(UserEntity user);
+    List<UserEntity> getAllUsers();
+    void deleteUser(UserEntity e);
 }

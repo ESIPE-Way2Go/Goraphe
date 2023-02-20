@@ -6,6 +6,7 @@ import fr.esipe.way2go.dao.InviteEntity;
 import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.dto.admin.UserBeforeInvitationRequest;
 import fr.esipe.way2go.dto.user.request.UserRequest;
+import fr.esipe.way2go.dto.user.response.UserInfo;
 import fr.esipe.way2go.dto.user.response.UserResponse;
 import fr.esipe.way2go.exception.EmailFormatWrongException;
 import fr.esipe.way2go.exception.UserEmailFound;
@@ -16,6 +17,7 @@ import fr.esipe.way2go.service.EmailService;
 import fr.esipe.way2go.service.InviteService;
 import fr.esipe.way2go.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -38,7 +41,7 @@ public class AdminController {
     private WebSecurityConfiguration webSecurityConfiguration;
 
     @Autowired
-    public AdminController(EmailService emailSenderService, UserService userService, InviteService inviteService, WebSecurityConfiguration webSecurityConfiguration) {
+    public AdminController(@Qualifier("emailService") EmailService emailSenderService, UserService userService, InviteService inviteService, WebSecurityConfiguration webSecurityConfiguration) {
         this.emailSenderService = emailSenderService;
         this.userService = userService;
         this.inviteService = inviteService;
@@ -145,6 +148,14 @@ public class AdminController {
         //emailSenderService.sendInvitation();
        //*/
         return "Email Sent!";
+    }
+
+    @PermitAll
+    @GetMapping("/getAllUsers")
+    public ResponseEntity<List<UserInfo>> checkAccount() {
+//        userService.
+//        return new ResponseEntity<>(new UserResponse(user.getEmail()), HttpStatus.OK);
+        return null;
     }
 
 }

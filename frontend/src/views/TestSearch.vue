@@ -1,24 +1,46 @@
 <template>
-  <div id="map" class="map"></div>
-  <div>
-    <v-text-field v-model="name" label="Name"></v-text-field>
-    <v-text-field v-model="desc" label="Description"></v-text-field>
-    <button @click="makePostRequest()"> SEND</button>
-  </div>
+  <v-container fluid>
+    <v-row>
+      <v-col cols="10">
+        <div id="map" class="map"></div>
+      </v-col>
+      <v-col cols="2">
+        <v-form @submit.prevent="makePostRequest">
+          <v-text-field v-model="name" label="Name"></v-text-field>
+          <v-text-field v-model="desc" label="Description"></v-text-field>
+          <v-text-field v-model.number="dist" label="Distance" type="number" min="100" max="10000" step="10"></v-text-field>
+          <v-select
+              chips
+              label="Select road types"
+              :items=roadTypes
+              v-model="selectedRoadTypes"
+              multiple
+          ></v-select>
+          <v-btn @click="uncheckRoadTypes" color="accent">Uncheck</v-btn>
+          <v-text-field v-model="script" label="Computing Script"></v-text-field>
+          <v-btn type="submit" color="primary">SEND</v-btn>
+        </v-form>
+      </v-col>
+    </v-row>
+  </v-container>
+
 </template>
 <script>
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 import authHeader from "@/services/auth-header";
 import {useTheme} from "vuetify";
+import {useToast} from "vue-toastification";
 
 
 export default {
   setup() {
     const theme = useTheme();
+    const toast = useToast();
     return {
       theme,
       toggleTheme: () => theme.global.name.value = theme.global.current.value.dark ? 'myCustomLightTheme' : 'dark',
+      toast
     }
   },
 
@@ -28,7 +50,11 @@ export default {
       name: "",
       desc: "",
       map: null,
-      waypoints: []
+      waypoints: [],
+      roadTypes: ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'residential', 'service'],
+      selectedRoadTypes: ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'residential', 'service'],
+      dist : 100,
+      script: "",
     };
   },
   mounted() {
@@ -60,21 +86,28 @@ export default {
     }).addTo(map);
     control.on('routesfound', (e) => {
       this.waypoints = e.waypoints.map(w => [w.latLng.lat, w.latLng.lng]);
+      console.log(e.routes[0]);
     });
   },
   methods: {
+    uncheckRoadTypes() {
+      this.selectedRoadTypes = [];
+    },
     async makePostRequest() {
+      if (!this.name) {
+        this.toast.error("Simulation name cannot be empty");
+        return;
+      }
       class Point {
         constructor(x, y) {
           this.x = x;
           this.y = y;
         }
       }
-
       try {
         let coordinates = this.waypoints.map(coord => new Point(coord[0], coord[1]));
-        const name = this.$data.name;
-        const desc = this.$data.desc;
+        let name = this.$data.name;
+        let desc = this.$data.desc;
         let start = coordinates.pop();
         let startX = start.x;
         let startY = start.y;
@@ -82,8 +115,10 @@ export default {
         let end = coordinates.pop();
         let endX = end.x;
         let endY = end.y;
-        const distance = 100;
-        let body = JSON.stringify({startX, startY, endX, endY, distance, name,desc});
+        let distance = 100;
+        let roadTypes = this.$data.selectedRoadTypes;
+        let script=this.$data.script;
+        let body = JSON.stringify({startX, startY, endX, endY, distance, name,desc,roadTypes,script});
         const response = await fetch('/api/simulation', {
           method: 'POST',
           headers: authHeader(),
@@ -107,9 +142,10 @@ export default {
 </script>
 
 <style>
-.map {
+#map {
+  position: relative;
+  height: 100vh;
   width: 100%;
-  height: 70%;
 }
 
 .leaflet-routing-container {
