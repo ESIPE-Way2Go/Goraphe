@@ -1,13 +1,12 @@
 import argparse
 import osmnx as ox
 import networkx as nx
-import matplotlib.pyplot as plt
 import random
-import heapq
 
 
 def random_nodes():
     # TEST DATA
+
     parser = argparse.ArgumentParser()
     # generation distance for the graph
     parser.add_argument("--dist", type=int, required=True)
@@ -30,56 +29,74 @@ def random_nodes():
     # nodes, edges = ox.graph_to_gdfs(G, nodes=True, edges=True)
     # print(nodes.to_json())
 
-    # define the number of the shortest paths to plot
-    n_shortest_paths = 20
+    # END TEST DATA
+
+    # define the number of random points at the start and at the end
+    n_shortest_paths = 10
     # define a list of colors to use for each path
+    # TO REMOVE
     colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF', '#800000', '#008000', '#000080',
               '#FFA500', '#808080', '#800080', '#008080', '#FFC0CB', '#00FF7F', '#7FFFD4', '#F5DEB3', '#D2691E',
               '#800000', '#2F4F4F', '#000000']
     # initialize a list to store the shortest paths
+    # TO REMOVE
     shortest_paths = []
 
+    # TO REMOVE
     x1 = 2.63797
+    # TO REMOVE
     y1 = 48.83106
+    # TO REMOVE
     x2 = 2.5508
+    # TO REMOVE
     y2 = 48.8364
-    dist = 0.0075
+
+    dist = 0.0125
+
     # Find the two nearest nodes to the first coordinate
+    # TO REMOVE
     source_chosen = ox.distance.nearest_nodes(G, x1, y1)
     # Find the two nearest nodes to the second coordinate
+    # TO REMOVE
     target_chosen = ox.distance.nearest_nodes(G, x2, y2)
     # add the shortest path for the 2 chosen nodes to the list
+    # TO REMOVE
     shortest_path = nx.shortest_path(G, source=source_chosen, target=target_chosen, weight='length')
     # add the shortest path to the list
+    # TO REMOVE
     shortest_paths.append(shortest_path)
 
     # add the shortest paths between the 10 nearest nodes of the first coordinate and the 10 nearest nodes of the
     # second coordinate
-    for i in range(n_shortest_paths):
-        dx1 = random.uniform(-dist, dist)
-        dy1 = random.uniform(-dist, dist)
-        dx2 = random.uniform(-dist, dist)
-        dy2 = random.uniform(-dist, dist)
-        print(dx1, " | ", dy1, " | ", dx2, " | ", dy2, " | ")
-        source_node = ox.distance.nearest_nodes(G, x1 + dx1, y1 + dy1)
-        target_node = ox.distance.nearest_nodes(G, x2 + dx2, y2 + dy2)
+    #for i in range(n_shortest_paths):
+        #dx1 = random.uniform(-dist, dist)
+        #dy1 = random.uniform(-dist, dist)
+        #dx2 = random.uniform(-dist, dist)
+        #dy2 = random.uniform(-dist, dist)
+        #source_node = ox.distance.nearest_nodes(G, x1 + dx1, y1 + dy1)
+        #target_node = ox.distance.nearest_nodes(G, x2 + dx2, y2 + dy2)
+        # TODO Add those points in an array so Vicent can use them
+
         # find the shortest path between the source and target nodes
-        shortest_path = nx.shortest_path(G, source=source_node, target=target_node, weight='length')
+        # TO REMOVE
+        #shortest_path = nx.shortest_path(G, source=source_node, target=target_node)
         # add the shortest path to the list
+        # TO REMOVE
+        #shortest_paths.append(shortest_path)
+
+    #FULL RANDOM (TO REMOVE)
+    # select two random nodes from the graph
+    nodes = list(G.nodes())
+    for i in range(n_shortest_paths):
+        source, target = random.sample(nodes, 2)
+        # find the shortest path between the source and target nodes
+        shortest_path = nx.shortest_path(G, source=source, target=target, weight='length')
         shortest_paths.append(shortest_path)
 
-    # Chose random nodes for the shortest path
-    # for i in range(n_shortest_paths):
-    # source, target = random.sample(nodes, 2)
-    # find the shortest path between the source and target nodes
-    # shortest_path = nx.shortest_path(G, source=source, target=target, weight='length')
-    # add the shortest path to the list
-    # shortest_paths.append(shortest_path)
-
     # plot the graph with all the shortest paths
-    fig, ax = ox.plot_graph_routes(G, shortest_paths, route_colors=colors[:n_shortest_paths + 1], node_size=0)
-    # show the plot
-    plt.show()
+    # TO REMOVE
+    ox.plot_graph_routes(G, shortest_paths, route_colors=colors[:n_shortest_paths + 1], node_size=0)
 
 
-random_nodes()
+for i in range(0, 5):
+    random_nodes()
