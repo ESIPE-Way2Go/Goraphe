@@ -1,6 +1,7 @@
 import sys
 
 import geopandas
+import numpy as np
 import requests
 import osmnx as ox
 import osmnet as oxnet
@@ -167,15 +168,19 @@ edges_proj_consistent=gpd.GeoDataFrame(columns=['osmid', 'oneway', 'highway', 'r
                                                 'geometry', 'junction', 'lanes', 'ref', 'bridge', 'name', 'service',
                                                 'area', 'width'], index=index)
 
+
+
 for index,entry in edges_proj.iterrows() :
     osmid = entry.get('osmid')
     if(isinstance(osmid,list)):
         for id in osmid :
             idsToRequest.append(id)
     else:
-        edges_proj_consistent = pd.concat([edges_proj_consistent, entry], ignore_index=True)
-        print(entry)
+        edges_proj_consistent.loc[(index[0], index[1], index[2])] = entry
+        #edges_proj_consistent = pd.concat([edges_proj_consistent, entry], ignore_index=True)
+
 nbSubList = len(idsToRequest)/100
+print(edges_proj_consistent)
 for i in range(int(nbSubList)+1):
     subList = idsToRequest[i*100:len(idsToRequest)] if i+1==nbSubList else idsToRequest[i*100:(i+1)*100]
     #query = "[out:json];(" + "".join(["way({});(._;>;);".format(osmid) for osmid in subList]) + ");out ids geom bb;"
@@ -234,7 +239,7 @@ for k in edges_proj_consistent.index:
     u = k[0]
     v = k[1]
     key = k[2]
-
+    edges_proj_consistent = edges_proj_consistent.fillna(value=np.nan)
     #print(edges_proj_consistent.at[k, 'osmid'])
     if math.isnan(float(edges_proj_consistent.at[k, 'maxspeed'])):
         #print(edges_proj_consistent.at[k, 'highway'])
@@ -251,7 +256,7 @@ nx.set_edge_attributes(g, fixedmaxspeed, 'fixedmaxspeed')
 nx.set_edge_attributes(g, traveltimes, 'traveltimes')
 
 # highlighted_roads = []
-#
+
 # Create a new column "highlight" in the edges GeoDataFrame
 # edges['highlight'] = edges['osmid'].isin(highlighted_roads)
 
