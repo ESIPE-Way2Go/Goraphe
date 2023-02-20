@@ -86,7 +86,7 @@ def way_to_row(way,edges_proj_consistent):
     panda_serie = pd.Series(data=data, index=['osmid', 'oneway', 'highway', 'reversed', 'length', 'maxspeed',
                                               'geometry', 'junction', 'lanes', 'ref', 'bridge', 'name', 'service',
                                               'area', 'width'])
-    print("Avant WARNING")
+    #print("Avant WARNING")
     #edges_proj_consistent = pd.concat([edges_proj_consistent, panda_serie], ignore_index=True)
     edges_proj_consistent.loc[(u,v,key)] = panda_serie
     return edges_proj_consistent
@@ -277,5 +277,6 @@ with open('highlighted_nodes.geojson', 'w') as f:
 
 time_elapsed = (time.perf_counter() - time_start)
 print("Filtering time : "+str(time_elapsed))
-#compute.compute(graph_proj=g,nodes_proj=nodes_proj,edges_proj=edges_proj_consistent)
+g_consistent = ox.graph_from_gdfs(nodes_proj, edges_proj_consistent)
+compute.compute(graph_proj=g,nodes_proj=nodes_proj,edges_proj=edges_proj_consistent)
 print("Total time : "+str((time.perf_counter() - time_start)))
