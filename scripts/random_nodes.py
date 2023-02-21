@@ -1,102 +1,37 @@
 import argparse
+
 import osmnx as ox
 import networkx as nx
 import random
 
 
-def random_nodes():
-    # TEST DATA
+def random_nodes(G, x1, y1, x2, y2):
+    # define the number of random points that will be used (this number will be around the first chosen node AND around
+    # the second chosen node ; so there will be random points equals to 2 times the number chosen below in total)
+    n_random_points = 10
+    # define a distance around each one of the 2 chosen nodes to create random points
+    distance = 0.0125
 
-    parser = argparse.ArgumentParser()
-    # generation distance for the graph
-    parser.add_argument("--dist", type=int, required=True)
-    # Type of roads accepted in the graph
-    parser.add_argument("--roads", type=lambda x: x.split(','), required=True)
-    # middle coordinates of the two points
-    parser.add_argument("--coords", type=lambda x: tuple(map(float, x.split(','))), required=True)
-    # Parse the command-line arguments
-    args = parser.parse_args()
+    # create the random points list, consisting of 2 "n_random_points" size lists in which will be stored our random
+    # points ("n_random_points" in the first list and "n_random_points" in the second list ; used to separate our points
+    # that will be around the 2 different chosen nodes)
+    random_points = [[0 for _ in range(n_random_points)] for _ in range(2)]
 
-    dist = args.dist
-    roads = args.roads
-    coords = args.coords
+    # define 2 x "n_random_points" at random positions in the graph (10 around each chosen node at a
+    # distance <= "distance")
+    for i in range(n_random_points):
+        rx1 = random.uniform(-distance, distance)
+        ry1 = random.uniform(-distance, distance)
+        rx2 = random.uniform(-distance, distance)
+        ry2 = random.uniform(-distance, distance)
+        # find the first random point
+        first_random_node = ox.distance.nearest_nodes(G, x1 + rx1, y1 + ry1)
+        # find the second random point
+        second_random_node = ox.distance.nearest_nodes(G, x2 + rx2, y2 + ry2)
+        # add the first random point
+        random_points[0][i] = first_random_node
+        # add the second random point
+        random_points[1][i] = second_random_node
 
-    # motorway,trunk,primary,secondary,tertiary,residential,service
-    cf = '["highway"~"' + '|'.join(roads) + '"]'
+    return random_points
 
-    # create the graph
-    G = ox.graph_from_point(coords, dist, network_type='drive', simplify=True, custom_filter=cf)
-    # nodes, edges = ox.graph_to_gdfs(G, nodes=True, edges=True)
-    # print(nodes.to_json())
-
-    # END TEST DATA
-
-    # define the number of random points at the start and at the end
-    n_shortest_paths = 10
-    # define a list of colors to use for each path
-    # TO REMOVE
-    colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF', '#800000', '#008000', '#000080',
-              '#FFA500', '#808080', '#800080', '#008080', '#FFC0CB', '#00FF7F', '#7FFFD4', '#F5DEB3', '#D2691E',
-              '#800000', '#2F4F4F', '#000000']
-    # initialize a list to store the shortest paths
-    # TO REMOVE
-    shortest_paths = []
-
-    # TO REMOVE
-    x1 = 2.63797
-    # TO REMOVE
-    y1 = 48.83106
-    # TO REMOVE
-    x2 = 2.5508
-    # TO REMOVE
-    y2 = 48.8364
-
-    dist = 0.0125
-
-    # Find the two nearest nodes to the first coordinate
-    # TO REMOVE
-    source_chosen = ox.distance.nearest_nodes(G, x1, y1)
-    # Find the two nearest nodes to the second coordinate
-    # TO REMOVE
-    target_chosen = ox.distance.nearest_nodes(G, x2, y2)
-    # add the shortest path for the 2 chosen nodes to the list
-    # TO REMOVE
-    shortest_path = nx.shortest_path(G, source=source_chosen, target=target_chosen, weight='length')
-    # add the shortest path to the list
-    # TO REMOVE
-    shortest_paths.append(shortest_path)
-
-    # add the shortest paths between the 10 nearest nodes of the first coordinate and the 10 nearest nodes of the
-    # second coordinate
-    #for i in range(n_shortest_paths):
-        #dx1 = random.uniform(-dist, dist)
-        #dy1 = random.uniform(-dist, dist)
-        #dx2 = random.uniform(-dist, dist)
-        #dy2 = random.uniform(-dist, dist)
-        #source_node = ox.distance.nearest_nodes(G, x1 + dx1, y1 + dy1)
-        #target_node = ox.distance.nearest_nodes(G, x2 + dx2, y2 + dy2)
-        # TODO Add those points in an array so Vicent can use them
-
-        # find the shortest path between the source and target nodes
-        # TO REMOVE
-        #shortest_path = nx.shortest_path(G, source=source_node, target=target_node)
-        # add the shortest path to the list
-        # TO REMOVE
-        #shortest_paths.append(shortest_path)
-
-    #FULL RANDOM (TO REMOVE)
-    # select two random nodes from the graph
-    nodes = list(G.nodes())
-    for i in range(n_shortest_paths):
-        source, target = random.sample(nodes, 2)
-        # find the shortest path between the source and target nodes
-        shortest_path = nx.shortest_path(G, source=source, target=target, weight='length')
-        shortest_paths.append(shortest_path)
-
-    # plot the graph with all the shortest paths
-    # TO REMOVE
-    ox.plot_graph_routes(G, shortest_paths, route_colors=colors[:n_shortest_paths + 1], node_size=0)
-
-
-for i in range(0, 5):
-    random_nodes()
