@@ -3,36 +3,37 @@
     <v-row class="d-flex">
       <div id="map" class="map"></div>
 
-      <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5" @click.stop="close= !close" v-if="close"></v-btn>
+      <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5" @click.stop="close= !close"
+             v-if="close"></v-btn>
       <v-slide-y-transition>
-      <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 " :class="{'panel-map-lg' : lgAndUp,'panel-map-md': md}"
-               v-if="!close">
-        <v-form @submit.prevent="makePostRequest" v-if="!close">
-          <v-row align="start">
-            <v-col cols="10">
-            <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
-            </v-col>
-            <v-col cols="2">
-              <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="x-large"></v-btn>
-            </v-col>
-          </v-row>
-          <v-text-field variant="outlined" v-model="desc" label="Description"></v-text-field>
-          <v-text-field variant="outlined" v-model.number="dist" label="Distance (mètre)" type="number" min="100"
-                        max="10000" step="10"></v-text-field>
-          <v-select
-              variant="outlined"
-              chips
-              label="Select road types"
-              :items=roadTypes
-              v-model="selectedRoadTypes"
-              multiple
-              clearable
-              closable-chips
-          ></v-select>
-          <v-text-field variant="outlined" v-model="script" label="Computing Script" disabled ></v-text-field>
-          <v-btn type="submit" color="primary" v-if="selectedRoadTypes.length>0">Lancer la simulation</v-btn>
-        </v-form>
-      </v-card>
+        <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 " :class="{'panel-map-lg' : lgAndUp,'panel-map-md': md}"
+                v-if="!close">
+          <v-form @submit.prevent="makePostRequest" v-if="!close">
+            <v-row align="start">
+              <v-col cols="10">
+                <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
+              </v-col>
+              <v-col cols="2">
+                <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="x-large"></v-btn>
+              </v-col>
+            </v-row>
+            <v-text-field variant="outlined" v-model="desc" label="Description"></v-text-field>
+            <v-text-field variant="outlined" v-model.number="dist" label="Distance (mètre)" type="number" :min="minDist"
+                          max="100000" step="10"></v-text-field>
+            <v-select
+                variant="outlined"
+                chips
+                label="Select road types"
+                :items=roadTypes
+                v-model="selectedRoadTypes"
+                multiple
+                clearable
+                closable-chips
+            ></v-select>
+            <v-text-field variant="outlined" v-model="script" label="Computing Script" disabled></v-text-field>
+            <v-btn type="submit" color="primary" v-if="selectedRoadTypes.length>0">Lancer la simulation</v-btn>
+          </v-form>
+        </v-card>
       </v-slide-y-transition>
     </v-row>
   </v-container>
@@ -47,6 +48,18 @@ import {useToast} from "vue-toastification";
 
 
 export default {
+  computed: {
+    minDist() {
+      return Math.max(this.length * 0.6, 100);
+    },
+  },
+  watch: {
+    minDist(newVal) {
+      if (this.dist < newVal) {
+        this.dist = newVal;
+      }
+    },
+  },
   setup() {
     const theme = useTheme();
     const toast = useToast();
@@ -71,6 +84,10 @@ export default {
       dist: 100,
       script: "default",
       close: false,
+      length: 0,
+      center: [],
+      start: [],
+      end: [],
     };
   },
   mounted() {
@@ -101,10 +118,38 @@ export default {
       ],
     }).addTo(map);
     control.on('routesfound', (e) => {
-      this.waypoints = e.waypoints.map(w => [w.latLng.lat, w.latLng.lng]);
+      this.start = [e.waypoints[0].latLng.lng, e.waypoints[0].latLng.lat];
+      this.end = [e.waypoints[e.waypoints.length - 1].latLng.lng, e.waypoints[e.waypoints.length - 1].latLng.lat];
+      this.length = e.routes[0] ? e.routes[0].summary.totalDistance : 0;
+      this.center = this.getCenter(e.routes[0].coordinates.map(coord => [coord.lat, coord.lng]));
+      console.log(this.center)
     });
   },
   methods: {
+    getCenter(coordinates) {
+      let x = 0, y = 0, z = 0;
+
+      for (let i = 0; i < coordinates.length; i++) {
+        let lat = coordinates[i][0] * Math.PI / 180;
+        let lng = coordinates[i][1] * Math.PI / 180;
+
+        x += Math.cos(lat) * Math.cos(lng);
+        y += Math.cos(lat) * Math.sin(lng);
+        z += Math.sin(lat);
+      }
+
+      const total = coordinates.length;
+
+      x = x / total;
+      y = y / total;
+      z = z / total;
+
+      const centralLongitude = Math.atan2(y, x);
+      const centralSquareRoot = Math.sqrt(x * x + y * y);
+      const centralLatitude = Math.atan2(z, centralSquareRoot);
+
+      return [centralLatitude * 180 / Math.PI, centralLongitude * 180 / Math.PI];
+    },
     uncheckRoadTypes() {
       this.selectedRoadTypes = [];
     },
@@ -113,29 +158,23 @@ export default {
         this.toast.error("Simulation name cannot be empty");
         return;
       }
-
-      class Point {
-        constructor(x, y) {
-          this.x = x;
-          this.y = y;
-        }
+      if (this.dist < this.length * 0.6 || this.dist < 100) {
+        this.toast.error("Generation distance cannot be less than 100 or less that 60% of the route length")
+        this.dist = this.minDist
+        return;
       }
-
+      console.log("length = " + this.length * 0.6)
+      console.log("dist = " + this.dist)
       try {
-        let coordinates = this.waypoints.map(coord => new Point(coord[0], coord[1]));
+        let center = this.center;
         let name = this.$data.name;
         let desc = this.$data.desc;
-        let start = coordinates.pop();
-        let startX = start.x;
-        let startY = start.y;
-
-        let end = coordinates.pop();
-        let endX = end.x;
-        let endY = end.y;
-        let distance = 100;
+        let start = this.start;
+        let end = this.end;
+        let distance = this.dist;
         let roadTypes = this.$data.selectedRoadTypes;
         let script = this.$data.script;
-        let body = JSON.stringify({startX, startY, endX, endY, distance, name, desc, roadTypes, script});
+        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center});
         const response = await fetch('/api/simulation', {
           method: 'POST',
           headers: authHeader(),
@@ -153,7 +192,7 @@ export default {
         console.error(error);
       }
     }
-  }
+  },
 };
 
 </script>
@@ -187,7 +226,7 @@ export default {
   z-index: 999;
 }
 
-.panel-burger{
+.panel-burger {
   z-index: 999;
 }
 
