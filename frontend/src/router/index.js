@@ -30,6 +30,12 @@ const routes = [
         component: () => import('@/views/SimulationPage.vue'),
         meta: { requiresAuth: true, layout: 'content' }
     },
+    {
+        path: '/simulation/:id/map',
+        name: "simulationMap",
+        component: () => import('@/views/SimulationMap.vue'),
+        meta: { requiresAuth: true, layout: 'map' }
+    },
     {   path: '/:pathMatch(.*)*',
         name: "error-404",
         component: () => import('@/views/Error404.vue'),

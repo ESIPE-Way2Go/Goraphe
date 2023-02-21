@@ -59,16 +59,14 @@ import {useDisplay, useTheme} from 'vuetify'
 import {can} from '@/utils'
 import Goraphe from '@/assets/Goraphe_small_no_text_no_background.png';
 
-import {onMounted} from 'vue'
+
 
 export default {
   setup() {
     const theme = useTheme()
     const {mobile} = useDisplay()
 
-    onMounted(() => {
-      console.log(mobile.value) // true
-    })
+
 
 
     return {
