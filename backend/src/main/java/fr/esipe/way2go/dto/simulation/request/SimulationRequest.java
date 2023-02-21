@@ -93,10 +93,9 @@ public class SimulationRequest {
     }
 
     public boolean checkBounds() {
-        double[][] worldBounds = {{-180.0, -90.0}, {180.0, 90.0}}; // Define the world bounds as a 2D array
         // Check if each coordinate is within the world bounds
-        return Arrays.stream(start).allMatch(coord -> coord >= worldBounds[0][0] && coord <= worldBounds[1][0] && coord >= worldBounds[0][1] && coord <= worldBounds[1][1])
-                && Arrays.stream(end).allMatch(coord -> coord >= worldBounds[0][0] && coord <= worldBounds[1][0] && coord >= worldBounds[0][1] && coord <= worldBounds[1][1])
-                && Arrays.stream(center).allMatch(coord -> coord >= worldBounds[0][0] && coord <= worldBounds[1][0] && coord >= worldBounds[0][1] && coord <= worldBounds[1][1]);
+        return start[0]>=-90 && start[0]<= 90 && start[1]>=-180 && start[1]<=180 &&
+                end[0]>=-90 && end[0]<= 90 && end[1]>=-180 && end[1]<=180 &&
+                center[0]>=-90 && center[0]<= 90 && center[1]>=-180 && center[1]<=180;
     }
 }
