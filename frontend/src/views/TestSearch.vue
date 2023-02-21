@@ -50,8 +50,7 @@ import {useToast} from "vue-toastification";
 export default {
   computed: {
     minDist() {
-      let min=Math.max(this.length*0.6, 100);
-      return min;
+      return Math.max(this.length*0.6, 100);
     },
   },
   watch: {
@@ -161,15 +160,18 @@ export default {
       }
       if (this.dist < this.length * 0.6 || this.dist < 100) {
         this.toast.error("Generation distance cannot be less than 100 or less that 60% of the route length")
+        this.dist=this.minDist
+        return;
       }
-
+      console.log("length = "+this.length*0.6)
+      console.log("dist = "+this.dist)
       try {
         let center=this.center;
         let name = this.$data.name;
         let desc = this.$data.desc;
         let start = this.start;
         let end = this.end;
-        let distance = 100;
+        let distance = this.dist;
         let roadTypes = this.$data.selectedRoadTypes;
         let script = this.$data.script;
         let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script,center});
