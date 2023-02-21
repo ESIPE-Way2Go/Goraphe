@@ -9,18 +9,24 @@ import {computed} from "vue";
 import {useRouter} from '@/utils'
 import LayoutBlank from '@/layouts/LayoutBlank'
 import LayoutContent from '@/layouts/LayoutContent'
+import LayoutMap from '@/layouts/LayoutMap'
 export default {
   name: 'App',
   components: {
     LayoutBlank,
-    LayoutContent
+    LayoutContent,
+    LayoutMap
+
   },
   setup() {
     const {route} = useRouter()
     const  resolveLayout = computed(()=>{
       if(route.value.name === null) return null
-      if(route.value.meta.layout === 'blank') return 'layout-blank'
-      return 'layout-content'
+      switch (route.value.meta.layout) {
+        case 'blank': return 'layout-blank';
+        case 'map' : return 'layout-map';
+        default : return 'layout-content';
+      }
     })
 
     return {
