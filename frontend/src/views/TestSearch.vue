@@ -1,26 +1,39 @@
 <template>
-  <v-container fluid>
-    <v-row>
-      <v-col cols="10">
-        <div id="map" class="map"></div>
-      </v-col>
-      <v-col cols="2">
-        <v-form @submit.prevent="makePostRequest">
-          <v-text-field v-model="name" label="Name"></v-text-field>
-          <v-text-field v-model="desc" label="Description"></v-text-field>
-          <v-text-field v-model.number="dist" label="Distance" type="number" min="100" max="10000" step="10"></v-text-field>
+  <v-container fluid style="padding: 10px">
+    <v-row class="d-flex">
+      <div id="map" class="map"></div>
+
+      <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5" @click.stop="close= !close" v-if="close"></v-btn>
+      <v-slide-y-transition>
+      <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 " :class="{'panel-map-lg' : lgAndUp,'panel-map-md': md}"
+               v-if="!close">
+        <v-form @submit.prevent="makePostRequest" v-if="!close">
+          <v-row align="start">
+            <v-col cols="10">
+            <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
+            </v-col>
+            <v-col cols="2">
+              <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="x-large"></v-btn>
+            </v-col>
+          </v-row>
+          <v-text-field variant="outlined" v-model="desc" label="Description"></v-text-field>
+          <v-text-field variant="outlined" v-model.number="dist" label="Distance (mètre)" type="number" min="100"
+                        max="10000" step="10"></v-text-field>
           <v-select
+              variant="outlined"
               chips
               label="Select road types"
               :items=roadTypes
               v-model="selectedRoadTypes"
               multiple
+              clearable
+              closable-chips
           ></v-select>
-          <v-btn @click="uncheckRoadTypes" color="accent">Uncheck</v-btn>
-          <v-text-field v-model="script" label="Computing Script"></v-text-field>
-          <v-btn type="submit" color="primary">SEND</v-btn>
+          <v-text-field variant="outlined" v-model="script" label="Computing Script" disabled ></v-text-field>
+          <v-btn type="submit" color="primary" v-if="selectedRoadTypes.length>0">Lancer la simulation</v-btn>
         </v-form>
-      </v-col>
+      </v-card>
+      </v-slide-y-transition>
     </v-row>
   </v-container>
 
@@ -29,7 +42,7 @@
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 import authHeader from "@/services/auth-header";
-import {useTheme} from "vuetify";
+import {useDisplay, useTheme} from "vuetify";
 import {useToast} from "vue-toastification";
 
 
@@ -37,10 +50,12 @@ export default {
   setup() {
     const theme = useTheme();
     const toast = useToast();
+    const {sm, md, lgAndUp} = useDisplay()
     return {
       theme,
       toggleTheme: () => theme.global.name.value = theme.global.current.value.dark ? 'myCustomLightTheme' : 'dark',
-      toast
+      toast,
+      sm, md, lgAndUp
     }
   },
 
@@ -53,8 +68,9 @@ export default {
       waypoints: [],
       roadTypes: ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'residential', 'service'],
       selectedRoadTypes: ['motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'residential', 'service'],
-      dist : 100,
-      script: "",
+      dist: 100,
+      script: "default",
+      close: false,
     };
   },
   mounted() {
@@ -97,12 +113,14 @@ export default {
         this.toast.error("Simulation name cannot be empty");
         return;
       }
+
       class Point {
         constructor(x, y) {
           this.x = x;
           this.y = y;
         }
       }
+
       try {
         let coordinates = this.waypoints.map(coord => new Point(coord[0], coord[1]));
         let name = this.$data.name;
@@ -116,8 +134,8 @@ export default {
         let endY = end.y;
         let distance = 100;
         let roadTypes = this.$data.selectedRoadTypes;
-        let script=this.$data.script;
-        let body = JSON.stringify({startX, startY, endX, endY, distance, name,desc,roadTypes,script});
+        let script = this.$data.script;
+        let body = JSON.stringify({startX, startY, endX, endY, distance, name, desc, roadTypes, script});
         const response = await fetch('/api/simulation', {
           method: 'POST',
           headers: authHeader(),
@@ -130,7 +148,7 @@ export default {
 
         const data = await response.json();
         console.log(data['simulationId']);
-        this.$router.push({ name: 'simulation', params: { id: data['simulationId'] } });
+        this.$router.push({name: 'simulation', params: {id: data['simulationId']}});
       } catch (error) {
         console.error(error);
       }
@@ -150,5 +168,28 @@ export default {
 .leaflet-routing-container {
   display: none !important;
 }
+
+
+.panel-map {
+  width: 90%;
+  z-index: 999;
+
+}
+
+.panel-map-md {
+  width: 30% !important;
+  z-index: 999;
+
+}
+
+.panel-map-lg {
+  width: 20% !important;
+  z-index: 999;
+}
+
+.panel-burger{
+  z-index: 999;
+}
+
 
 </style>
