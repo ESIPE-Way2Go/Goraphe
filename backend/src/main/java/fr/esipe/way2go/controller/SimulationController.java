@@ -61,6 +61,7 @@ public class SimulationController {
 
         POOL.execute(() -> {
             simulationSave.setBeginDate(Calendar.getInstance());
+            simulationSave.setStatus("EN COURS");
             scriptPythonService.executeScript(user, simulationSave, midPoint,simulationRequest.getDistance(),simulationRequest.getDesc());
         });
         return new ResponseEntity<>(new SimulationIdResponse(simulationSave.getSimulationId()), HttpStatus.ACCEPTED);

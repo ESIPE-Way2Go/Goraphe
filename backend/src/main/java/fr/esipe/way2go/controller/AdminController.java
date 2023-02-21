@@ -7,7 +7,6 @@ import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.dto.admin.UserBeforeInvitationRequest;
 import fr.esipe.way2go.dto.user.request.UpdatePasswordRequest;
 import fr.esipe.way2go.dto.user.request.UserRequest;
-import fr.esipe.way2go.dto.user.response.UserInfo;
 import fr.esipe.way2go.dto.user.response.UserResponse;
 import fr.esipe.way2go.exception.EmailFormatWrongException;
 import fr.esipe.way2go.exception.UserEmailFound;
@@ -22,13 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Calendar;
-import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -179,13 +175,7 @@ public class AdminController {
         return "Email Sent!";
     }
 
-    @PermitAll
-    @GetMapping("/getAllUsers")
-    public ResponseEntity<List<UserInfo>> checkAccount() {
-//        userService.
-//        return new ResponseEntity<>(new UserResponse(user.getEmail()), HttpStatus.OK);
-        return null;
-    }
+
 
 }
 

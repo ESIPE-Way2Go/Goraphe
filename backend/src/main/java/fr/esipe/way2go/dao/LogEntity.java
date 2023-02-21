@@ -30,7 +30,7 @@ public class LogEntity {
 
     public LogEntity(SimulationEntity simulation, String script) {
         this.simulation = simulation;
-        this.status = "EN COURS";
+        this.status = "PAS LANCE";
         this.script = script;
     }
 

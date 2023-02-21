@@ -50,8 +50,5 @@ G = ox.graph_from_point(coords, dist, network_type='drive', simplify=True)
 
 edges = ox.graph_to_gdfs(G, nodes=False, edges=True)
 
-print("LOG_FILENAME", LOG_FILENAME)
-print(edges.to_json())
-
 time_elapsed = (time.perf_counter() - time_start)
 logging.info("Filtering time : " + str(time_elapsed))

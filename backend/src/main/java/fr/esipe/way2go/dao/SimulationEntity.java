@@ -56,7 +56,8 @@ public class SimulationEntity {
 
     @Column(name = "statistics", nullable = false)
     private String statistics;
-
+    @Column(name = "status", nullable = false)
+    private String status;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "simulation")
     private List<LogEntity> logs;
 
@@ -77,6 +78,7 @@ public class SimulationEntity {
         int randomNumber = rand.nextInt(100000) + 1;
         this.shareLink = String.valueOf(randomNumber);
         this.statistics = "statistics";
+        this.status = "NOT LAUNCH";
     }
 
     /**
@@ -276,6 +278,10 @@ public class SimulationEntity {
         return shareLink;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
     /**
      * Sets a new share link for this simulation.
      *
@@ -327,6 +333,10 @@ public class SimulationEntity {
 
     public void setEndDate(Calendar endDate) {
         this.endDate = endDate;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
