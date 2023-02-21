@@ -1,59 +1,18 @@
 package fr.esipe.way2go.dto.simulation.request;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class SimulationRequest {
 
     String name;
-    double startX;
-    double startY;
-    double endX;
-    double endY;
+    double [] start;
+    double [] end;
     int distance;
     String desc;
     String script;
     List<String> roadTypes;
-
-
-    public int getDistance() {
-        return distance;
-    }
-
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
-
-    public double getStartX() {
-        return startX;
-    }
-
-    public void setStartX(double startX) {
-        this.startX = startX;
-    }
-
-    public double getStartY() {
-        return startY;
-    }
-
-    public void setStartY(double startY) {
-        this.startY = startY;
-    }
-
-    public double getEndX() {
-        return endX;
-    }
-
-    public void setEndX(double endX) {
-        this.endX = endX;
-    }
-
-    public double getEndY() {
-        return endY;
-    }
-
-    public void setEndY(double endY) {
-        this.endY = endY;
-    }
+    double [] center;
 
     public String getName() {
         return name;
@@ -61,6 +20,30 @@ public class SimulationRequest {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public double[] getStart() {
+        return start;
+    }
+
+    public void setStart(double[] start) {
+        this.start = start;
+    }
+
+    public double[] getEnd() {
+        return end;
+    }
+
+    public void setEnd(double[] end) {
+        this.end = end;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
     }
 
     public String getDesc() {
@@ -87,18 +70,25 @@ public class SimulationRequest {
         this.roadTypes = roadTypes;
     }
 
+    public double[] getCenter() {
+        return center;
+    }
+
+    public void setCenter(double[] center) {
+        this.center = center;
+    }
+
     @Override
     public String toString() {
         return "SimulationRequest{" +
                 "name='" + name + '\'' +
-                ", startX=" + startX +
-                ", startY=" + startY +
-                ", endX=" + endX +
-                ", endY=" + endY +
+                ", start=" + Arrays.toString(start) +
+                ", end=" + Arrays.toString(end) +
                 ", distance=" + distance +
                 ", desc='" + desc + '\'' +
                 ", script='" + script + '\'' +
                 ", roadTypes=" + roadTypes +
+                ", center=" + Arrays.toString(center) +
                 '}';
     }
 }
