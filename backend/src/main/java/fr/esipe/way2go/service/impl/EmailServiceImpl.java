@@ -43,11 +43,12 @@ public class EmailServiceImpl implements EmailService {
     public void sendLinkForForgetPassword(UserEntity userEntity) {
         var subject = "Récupération de votre mot de passe";
         var link = uri + "/modifyPassword/" + userEntity.getToken();
-        var body = " Bonjour " + userEntity.getUsername() + "," + """
+        var body = "Bonjour " + userEntity.getUsername() + "," + """
                                 
                 Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer ce message.                               
                 Si vous avez oublié votre mot de passe, nous sommes là pour vous aider. Pour réinitialiser votre mot de passe, veuillez cliquer sur le lien ci-dessous :                                
                 """ + link + """
+                
                 Si le lien ne fonctionne pas, copiez-le et collez-le dans la barre d'adresse de votre navigateur.                               
                 Après avoir cliqué sur le lien, vous serez redirigé vers une page où vous pourrez créer un nouveau mot de passe. Nous vous recommandons de choisir un mot de passe sécurisé en utilisant une combinaison de lettres, de chiffres et de caractères spéciaux.                                
                 Si vous avez des difficultés pour réinitialiser votre mot de passe ou si vous avez d'autres questions, n'hésitez pas à contacter notre équipe d'assistance à l'adresse suivante : [Insérez l'adresse e-mail de l'assistance].

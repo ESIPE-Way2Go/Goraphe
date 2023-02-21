@@ -5,6 +5,7 @@ import fr.esipe.way2go.configuration.WebSecurityConfiguration;
 import fr.esipe.way2go.dao.InviteEntity;
 import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.dto.admin.UserBeforeInvitationRequest;
+import fr.esipe.way2go.dto.user.request.UpdatePasswordRequest;
 import fr.esipe.way2go.dto.user.request.UserRequest;
 import fr.esipe.way2go.dto.user.response.UserInfo;
 import fr.esipe.way2go.dto.user.response.UserResponse;
@@ -12,6 +13,7 @@ import fr.esipe.way2go.exception.EmailFormatWrongException;
 import fr.esipe.way2go.exception.UserEmailFound;
 import fr.esipe.way2go.exception.invite.InviteNotFoundException;
 import fr.esipe.way2go.exception.user.UserNotFoundException;
+import fr.esipe.way2go.exception.user.UserTokenNotFoundException;
 import fr.esipe.way2go.exception.user.UsernameExistAlreadyException;
 import fr.esipe.way2go.service.EmailService;
 import fr.esipe.way2go.service.InviteService;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.PermitAll;
@@ -87,7 +90,7 @@ public class AdminController {
     }
 
     @PermitAll
-    @PostMapping("/createAccount")
+    @PutMapping("/createAccount")
     public ResponseEntity<Boolean> createAccount(@RequestBody UserRequest userRequest) {
         var user = userService.getUser(userRequest.getUsername());
         if (user.isPresent())
@@ -108,15 +111,41 @@ public class AdminController {
     }
 
     @PermitAll
-    @PostMapping("/forgetPassword/{email}")
+    @GetMapping("/forgetPassword/{email}")
     public void sendForgotPassword(@PathVariable String email) {
         var userOptional = userService.getUserByEmail(email);
         if (userOptional.isEmpty())
             throw new UserNotFoundException();
         var user = userOptional.get();
-
-
+        user.setToken(Generators.timeBasedGenerator().generate().toString());
+        var userSave = userService.saveUser(user);
+        emailSenderService.sendLinkForForgetPassword(userSave);
     }
+
+    @PermitAll
+    @GetMapping("/checkModifyPassword/{token}")
+    public ResponseEntity<Object> checkModifyPassword(@PathVariable String token) {
+        var user = userService.getUserByToken(token);
+        if (user.isEmpty())
+            throw new UserTokenNotFoundException();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PermitAll
+    @PutMapping("/updatePassword/")
+    public ResponseEntity<Boolean> updatePassword(@RequestBody UpdatePasswordRequest updatePasswordRequest) {
+        var userEntityOptional = userService.getUserByToken(updatePasswordRequest.getToken());
+        if (userEntityOptional.isEmpty())
+            throw new UserTokenNotFoundException();
+        var userEntity = userEntityOptional.get();
+        var passwordEncoder = webSecurityConfiguration.passwordEncoder();
+        userEntity.setPassword(passwordEncoder.encode(updatePasswordRequest.getPassword()));
+        userEntity.setToken(null);
+        userService.saveUser(userEntity);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
     @PermitAll
     @ResponseBody

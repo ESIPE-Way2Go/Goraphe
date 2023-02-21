@@ -1,6 +1,7 @@
 package fr.esipe.way2go.exception;
 
 import fr.esipe.way2go.exception.user.UserNotFoundException;
+import fr.esipe.way2go.exception.user.UserTokenNotFoundException;
 import fr.esipe.way2go.exception.user.UsernameExistAlreadyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,4 +52,11 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(UserTokenNotFoundException.class)
+    public ResponseEntity<Object> handleUsernameTokenNotFound(UserTokenNotFoundException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
 }

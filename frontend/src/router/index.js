@@ -20,6 +20,18 @@ const routes = [
         meta: { requiresAuth: false, layout: 'blank' }
     },
     {
+        path: '/forgetPassword/',
+        name: "forgetPassword",
+        component: () => import('@/views/PasswordForgotPage.vue'),
+        meta: { requiresAuth: false, layout: 'blank' }
+    },
+    {
+        path: '/updatePassword/:token',
+        name: "updatePassword",
+        component: () => import('@/views/ChangePasswordPage.vue'),
+        meta: { requiresAuth: false, layout: 'blank' }
+    },
+    {
         path: '/simulation/:id',
         name: "simulation",
         component: () => import('@/views/SimulationPage.vue'),

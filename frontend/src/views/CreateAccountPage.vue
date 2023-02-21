@@ -21,7 +21,6 @@
 <script>
 import { useToast } from "vue-toastification";
 
-
 export default {
     setup() {
         const toast = useToast();
@@ -89,9 +88,6 @@ export default {
                     })
                 })
         },
-            formValid() {
-            return this.usernameRules && this.passwordRules && this.confirmPasswordRules
-        }
     },
     mounted() {
         this.checkAutorization()

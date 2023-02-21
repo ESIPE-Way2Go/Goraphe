@@ -19,7 +19,6 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
     private final LogService logService;
     private final SimulationService simulationService;
 
-
     @Autowired
     public ScriptPythonServiceImpl(LogService logService, SimulationService simulationService) {
         this.logService = logService;

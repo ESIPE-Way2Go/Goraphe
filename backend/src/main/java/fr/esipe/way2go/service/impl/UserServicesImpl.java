@@ -52,4 +52,9 @@ public class UserServicesImpl implements UserService {
     public Optional<UserEntity> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    @Override
+    public Optional<UserEntity> getUserByToken(String token) {
+        return userRepository.findByToken(token);
+    }
 }
