@@ -55,7 +55,7 @@ public class AdminController {
         if(! Pattern.compile(regex).matcher(email).matches()) throw new WrongEmailFormatException();
     }
     private void checkPassword(String password){
-        var regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$";
+        var regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$";
         if(! password.matches(regex)) throw new WrongPasswordFormatException();
     }
 
