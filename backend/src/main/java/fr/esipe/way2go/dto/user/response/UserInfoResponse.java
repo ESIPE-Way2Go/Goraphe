@@ -1,12 +1,12 @@
-package fr.esipe.way2go.dto.user.request;
+package fr.esipe.way2go.dto.user.response;
 
-public class UserInfo {
+public class UserInfoResponse {
     private Long id;
     private String name;
     private String mail;
     private String role;
 
-    public UserInfo(Long id, String name, String mail, String role) {
+    public UserInfoResponse(Long id, String name, String mail, String role) {
         this.id = id;
         this.name = name;
         this.mail = mail;

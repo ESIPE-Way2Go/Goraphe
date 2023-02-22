@@ -21,7 +21,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendInvitation(String email, InviteEntity inviteEntity) {
         var subject = "Invitation à créer un compte sur Goraphe";
-        var link = uri + "/createAccount/" + inviteEntity.getInviteId() + "?token=" + inviteEntity.getToken();
+        var link = uri + "/createAccount/" + inviteEntity.getToken();
         var content = """                                
                 Bonjour,
                                 

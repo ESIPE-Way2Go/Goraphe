@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface InviteRepository extends JpaRepository<InviteEntity, Long> {
     @Query("SELECT i FROM InviteEntity i WHERE token = :token")
     Optional<InviteEntity> findByToken(String token);
+
 }

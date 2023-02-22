@@ -59,4 +59,12 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         body.put(MESSAGE, ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
     }
+
+    @ExceptionHandler(UserEmailFound.class)
+    public ResponseEntity<Object> handleUserEmailFound(UserEmailFound ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
 }

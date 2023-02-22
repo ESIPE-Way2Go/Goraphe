@@ -5,9 +5,10 @@ import fr.esipe.way2go.configuration.WebSecurityConfiguration;
 import fr.esipe.way2go.dao.InviteEntity;
 import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.dto.admin.UserBeforeInvitationRequest;
+import fr.esipe.way2go.dto.invite.response.InvitationResponse;
 import fr.esipe.way2go.dto.user.request.UpdatePasswordRequest;
-import fr.esipe.way2go.dto.user.request.UserInfo;
 import fr.esipe.way2go.dto.user.request.UserRequest;
+import fr.esipe.way2go.dto.user.response.UserInfoResponse;
 import fr.esipe.way2go.dto.user.response.UserResponse;
 import fr.esipe.way2go.exception.EmailFormatWrongException;
 import fr.esipe.way2go.exception.UserEmailFound;
@@ -19,12 +20,10 @@ import fr.esipe.way2go.service.EmailService;
 import fr.esipe.way2go.service.InviteService;
 import fr.esipe.way2go.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.PermitAll;
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -49,25 +48,6 @@ public class AdminController {
         this.inviteService = inviteService;
         this.webSecurityConfiguration = webSecurityConfiguration;
     }
-
-    @PermitAll
-    //  @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/invitation")
-    public void sendInvitation(HttpServletRequest request, @RequestBody UserBeforeInvitationRequest userBeforeInvitationRequest) {
-        var email = userBeforeInvitationRequest.getEmail();
-        checkEmail(email);
-        var user = userService.getUserByEmail(email);
-        if (user.isPresent())
-            throw new UserEmailFound(email);
-        var inviteEntity = new InviteEntity(
-                userService.saveUser(new UserEntity(email, userBeforeInvitationRequest.getRole())),
-                Generators.timeBasedGenerator().generate().toString()
-        );
-
-        var saveInvite = inviteService.save(inviteEntity);
-        emailSenderService.sendInvitation(email, saveInvite);
-    }
-
 
     private void checkEmail(String email) {
         var regex = "^(.+)@(\\S+)$";
@@ -148,21 +128,78 @@ public class AdminController {
 
     @PermitAll
     @GetMapping("/users")
-    public ResponseEntity<List<UserInfo>> getAllUsers() {
+    public ResponseEntity<List<UserInfoResponse>> getAllUsers() {
         var users = userService.getAllUsers();
-        var usersInfo = new ArrayList<UserInfo>();
-        users.forEach(user -> usersInfo.add(new UserInfo(user.getId(), user.getUsername(), user.getEmail(), user.getRole())));
+        var usersInfo = new ArrayList<UserInfoResponse>();
+        users.forEach(user -> usersInfo.add(new UserInfoResponse(user.getId(), user.getUsername(), user.getEmail(), user.getRole())));
         return new ResponseEntity<>(usersInfo, HttpStatus.OK);
     }
 
     @PermitAll
-    @DeleteMapping("/user/:id")
+    @DeleteMapping("/user/{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable Long id) {
         var userOptional = userService.getUserById(id);
         if (userOptional.isEmpty())
             throw new UserNotFoundException();
         userService.deleteUser(userOptional.get());
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PermitAll
+    @GetMapping("/invitations")
+    public ResponseEntity<List<InvitationResponse>> getInvitations() {
+        var invites = new ArrayList<InvitationResponse>();
+        inviteService.getAll().forEach(invite ->  invites.add(new InvitationResponse(invite.getInviteId(), invite.getUser().getEmail(), invite.getFirstMailSent(), invite.getMailCount())));
+        return new ResponseEntity<>(invites, HttpStatus.OK);
+    }
+
+    @PermitAll
+    @DeleteMapping("/invitation/{id}")
+    public ResponseEntity<Object> deleteInvitation(@PathVariable Long id) {
+        var inviteEntityOptional = inviteService.findById(id);
+        if (inviteEntityOptional.isEmpty())
+            throw new InviteNotFoundException();
+
+        inviteService.delete(inviteEntityOptional.get());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PermitAll
+    //  @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/invitation")
+    public void sendInvitation(@RequestBody UserBeforeInvitationRequest userBeforeInvitationRequest) {
+        var email = userBeforeInvitationRequest.getEmail();
+        checkEmail(email);
+        var user = userService.getUserByEmail(email);
+        if (user.isPresent())
+            throw new UserEmailFound(email);
+        var inviteEntity = new InviteEntity(
+                userService.saveUser(new UserEntity(email, "ROLE_USER")),
+                generateToken()
+        );
+
+        var saveInvite = inviteService.save(inviteEntity);
+        emailSenderService.sendInvitation(email, saveInvite);
+    }
+
+    @PermitAll
+    @PutMapping("/invitation/{id}")
+    public ResponseEntity<Object> reSendInvitation(@PathVariable Long id) {
+        var inviteEntityOptional = inviteService.findById(id);
+        if (inviteEntityOptional.isEmpty())
+            throw new InviteNotFoundException();
+
+        var invite = inviteEntityOptional.get();
+        invite.setFirstMailSent(Calendar.getInstance());
+        invite.setMailCount(invite.getMailCount() + 1);
+        invite.setToken(generateToken());
+        inviteService.save(invite);
+        emailSenderService.sendInvitation(invite.getUser().getEmail(), invite);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private String generateToken() {
+        return UUID.randomUUID().toString();
     }
 }
 

@@ -3,10 +3,9 @@ package fr.esipe.way2go.service.impl;
 import fr.esipe.way2go.dao.InviteEntity;
 import fr.esipe.way2go.repository.InviteRepository;
 import fr.esipe.way2go.service.InviteService;
-import jnr.ffi.annotations.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,5 +26,20 @@ public class InviteServiceImpl implements InviteService {
     @Override
     public Optional<InviteEntity> findByToken(String token) {
         return  inviteRepository.findByToken(token);
+    }
+
+    @Override
+    public Optional<InviteEntity> findById(Long id) {
+        return inviteRepository.findById(id);
+    }
+
+    @Override
+    public List<InviteEntity> getAll() {
+        return inviteRepository.findAll();
+    }
+
+    @Override
+    public void delete(InviteEntity inviteEntity) {
+        inviteRepository.delete(inviteEntity);
     }
 }
