@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 import osmnx as ox
 import networkx as nx
@@ -30,13 +31,13 @@ def random_nodes(G_proj,G, x1, y1, x2, y2):
         #TODO à perfectionner
         if(G_proj.has_node(first_random_node)):
             # first_random_node = ox.distance.nearest_nodes(G, x1 + rx1, y1 + ry1)
-            print("IN GRAPH :"+str(first_random_node))
+            logging.info("IN GRAPH :"+str(first_random_node))
             random_points.append(first_random_node)
         # find the second random point
         second_random_node = ox.distance.nearest_nodes(G, x2 + rx2, y2 + ry2)
         if(G_proj.has_node(second_random_node)):
             # second_random_node = ox.distance.nearest_nodes(G, x2 + rx2, y2 + ry2)
-            print("IN GRAPH :"+str(second_random_node))
+            logging.info("IN GRAPH :"+str(second_random_node))
             random_points.append(second_random_node)
         # add the first random point
 

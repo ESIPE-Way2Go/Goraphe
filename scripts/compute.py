@@ -8,6 +8,8 @@ import pandas as pd
 import math
 import time
 import openpyxl
+
+import filter
 import random_nodes
 
 
@@ -27,7 +29,7 @@ def compute(g_not_proj,graph_proj,rand_nodes,point1,point2):
 
     def edge_to_str(item):
         return str(item[0]) + "_" + str(item[1])
-    print("Random_nodes : "+str(rand_nodes))
+    logging.info("Random_nodes : "+str(rand_nodes))
     for origin in rand_nodes:
         routes_traveltimes[origin] = dict([])
         timetravel_shortest_paths[origin] = dict([])
@@ -40,14 +42,14 @@ def compute(g_not_proj,graph_proj,rand_nodes,point1,point2):
                 route_traveltimes = nx.shortest_path(graph_proj, source=origin, target=destination, weight='traveltimes')
                 routes_traveltimes[origin][destination] = route_traveltimes
             except:
-                print("no route beetween"+str(origin)+" and "+str(destination))
+                logging.error("no route beetween"+str(origin)+" and "+str(destination))
             timetravel_shortest_path = 0
             roads_traveltimesSP = dict()
             for u, v in zip(route_traveltimes[:-1], route_traveltimes[1:]):
                 timetravel_shortest_path += graph_proj.get_edge_data(u, v)[0]['traveltimes']
                 roads_traveltimesSP[(u, v)] = graph_proj.get_edge_data(u, v)
-            print("ORIGIN : "+str(origin)+" || DEST : "+str(destination))
-            print("TIMETRAVEL SHORTEST PATHS : "+str(timetravel_shortest_paths))
+            logging.info("ORIGIN : "+str(origin)+" || DEST : "+str(destination))
+            logging.info("TIMETRAVEL SHORTEST PATHS : "+str(timetravel_shortest_paths))
             timetravel_shortest_paths[origin][destination] = timetravel_shortest_path
 
             source_node = ox.distance.nearest_nodes(g_not_proj, point1[0], point1[1])
@@ -70,9 +72,9 @@ def compute(g_not_proj,graph_proj,rand_nodes,point1,point2):
                 try:
                     route_traveltimes = nx.shortest_path(G6_proj, source=origin, target=destination,
                                                          weight='traveltimes')
-                    if not edge_name in routes_er:
+                    if edge_name not in routes_er:
                         routes_er[edge_name] = dict([])
-                    if not origin in routes_er[edge_name]:
+                    if origin not in routes_er[edge_name]:
                         routes_er[edge_name][origin] = dict([])
                     routes_er[edge_name][origin][destination] = route_traveltimes
                     for u, v in zip(route_traveltimes[:-1], route_traveltimes[1:]):
@@ -148,7 +150,9 @@ def compute(g_not_proj,graph_proj,rand_nodes,point1,point2):
     df_Res_traveltimeSP.to_excel("Set_37_traveltimesSP_test1.xlsx")
     df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
     df_essential_mw_edges.to_excel("Set_37_essential_mw_edges_test1.xlsx")
-
+    ## TODO print 3 geojsons : random nodes, shortest path, result graph
+    print(filter.get_nodes_geojson(graph_proj),random_nodes)
+    print(filter.shortest_path_geojson(graph_proj,source_node,dest_node))
     # calculate computational time
     time_elapsed = (time.perf_counter() - time_start)
-    print("Computing time : " + str(time_elapsed))
+    logging.info("Computing time : " + str(time_elapsed))
