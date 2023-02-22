@@ -54,15 +54,15 @@ public class SimulationController {
         if (userOptional.isEmpty())
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         var user = userOptional.get();
-        var simulation = new SimulationEntity(simulationRequest.getName(), user, "Hello world", "test",new ArrayList<>());
+        if(simulationRequest.getDistance()<100 || !simulationRequest.checkBounds() || simulationRequest.getRoadTypes().isEmpty())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        var simulation = new SimulationEntity(simulationRequest.getName(), user, simulationRequest.getDesc(), "test",simulationRequest.getRoadTypes());
         var simulationSave = simulationService.save(simulation);
-        var midPoint= MapController.Point.midPoint(new MapController.Point(simulationRequest.getStartX(), simulationRequest.getStartY()),
-                new MapController.Point(simulationRequest.getEndX(),simulationRequest.getEndY()));
-
+        var midPoint= new MapController.Point(simulationRequest.getCenter());
         POOL.execute(() -> {
             simulationSave.setBeginDate(Calendar.getInstance());
-            simulationSave.setStatus("EN COURS");
-            scriptPythonService.executeScript(user, simulationSave, midPoint,simulationRequest.getDistance(),simulationRequest.getDesc());
+            simulationService.save(simulation);
+            scriptPythonService.executeScript(user, simulationSave, midPoint,simulationRequest);
         });
         return new ResponseEntity<>(new SimulationIdResponse(simulationSave.getSimulationId()), HttpStatus.ACCEPTED);
     }

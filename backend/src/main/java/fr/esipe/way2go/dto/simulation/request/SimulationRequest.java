@@ -1,54 +1,18 @@
 package fr.esipe.way2go.dto.simulation.request;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class SimulationRequest {
 
     String name;
-    double startX;
-    double startY;
-    double endX;
-    double endY;
+    double[] start;
+    double[] end;
     int distance;
     String desc;
-
-    public int getDistance() {
-        return distance;
-    }
-
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
-
-    public double getStartX() {
-        return startX;
-    }
-
-    public void setStartX(double startX) {
-        this.startX = startX;
-    }
-
-    public double getStartY() {
-        return startY;
-    }
-
-    public void setStartY(double startY) {
-        this.startY = startY;
-    }
-
-    public double getEndX() {
-        return endX;
-    }
-
-    public void setEndX(double endX) {
-        this.endX = endX;
-    }
-
-    public double getEndY() {
-        return endY;
-    }
-
-    public void setEndY(double endY) {
-        this.endY = endY;
-    }
+    String script;
+    List<String> roadTypes;
+    double[] center;
 
     public String getName() {
         return name;
@@ -56,6 +20,30 @@ public class SimulationRequest {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public double[] getStart() {
+        return start;
+    }
+
+    public void setStart(double[] start) {
+        this.start = start;
+    }
+
+    public double[] getEnd() {
+        return end;
+    }
+
+    public void setEnd(double[] end) {
+        this.end = end;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
     }
 
     public String getDesc() {
@@ -66,15 +54,48 @@ public class SimulationRequest {
         this.desc = desc;
     }
 
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
+    }
+
+    public List<String> getRoadTypes() {
+        return roadTypes;
+    }
+
+    public void setRoadTypes(List<String> roadTypes) {
+        this.roadTypes = roadTypes;
+    }
+
+    public double[] getCenter() {
+        return center;
+    }
+
+    public void setCenter(double[] center) {
+        this.center = center;
+    }
+
     @Override
     public String toString() {
-        return "DemoPayload{" +
-                "startX=" + startX +
-                ", startY=" + startY +
-                ", endX=" + endX +
-                ", endY=" + endY +
+        return "SimulationRequest{" +
+                "name='" + name + '\'' +
+                ", start=" + Arrays.toString(start) +
+                ", end=" + Arrays.toString(end) +
                 ", distance=" + distance +
+                ", desc='" + desc + '\'' +
+                ", script='" + script + '\'' +
+                ", roadTypes=" + roadTypes +
+                ", center=" + Arrays.toString(center) +
                 '}';
     }
 
+    public boolean checkBounds() {
+        // Check if each coordinate is within the world bounds
+        return start[0]>=-90 && start[0]<= 90 && start[1]>=-180 && start[1]<=180 &&
+                end[0]>=-90 && end[0]<= 90 && end[1]>=-180 && end[1]<=180 &&
+                center[0]>=-90 && center[0]<= 90 && center[1]>=-180 && center[1]<=180;
+    }
 }
