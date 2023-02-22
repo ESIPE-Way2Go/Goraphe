@@ -52,11 +52,18 @@ const routes = [
         component: () => import('@/views/SimulationMap.vue'),
         meta: { requiresAuth: true, layout: 'map' }
     },
+    {
+        path: '/admin/',
+        name: "admin",
+        component: () => import('@/views/admin/AdminPage.vue'),
+        meta: { requiresAuth: false, layout: 'content' }
+    },
     {   path: '/:pathMatch(.*)*',
         name: "error-404",
         component: () => import('@/views/Error404.vue'),
         meta: { requiresAuth: false, layout: 'blank' }
     },
+    
 ]
 
 // 3. Create the router instance and pass the `routes` option

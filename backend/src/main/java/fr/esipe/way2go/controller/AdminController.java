@@ -6,6 +6,7 @@ import fr.esipe.way2go.dao.InviteEntity;
 import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.dto.admin.UserBeforeInvitationRequest;
 import fr.esipe.way2go.dto.user.request.UpdatePasswordRequest;
+import fr.esipe.way2go.dto.user.request.UserInfo;
 import fr.esipe.way2go.dto.user.request.UserRequest;
 import fr.esipe.way2go.dto.user.response.UserResponse;
 import fr.esipe.way2go.exception.EmailFormatWrongException;
@@ -24,7 +25,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -144,38 +147,22 @@ public class AdminController {
 
 
     @PermitAll
-    @ResponseBody
-    @GetMapping("/sendSimpleEmail")
-    public String sendSimpleEmail(HttpServletRequest request) {
-        System.out.println(request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort());
-
-        UUID timebaseUUID = Generators.timeBasedGenerator().generate();      // it will geneate timebased UUID
-        System.out.println("Time based UUID :" + timebaseUUID.toString());      // UUID string
-        System.out.println("UUID version : " + timebaseUUID.version());         // 1 - version
-        System.out.println("UUID Node : " + timebaseUUID.node());               // IEEE 802 address of mechine that generate value
-        System.out.println("UUID Timestamp : " + timebaseUUID.timestamp());     // 60 bit timestamp
-
-        var calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(timebaseUUID.timestamp());
-        System.out.println(calendar.getTime());
-        /*
-        //var uuid = UUID.randomUUID();
-        var calendar = Calendar.getInstance();
-     //   var test = UUID.fromString(uuid.toString());
-       // calendar.setTimeInMillis();
-        var uuid = Generators.timeBasedGenerator().generate();
-        long timestamp = uuid.timestamp();
-        var date = new Date((timestamp / 10000) - 12219292800000L);
-        System.out.println(date);
-    //    System.out.println(test.timestamp());
-       // System.out.println(uuid.clockSequence());
-       // System.out.println(UUID.randomUUID());
-        //emailSenderService.sendInvitation();
-       //*/
-        return "Email Sent!";
+    @GetMapping("/users")
+    public ResponseEntity<List<UserInfo>> getAllUsers() {
+        var users = userService.getAllUsers();
+        var usersInfo = new ArrayList<UserInfo>();
+        users.forEach(user -> usersInfo.add(new UserInfo(user.getId(), user.getUsername(), user.getEmail(), user.getRole())));
+        return new ResponseEntity<>(usersInfo, HttpStatus.OK);
     }
 
-
-
+    @PermitAll
+    @DeleteMapping("/user/:id")
+    public ResponseEntity<Object> deleteUser(@PathVariable Long id) {
+        var userOptional = userService.getUserById(id);
+        if (userOptional.isEmpty())
+            throw new UserNotFoundException();
+        userService.deleteUser(userOptional.get());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
 
