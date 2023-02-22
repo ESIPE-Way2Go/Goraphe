@@ -8,12 +8,27 @@
       <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 " :class="{'panel-map-lg' : lgAndUp,'panel-map-md': md}"
                v-if="!close">
         <v-form @submit.prevent="makePostRequest" v-if="!close">
-          <v-row align="start">
+          <v-row align="start" class="mt-1">
+            <v-autocomplete
+                v-model="select"
+                :loading="loading"
+                :items="items.map(items => items.label).filter((val,i)=>i<4)"
+                v-model:search="search"
+                class="mx-4"
+                density="default"
+                label="Rechercher une déstination"
+                clearable
+                variant="outlined"
+                @update:modelValue="selectedSearch"
+            ></v-autocomplete>
+          </v-row>
+
+          <v-row align="start" class="mt-1">
             <v-col cols="10">
             <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
             </v-col>
-            <v-col cols="2">
-              <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="x-large"></v-btn>
+            <v-col cols="2" align-self="start">
+              <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="large"></v-btn>
             </v-col>
           </v-row>
           <v-text-field variant="outlined" v-model="desc" label="Description"></v-text-field>
@@ -22,7 +37,7 @@
           <v-select
               variant="outlined"
               chips
-              label="Select road types"
+              label="Type de routes"
               :items=roadTypes
               v-model="selectedRoadTypes"
               multiple
@@ -44,6 +59,7 @@ import 'leaflet-routing-machine';
 import authHeader from "@/services/auth-header";
 import {useDisplay, useTheme} from "vuetify";
 import {useToast} from "vue-toastification";
+import {OpenCageProvider} from "leaflet-geosearch";
 
 
 export default {
@@ -60,8 +76,28 @@ export default {
   },
 
   name: 'TestSearch',
+
+
+
+  watch: {
+    search (val) {
+      val && val !== this.select && this.querySelections(val)
+    },
+  },
+
+
   data() {
     return {
+      //search bar
+      center : [48.8405364, 2.5843466],
+      loading: false,
+      items: [],
+      search: null,
+      select: null,
+      //end
+
+      control:null,
+
       name: "",
       desc: "",
       map: null,
@@ -87,7 +123,7 @@ export default {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
-    let control = L.Routing.control({
+    this.control = L.Routing.control({
       show: false,
       showInstructions: false,
       routeWhileDragging: false,
@@ -100,11 +136,41 @@ export default {
         L.latLng(48.84009439586693, 2.586180556928124)
       ],
     }).addTo(map);
-    control.on('routesfound', (e) => {
+    this.control.on('routesfound', (e) => {
       this.waypoints = e.waypoints.map(w => [w.latLng.lat, w.latLng.lng]);
     });
+  this.map = map;
   },
   methods: {
+    //search bar
+    async querySelections (v) {
+      const provider = new OpenCageProvider({
+        params: {
+          key: 'ab736f9a32a2477aaf2036de1dc4340d',
+        },
+      });
+      this.loading = true
+      this.items = await provider.search({ query: v });
+      this.loading = false
+    },
+    selectedSearch(){
+      //console.log(this.select)
+      if(this.select===null) return;
+      let value = this.items.filter(i => i.label === this.select);
+      if(value.length<1) return;
+     // console.log(this.value)
+      this.map.setView([value[0].y,value[0].x], 15);
+      console.log(value)
+      this.control.setWaypoints([
+        L.latLng(value[0].y, value[0].x),
+        L.latLng(value[0].y, value[0].x)
+      ])
+      console.log(this.control.waypoints)
+      //this.center = [value[0].y,value[0].x]
+    },
+
+    //end search bar
+
     uncheckRoadTypes() {
       this.selectedRoadTypes = [];
     },
@@ -187,6 +253,12 @@ export default {
   z-index: 999;
 }
 
+.panel-search-bar{
+  width: 300px;
+  height: 40px;
+  left: 50%;
+  margin-left: -250px; /* Negative half of width. */
+}
 .panel-burger{
   z-index: 999;
 }
