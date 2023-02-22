@@ -23,7 +23,6 @@ import static org.hamcrest.Matchers.equalTo;
         locations = "classpath:application-test.properties"
 )
 public class HandleExceptionTests {
-
     @Nested
     @DisplayName("Simulation Forbidden Exception")
     class SimulationForbiddenExceptionTest {
@@ -94,7 +93,7 @@ public class HandleExceptionTests {
         @Test
          void returnStatus() {
             // Arrange
-            UserNotFoundException ex = new UserNotFoundException(1L);
+            UserNotFoundException ex = new UserNotFoundException();
             ControllerAdvisor advisor = new ControllerAdvisor();
             // Act
             ResponseEntity<Object> result = advisor.handleUserNotFound(ex);
@@ -105,7 +104,7 @@ public class HandleExceptionTests {
         @Test
          void returnBody() {
             // Arrange
-            UserNotFoundException ex = new UserNotFoundException(1L);
+            UserNotFoundException ex = new UserNotFoundException();
             ControllerAdvisor advisor = new ControllerAdvisor();
 
             // Act
@@ -119,8 +118,4 @@ public class HandleExceptionTests {
             assertThat(body.get("message"), equalTo(ex.getMessage()));
         }
     }
-
-
-
-
 }

@@ -1,21 +1,32 @@
 <template>
-    <v-sheet width="300" class="mx-auto">
-        <v-form fast-fail @submit.prevent="createAccount" v-model="isFormValid">
-            <v-text-field v-model="form.email" label="Mail" readonly></v-text-field>
-            <v-text-field v-model="form.username" label="Pseudo" :rules="usernameRules"></v-text-field>
+    <div class="d-flex align-center fill-height">
+        <v-card width="20%" class="mx-auto pa-6 bg-white" style="border-color: blue" variant="outlined" rounded-lg>
+            <v-img class="align-end text-white" :src=imageGoraphe cover></v-img>
+            <v-card-title class="text-center" style="color: blue">
+                Création de compte
+            </v-card-title>
+            <v-card-text>
+                <v-form fast-fail @submit.prevent="createAccount" v-model="isFormValid">
+                    <v-text-field variant="outlined" v-model="form.email" label="Mail" readonly></v-text-field>
+                    <v-text-field variant="outlined" v-model="form.username" label="Pseudo"
+                        :rules="usernameRules"></v-text-field>
 
-            <v-text-field v-model="form.password" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :rules="passwordRules"
-                :type="show1 ? 'text' : 'password'" label="Mot de passe "
-                hint="Au moins 8 caractères avec au moins une majuscule, une minuscule et un chifffre" counter
-                @click:append="show1 = !show1"></v-text-field>
+                    <v-text-field variant="outlined" v-model="form.password"
+                        :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :rules="passwordRules"
+                        :type="show1 ? 'text' : 'password'" label="Mot de passe "
+                        hint="Au moins 8 caractères avec au moins une majuscule, une minuscule et un chifffre" counter
+                        @click:append="show1 = !show1"></v-text-field>
 
-            <v-text-field v-model="confirmPassword" :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
-                :rules="confirmPasswordRules" :type="show2 ? 'text' : 'password'" label="Confirmation de mot de passe"
-                @click:append="show2 = !show2"></v-text-field>
+                    <v-text-field variant="outlined" v-model="confirmPassword"
+                        :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'" :rules="confirmPasswordRules"
+                        :type="show2 ? 'text' : 'password'" label="Confirmation de mot de passe"
+                        @click:append="show2 = !show2"></v-text-field>
 
-            <v-btn type="submit" block class="mt-2" :disabled="!isFormValid">Créer le compte</v-btn>
-        </v-form>
-    </v-sheet>
+                    <v-btn type="submit" color=primary block class="mt-2" :disabled="!isFormValid" rounded>Valider</v-btn>
+                </v-form>
+            </v-card-text>
+        </v-card>
+    </div>
 </template>
 
 <script>

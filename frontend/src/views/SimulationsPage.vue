@@ -1,9 +1,8 @@
 <template>
-    <v-container class="bg-blue-grey-lighten-5" >
+    <v-container class="bg-blue-grey-lighten-5">
         <h2 align-center>En cours</h2>
         <div v-if="simulationsInLoad.length == 0">
-            <v-alert type="info" title="Info"
-                text="Pas de simulation en cours"></v-alert>
+            <v-alert type="info" title="Info" text="Pas de simulation en cours"></v-alert>
         </div>
         <v-row no-gutters>
             <v-col v-for="simulation in simulationsInLoad" :key=simulation.id cols="12" sm="3" lg="2">
@@ -26,8 +25,7 @@
     <v-container class="bg-light-green-accent-1">
         <h2>Terminé</h2>
         <div v-if="simulations.length == 0">
-            <v-alert type="info" title="Info"
-                text="Aucune simulation"></v-alert>
+            <v-alert type="info" title="Info" text="Aucune simulation"></v-alert>
         </div>
         <v-row no-gutters>
             <v-col v-for="simulation in simulations" :key=simulation.id cols="12" sm="3" lg="2">
@@ -97,6 +95,8 @@ export default {
 
     methods: {
         getSimuations() {
+            var simulationsInLoad = []
+            var simulations = []
             fetch("/api/simulation/", {
                 method: "GET",
                 headers: authHeader(),
@@ -106,11 +106,14 @@ export default {
                     data.forEach(element => {
                         let elt = { id: element['id'], title: element['title'], date: this.getFormatDate(element['beginDate']) };
                         if (element['endDate'] === null)
-                            this.simulationsInLoad.push(elt)
+                            simulationsInLoad.push(elt)
                         else
-                            this.simulations.push(elt)
+                            simulations.push(elt)
                     });
                 });
+
+            this.simulationsInLoad = simulationsInLoad
+            this.simulation = simulations
 
         },
         goSimulation(id) {
@@ -138,7 +141,7 @@ export default {
                 .then(data => {
                     if (data === true) {
                         this.toast.success(`Suppression de la simulation réussi`)
-                        this.simulations=[]
+                        this.simulations = []
                         this.getSimuations()
                     } else {
                         this.toast.error(`Suppression de la simulation pas réussi`)

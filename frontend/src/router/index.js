@@ -17,21 +17,27 @@ const routes = [
         meta: { requiresAuth: false, layout: 'blank' }
     },
     {
+        path: '/map',
+        name: "map",
+        component: () => import('@/views/TestSearch.vue'),
+        meta: { requiresAuth: true, layout: 'map' }
+    },
+    {
         path: '/createAccount/:token',
         name: "createAccount",
-        component: () => import('@/views/CreateAccountPage.vue'),
+        component: () => import('@/views/user/CreateAccountPage.vue'),
         meta: { requiresAuth: false, layout: 'blank' }
     },
     {
         path: '/forgetPassword/',
         name: "forgetPassword",
-        component: () => import('@/views/PasswordForgotPage.vue'),
+        component: () => import('@/views/user/PasswordForgotPage.vue'),
         meta: { requiresAuth: false, layout: 'blank' }
     },
     {
         path: '/updatePassword/:token',
         name: "updatePassword",
-        component: () => import('@/views/ChangePasswordPage.vue'),
+        component: () => import('@/views/user/ChangePasswordPage.vue'),
         meta: { requiresAuth: false, layout: 'blank' }
     },
     {

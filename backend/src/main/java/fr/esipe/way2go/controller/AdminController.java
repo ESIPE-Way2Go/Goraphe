@@ -40,7 +40,7 @@ public class AdminController {
     private WebSecurityConfiguration webSecurityConfiguration;
 
     @Autowired
-    public AdminController(@Qualifier("emailService") EmailService emailSenderService, UserService userService, InviteService inviteService, WebSecurityConfiguration webSecurityConfiguration) {
+    public AdminController(EmailService emailSenderService, UserService userService, InviteService inviteService, WebSecurityConfiguration webSecurityConfiguration) {
         this.emailSenderService = emailSenderService;
         this.userService = userService;
         this.inviteService = inviteService;
