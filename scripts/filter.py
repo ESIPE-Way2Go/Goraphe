@@ -39,6 +39,7 @@ def shortest_path_geojson(G, point1, point2, weight='length'):
         lambda x: LineString([(G.nodes[x[0]]['x'], G.nodes[x[0]]['y']), (G.nodes[x[1]]['x'], G.nodes[x[1]]['y'])]),
         axis=1)
     features['name'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('name', ''), axis=1)
+    features['maxspeed'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('maxspeed', ''), axis=1)
     return features.to_json()
 
 
