@@ -188,7 +188,6 @@ public class AdminController {
         var inviteEntityOptional = inviteService.findById(id);
         if (inviteEntityOptional.isEmpty())
             throw new InviteNotFoundException();
-
         var invite = inviteEntityOptional.get();
         invite.setFirstMailSent(Calendar.getInstance());
         invite.setMailCount(invite.getMailCount() + 1);

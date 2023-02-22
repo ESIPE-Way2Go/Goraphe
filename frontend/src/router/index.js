@@ -56,7 +56,7 @@ const routes = [
         path: '/admin/',
         name: "admin",
         component: () => import('@/views/admin/AdminPage.vue'),
-        meta: { requiresAuth: false, layout: 'content' }
+        meta: { requiresAuth: true, layout: 'content'}
     },
     {   path: '/:pathMatch(.*)*',
         name: "error-404",
@@ -76,12 +76,13 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-
     const loggedIn = localStorage.getItem('user');
     const isLogged = loggedIn !== null;
+
+ 
     if (!to.meta.requiresAuth) {
         next();
-        //nedd to be logged
+        //need to be logged
     } else if (!isLogged) {
         next({ name: "login" });
         //token expire

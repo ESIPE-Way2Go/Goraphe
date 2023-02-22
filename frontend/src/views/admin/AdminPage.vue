@@ -106,8 +106,7 @@
 
 
 <script>
-//import authHeader from "@/services/auth-header";
-
+import {can} from '@/utils'
 import authHeader from "@/services/auth-header";
 import { useToast } from "vue-toastification";
 
@@ -160,7 +159,7 @@ export default {
         deleteUser(id) {
             fetch("/api/administration/user/" + id, {
                 method: "DELETE",
-                
+                headers: authHeader(),            
             })
             .then(response => {
                 if (response.ok) {
@@ -192,7 +191,7 @@ export default {
         getInvitations() {
             fetch("/api/administration/invitations/", {
                 method: "GET",
-                headers: { "Content-Type": "application/json" },
+                headers: authHeader(),
             })
             .then(response => response.json()).then(data => {
                 this.invitations = data
@@ -232,9 +231,15 @@ export default {
                     this.toast.error(data['message'])
                 })
             })
+        },
+        checkAdmin() {
+            var checkAdmin = can("ROLE_ADMIN") 
+            if (checkAdmin === null || !checkAdmin)
+                this.$router.push({name: 'home'});
         }
     },
     mounted() {
+        this.checkAdmin()
         this.getUsers()
         this.getInvitations()
     }
