@@ -67,4 +67,18 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         body.put(MESSAGE, ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
     }
+    @ExceptionHandler(WrongEmailFormatException.class)
+    public ResponseEntity<Object> handleWrongEmailFormat(WrongEmailFormatException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(WrongPasswordFormatException.class)
+    public ResponseEntity<Object> handleWrongPasswordFormat(WrongPasswordFormatException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
 }

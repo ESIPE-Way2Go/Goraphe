@@ -22,7 +22,7 @@ export default {
                 return 'mail est requis'
             },
             value => {
-                if (/.+@.+\..+/.test(value)) return true
+                if (/^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,})+$/.test(value)) return true
                 return 'Mail doit être valide'
             },
         ],

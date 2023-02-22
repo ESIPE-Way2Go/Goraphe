@@ -10,8 +10,9 @@ import fr.esipe.way2go.dto.user.request.UpdatePasswordRequest;
 import fr.esipe.way2go.dto.user.request.UserRequest;
 import fr.esipe.way2go.dto.user.response.UserInfoResponse;
 import fr.esipe.way2go.dto.user.response.UserResponse;
-import fr.esipe.way2go.exception.EmailFormatWrongException;
+import fr.esipe.way2go.exception.WrongEmailFormatException;
 import fr.esipe.way2go.exception.UserEmailFound;
+import fr.esipe.way2go.exception.WrongPasswordFormatException;
 import fr.esipe.way2go.exception.invite.InviteNotFoundException;
 import fr.esipe.way2go.exception.user.UserNotFoundException;
 import fr.esipe.way2go.exception.user.UserTokenNotFoundException;
@@ -50,10 +51,12 @@ public class AdminController {
     }
 
     private void checkEmail(String email) {
-        var regex = "^(.+)@(\\S+)$";
-        var result = Pattern.compile(regex).matcher(email).matches();
-        if (!result)
-            throw new EmailFormatWrongException();
+        var regex =  "^\\w[\\w.%+-]*@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        if(! Pattern.compile(regex).matcher(email).matches()) throw new WrongEmailFormatException();
+    }
+    private void checkPassword(String password){
+        var regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$";
+        if(! password.matches(regex)) throw new WrongPasswordFormatException();
     }
 
     @PermitAll
@@ -71,10 +74,12 @@ public class AdminController {
     @PermitAll
     @PutMapping("/createAccount")
     public ResponseEntity<Boolean> createAccount(@RequestBody UserRequest userRequest) {
+        checkEmail(userRequest.getEmail());
+        checkPassword(userRequest.getPassword());
+        if(userRequest.getUsername().strip().isBlank()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         var user = userService.getUser(userRequest.getUsername());
         if (user.isPresent())
             throw new UsernameExistAlreadyException();
-
         var userSave = userService.getUserByEmail(userRequest.getEmail());
         if (userSave.isEmpty())
             throw new UserNotFoundException();
@@ -91,14 +96,16 @@ public class AdminController {
 
     @PermitAll
     @GetMapping("/forgetPassword/{email}")
-    public void sendForgotPassword(@PathVariable String email) {
+    public ResponseEntity<Object> sendForgotPassword(@PathVariable String email) {
+        checkEmail(email);
         var userOptional = userService.getUserByEmail(email);
         if (userOptional.isEmpty())
-            throw new UserNotFoundException();
+            return new ResponseEntity<>(HttpStatus.OK);
         var user = userOptional.get();
         user.setToken(Generators.timeBasedGenerator().generate().toString());
         var userSave = userService.saveUser(user);
         emailSenderService.sendLinkForForgetPassword(userSave);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PermitAll
@@ -113,6 +120,7 @@ public class AdminController {
     @PermitAll
     @PutMapping("/updatePassword/")
     public ResponseEntity<Boolean> updatePassword(@RequestBody UpdatePasswordRequest updatePasswordRequest) {
+        checkPassword(updatePasswordRequest.getPassword());
         var userEntityOptional = userService.getUserByToken(updatePasswordRequest.getToken());
         if (userEntityOptional.isEmpty())
             throw new UserTokenNotFoundException();
