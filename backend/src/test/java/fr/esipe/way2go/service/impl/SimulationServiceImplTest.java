@@ -45,9 +45,8 @@ class SimulationServiceImplTest {
     }
     @Test
     void saveSimulation() {
-        var simulation = new SimulationEntity("simulationTest", user, "Description de la simulation de test", "default",new ArrayList<>());
+        var simulation = new SimulationEntity("simulationTest", user, "Description de la simulation de test", 5,  "default", new ArrayList<>());
         var simulationSave = simulationService.save(simulation);
-        System.out.println(simulationSave);
         assertEquals(simulation, simulationSave);
     }
 }

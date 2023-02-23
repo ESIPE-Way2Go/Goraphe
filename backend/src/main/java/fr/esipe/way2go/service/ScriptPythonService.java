@@ -29,7 +29,7 @@ public interface ScriptPythonService {
                 logs.append(line).append("\n");
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+           return "";
         }
         return logs.toString();
     }

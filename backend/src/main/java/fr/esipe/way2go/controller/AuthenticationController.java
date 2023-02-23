@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
-// Faudrait peut être delete le cross origin. Normalement, il y en a pas besoin: à tester.
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {

@@ -160,16 +160,4 @@ public class UserEntity {
     public void setToken(String token) {
         this.token = token;
     }
-
-    @Override
-    public String toString() {
-        return "UserEntity{" +
-                "userId=" + userId +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", role='" + role + '\'' +
-                ", simulations=" + simulations +
-                '}';
-    }
 }

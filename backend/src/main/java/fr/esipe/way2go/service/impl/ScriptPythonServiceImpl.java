@@ -11,7 +11,9 @@ import fr.esipe.way2go.service.SimulationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.Calendar;
 
@@ -39,29 +41,60 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
     public void executeScript(UserEntity user, SimulationEntity simulation, MapController.Point coords, SimulationRequest simulationRequest) {
         var sep = System.getProperty("file.separator");
         var pathGeneric = System.getProperty("user.dir") + sep + "scripts" + sep;
-        var pathLog = pathGeneric + user.getUsername() + sep + simulation.getName() + "_1.log";
+        var genericPathLog = pathGeneric + user.getUsername() + sep + simulation.getName();
+        var pathLog1 = genericPathLog + "_1.log";
+        var pathLog2 = genericPathLog + "_2.log";
+        var pathLog3 = genericPathLog + "_3.log";
+        var logEntity1 = logService.save(new LogEntity(simulation, "filter"));
+        var logEntity2 = logService.save(new LogEntity(simulation, "random_nodes"));
+        var logEntity3 = logService.save(new LogEntity(simulation, "compute"));
 
-        var builder = new ProcessBuilder("python3", pathGeneric + "test.py",
+        var builder = new ProcessBuilder("python3", pathGeneric + "filter.py",
                 "--dist", Integer.toString(simulationRequest.getDistance()),
                 "--coords", coords.toString(),
                 "--user", user.getUsername(),
                 "--sim", simulation.getName(),
-                "--desc", simulationRequest.getDesc(),
-                "--roads", String.join(",", simulationRequest.getRoadTypes()));
+                "--roads", String.join(",", simulationRequest.getRoadTypes()),
+                "--point1", new MapController.Point(simulationRequest.getStart()).toString(),
+                "--point2", new MapController.Point(simulationRequest.getEnd()).toString()
+        );
 
         try {
             var process = builder.start();
-            var logEntity = logService.save(new LogEntity(simulation, "test.py"));
             int exitCode = process.waitFor();
-            var errorLogs = new String(process.getErrorStream().readAllBytes());
             var status = exitCode == 0 ? "SUCCESS" : "ERROR";
-            logEntity.setContent(exitCode != 0 ? errorLogs : readFile(Path.of(pathLog).toString()) + errorLogs);
-            logEntity.setStatus(status);
-            logService.save(logEntity);
+            var errorLogs = new String(process.getErrorStream().readAllBytes());
+
+            logEntity1.setContent(readFile(Path.of(pathLog1).toString()));
+            logEntity2.setContent(readFile(Path.of(pathLog2).toString()));
+            logEntity3.setContent(readFile(Path.of(pathLog3).toString()));
+
+            if (logEntity2.getContent().equals("")) {
+                logEntity1.setStatus(status);
+                logEntity1.setContent(logEntity1.getContent() + errorLogs);
+            }
+            else if (logEntity3.getContent().equals("")) {
+                logEntity2.setStatus(status);
+                logEntity2.setContent(logEntity2.getContent() + errorLogs);
+            } else {
+                logEntity3.setStatus(status);
+                logEntity3.setContent(logEntity3.getContent() + errorLogs);
+            }
+
+            logService.save(logEntity1);
+            logService.save(logEntity2);
+            logService.save(logEntity3);
+
+            var stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            var randomPoints = stdInput.readLine();
+            var shortestPath = stdInput.readLine();
             simulation.setEndDate(Calendar.getInstance());
+            simulation.setRandomPoints(randomPoints);
+            simulation.setShortestPath(shortestPath);
+            simulation.setStatus(status);
             simulationService.save(simulation);
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException();
+            Thread.currentThread().interrupt();
         }
     }
 }
