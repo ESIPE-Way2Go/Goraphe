@@ -8,16 +8,16 @@
             <div class="row">
               <div class="col-lg-10 col-xl-7 mx-auto">
                 <h3 class="display-4">GoRaphe</h3>
-                <p class="text-muted mb-4">The road to success.</p>
+                <p class="text-muted mb-4">La route du succès.</p>
                 <form @submit.prevent="handleLogin">
                   <div class="mb-3">
                     <input id="inputEmail" v-model="form.username" autofocus=""
-                           class="form-control rounded-pill border-0 shadow-sm px-4" placeholder="Username"
+                           class="form-control rounded-pill border-0 shadow-sm px-4" placeholder="Nom d'utilisateur"
                            required="" type="text"/>
                   </div>
                   <div class="mb-3">
                     <input id="inputPassword" v-model="form.password"
-                           class="form-control rounded-pill border-0 shadow-sm px-4 text-primary" placeholder="Password"
+                           class="form-control rounded-pill border-0 shadow-sm px-4 text-primary" placeholder="Mor de passe"
                            required=""
                            type="password"/>
                   </div>
@@ -27,7 +27,7 @@
                     </v-btn>
                   </div>
                   <div class="d-grid gap-2 mt-2">
-                    <button class="btn btn-primary btn-block text-uppercase mb-2 rounded-pill shadow-sm">Sign in
+                    <button class="btn btn-primary btn-block text-uppercase mb-2 rounded-pill shadow-sm">Se connecter
                     </button>
                   </div>
                 </form>
@@ -77,7 +77,7 @@ export default {
 }
 
 .bg-image {
-  background-image: url('@/assets/login.png');
+  background-image: url('@/assets/roads_backgroung_img.svg');
   background-size: cover;
   background-position: center center;
 }
