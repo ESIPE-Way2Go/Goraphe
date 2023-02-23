@@ -42,7 +42,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendLinkForForgetPassword(UserEntity userEntity) {
         var subject = "Récupération de votre mot de passe";
-        var link = uri + "/modifyPassword/" + userEntity.getToken();
+        var link = uri + "/updatePassword/" + userEntity.getToken();
         var body = "Bonjour " + userEntity.getUsername() + "," + """
                                 
                 Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer ce message.                               

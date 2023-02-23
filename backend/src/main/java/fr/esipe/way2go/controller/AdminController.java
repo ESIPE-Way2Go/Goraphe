@@ -70,10 +70,8 @@ public class AdminController {
         var inviteEntityOptional = inviteService.findByToken(token);
         if (inviteEntityOptional.isEmpty())
             throw new InviteNotFoundException();
-
         var inviteEntity = inviteEntityOptional.get();
-        var user = inviteEntity.getUser();
-        return new ResponseEntity<>(new UserResponse(user.getEmail()), HttpStatus.OK);
+        return new ResponseEntity<>(new UserResponse(inviteEntity.getTargetEmail()), HttpStatus.OK);
     }
 
     @PermitAll
@@ -85,18 +83,14 @@ public class AdminController {
         var user = userService.getUser(userRequest.getUsername());
         if (user.isPresent())
             throw new UsernameExistAlreadyException();
-        var userSave = userService.getUserByEmail(userRequest.getEmail());
-        if (userSave.isEmpty())
-            throw new UserNotFoundException();
-        var userGet = userSave.get();
 
         var passwordEncoder = webSecurityConfiguration.passwordEncoder();
-        userGet.setUsername(userRequest.getUsername());
-        userGet.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-        userGet.setToken(null);
+        var newUser =new UserEntity(userRequest.getUsername(), passwordEncoder.encode(userRequest.getPassword()), userRequest.getEmail(), "ROLE_USER");
 
-
-        userService.saveUser(userGet);
+        userService.saveUser(newUser);
+        var invite = inviteService.findByEmail(userRequest.getEmail());
+        if (invite.isPresent())
+            inviteService.delete(invite.get());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -163,7 +157,7 @@ public class AdminController {
     @GetMapping("/invitations")
     public ResponseEntity<List<InvitationResponse>> getInvitations() {
         var invites = new ArrayList<InvitationResponse>();
-        inviteService.getAll().forEach(invite -> invites.add(new InvitationResponse(invite.getInviteId(), invite.getUser().getEmail(), invite.getFirstMailSent(), invite.getMailCount())));
+        inviteService.getAll().forEach(invite -> invites.add(new InvitationResponse(invite.getInviteId(), invite.getTargetEmail(), invite.getMailSent(), invite.getMailCount())));
         return new ResponseEntity<>(invites, HttpStatus.OK);
     }
 
@@ -188,8 +182,7 @@ public class AdminController {
         if (user.isPresent())
             throw new UserEmailFound(email);
         var inviteEntity = new InviteEntity(
-                userService.saveUser(new UserEntity(email, "ROLE_USER")),
-                generateToken()
+                email, generateToken()
         );
 
         var saveInvite = inviteService.save(inviteEntity);
@@ -203,11 +196,11 @@ public class AdminController {
         if (inviteEntityOptional.isEmpty())
             throw new InviteNotFoundException();
         var invite = inviteEntityOptional.get();
-        invite.setFirstMailSent(Calendar.getInstance());
+        invite.setMailSent(Calendar.getInstance());
         invite.setMailCount(invite.getMailCount() + 1);
         invite.setToken(generateToken());
         inviteService.save(invite);
-        emailSenderService.sendInvitation(invite.getUser().getEmail(), invite);
+        emailSenderService.sendInvitation(invite.getTargetEmail(), invite);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

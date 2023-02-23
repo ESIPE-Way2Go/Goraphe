@@ -2,7 +2,6 @@ package fr.esipe.way2go.dao;
 
 import fr.esipe.way2go.dao.converter.CalendarConverter;
 import javax.persistence.*;
-import java.sql.Date;
 import java.util.Calendar;
 
 @Entity
@@ -13,22 +12,15 @@ public class InviteEntity {
     @Column(name = "invite_id")
     private Long inviteId;
 
-    @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
-    private UserEntity user;
-
     @Column(name = "target_email")
     private String targetEmail;
 
     @Column(name = "status")
     private String status;
 
-    @Column(name = "first_mail_sent")
+    @Column(name = "mail_sent")
     @Convert(converter = CalendarConverter.class)
-    private Calendar firstMailSent;
-
-    @Column(name = "last_mail_sent")
-    private Date lastMailSent;
+    private Calendar mailSent;
 
     @Column(name = "mail_count", nullable = false)
     private Integer mailCount = 0;
@@ -39,10 +31,10 @@ public class InviteEntity {
     public InviteEntity() {
     }
 
-    public InviteEntity(UserEntity userEntity, String token) {
-        this.user = userEntity;
+    public InviteEntity(String email, String token) {
+        this.targetEmail = email;
         this.token = token;
-        firstMailSent = Calendar.getInstance();
+        mailSent = Calendar.getInstance();
         this.mailCount += 1;
     }
 
@@ -62,24 +54,6 @@ public class InviteEntity {
      */
     public void setInviteId(Long inviteId) {
         this.inviteId = inviteId;
-    }
-
-    /**
-     * Returns this invite's receiver user.
-     *
-     * @return user This invite's receiver user. (UserEntity)
-     */
-    public UserEntity getUser() {
-        return user;
-    }
-
-    /**
-     * Sets a new ID for this invite's receiver user.
-     *
-     * @param user This new invite's receiver user. (UserEntity)
-     */
-    public void setUser(UserEntity user) {
-        this.user = user;
     }
 
     /**
@@ -129,39 +103,21 @@ public class InviteEntity {
     /**
      * Returns this invite's first mail sent date.
      *
-     * @return firstMailSent This invite's first mail sent date. (Date)
+     * @return mailSent This invite's first mail sent date. (Date)
      */
-    public Calendar getFirstMailSent() {
-        return firstMailSent;
+    public Calendar getMailSent() {
+        return mailSent;
     }
 
     /**
      * Sets a new date for this invite's first mail sent.
      *
-     * @param firstMailSent The new date for this invite's first mail sent. (Date)
+     * @param mailSent The new date for this invite's first mail sent. (Date)
      */
-    public void setFirstMailSent(Calendar firstMailSent) {
-        this.firstMailSent = firstMailSent;
+    public void setMailSent(Calendar mailSent) {
+        this.mailSent = mailSent;
     }
-
-    /**
-     * Returns this invite's last mail sent date.
-     *
-     * @return lastMailSent This invite's last mail sent date. (Date)
-     */
-    public Date getLastMailSent() {
-        return lastMailSent;
-    }
-
-    /**
-     * Sets a new date for this invite's last mail sent.
-     *
-     * @param lastMailSent The new date for this invite's last mail sent. (Date)
-     */
-    public void setLastMailSent(Date lastMailSent) {
-        this.lastMailSent = lastMailSent;
-    }
-
+    
     /**
      * Returns this invite's mail count sent.
      *
