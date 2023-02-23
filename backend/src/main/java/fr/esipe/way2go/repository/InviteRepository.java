@@ -10,5 +10,6 @@ public interface InviteRepository extends JpaRepository<InviteEntity, Long> {
     @Query("SELECT i FROM InviteEntity i WHERE token = :token")
     Optional<InviteEntity> findByToken(String token);
 
-
+    @Query("SELECT i FROM InviteEntity i WHERE targetEmail = :email")
+    Optional<InviteEntity> findByEmail(String email);
 }

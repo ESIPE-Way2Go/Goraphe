@@ -12,8 +12,11 @@ public interface InviteService {
 
     Optional<InviteEntity> findByToken(String token);
     Optional<InviteEntity> findById(Long id);
+    Optional<InviteEntity> findByEmail(String email);
 
     List<InviteEntity> getAll();
 
     void delete(InviteEntity inviteEntity);
+
+
 }
