@@ -76,6 +76,9 @@ export default {
         this.dist = newVal;
       }
     },
+    search (val) {
+      val && val !== this.select && this.querySelections(val)
+    },
   },
   setup() {
     const theme = useTheme();
@@ -88,18 +91,7 @@ export default {
       sm, md, lgAndUp
     }
   },
-
   name: 'TestSearch',
-
-
-
-  watch: {
-    search (val) {
-      val && val !== this.select && this.querySelections(val)
-    },
-  },
-
-
   data() {
     return {
       //search bar
@@ -122,7 +114,6 @@ export default {
       script: "default",
       close: false,
       length: 0,
-      center: [],
       start: [],
       end: [],
     };
@@ -156,7 +147,7 @@ export default {
       router: L.Routing.mapbox('pk.eyJ1IjoibWV4aW1hIiwiYSI6ImNsZWd2djNkdDBwc3gzcXR0ZXB3Nmt6dDQifQ.GeKKqQmsdu8WhrePgFj2ww')
     }).addTo(map);
 
-    control.on('routesfound', (e) => {
+    this.control.on('routesfound', (e) => {
       this.start = [e.waypoints[0].latLng.lng, e.waypoints[0].latLng.lat];
       this.end = [e.waypoints[e.waypoints.length - 1].latLng.lng, e.waypoints[e.waypoints.length - 1].latLng.lat];
       this.length = e.routes[0] ? e.routes[0].summary.totalDistance : 0;
