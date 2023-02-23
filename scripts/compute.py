@@ -1,16 +1,8 @@
 import logging
-
-import osmnx as ox
 import networkx as nx
-import geopandas as gpd
-import matplotlib.pyplot as plt
 import pandas as pd
-import math
 import time
-import openpyxl
-from shapely import LineString
-
-import random_nodes
+import openpyxl #Shows as not used but is needed to export .xlsx files
 
 
 

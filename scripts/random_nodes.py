@@ -1,8 +1,5 @@
-import argparse
 import logging
-
 import osmnx as ox
-import networkx as nx
 import random
 
 

@@ -1,22 +1,13 @@
 import logging
 import sys
-import json
-import geopandas
 import numpy as np
-import requests
 import osmnx as ox
-import osmnet as oxnet
 import networkx as nx
 import geopandas as gpd
-import matplotlib.pyplot as plt
-import pandas as pd
 import math
 import time
 import argparse
-
-from networkx import nodes
 from shapely import LineString
-
 import compute
 import random_nodes
 
