@@ -10,11 +10,14 @@ public class SimulationHomeResponse {
     private Calendar beginDate;
     private Calendar endDate;
 
+    private String status;
+
     public SimulationHomeResponse(SimulationEntity simulationEntity) {
         id = simulationEntity.getSimulationId();
         title = simulationEntity.getName();
         beginDate = simulationEntity.getBeginDate();
         endDate = simulationEntity.getEndDate();
+        status = simulationEntity.getStatus();
     }
 
     public Long getId() {
@@ -47,5 +50,13 @@ public class SimulationHomeResponse {
 
     public void setEndDate(Calendar endDate) {
         this.endDate = endDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
