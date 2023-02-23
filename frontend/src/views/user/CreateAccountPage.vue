@@ -8,7 +8,7 @@
       </v-card-title>
       <v-card-text>
         <v-form v-model="isFormValid" fast-fail @submit.prevent="createAccount">
-          <v-text-field v-model="form.mail" class="ma-2" label="Mail" readonly variant="outlined"></v-text-field>
+          <v-text-field v-model="mail" class="ma-2" label="Mail" readonly variant="outlined"></v-text-field>
           <v-text-field v-model="form.username" :rules="usernameRules" class="ma-2" label="Pseudonyme"
                         variant="outlined"></v-text-field>
           <v-text-field v-model="form.password" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :rules="passwordRules"

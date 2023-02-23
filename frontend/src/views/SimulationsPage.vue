@@ -110,11 +110,10 @@ export default {
                         else
                             simulations.push(elt)
                     });
+
+                    this.simulationsInLoad = simulationsInLoad
+                    this.simulations = simulations
                 });
-
-            this.simulationsInLoad = simulationsInLoad
-            this.simulation = simulations
-
         },
         goSimulation(id) {
             this.$router.push({ name: 'simulation', params: { id: id } });

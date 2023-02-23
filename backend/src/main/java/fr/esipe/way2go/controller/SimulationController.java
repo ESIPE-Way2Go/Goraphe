@@ -5,7 +5,10 @@ import fr.esipe.way2go.dao.SimulationEntity;
 import fr.esipe.way2go.dto.simulation.request.SimulationRequest;
 import fr.esipe.way2go.dto.simulation.response.SimulationHomeResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationIdResponse;
+import fr.esipe.way2go.dto.simulation.response.SimulationMapResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationResponse;
+import fr.esipe.way2go.exception.SimulationForbidden;
+import fr.esipe.way2go.exception.SimulationNotFoundException;
 import fr.esipe.way2go.service.ScriptPythonService;
 import fr.esipe.way2go.service.SimulationService;
 import fr.esipe.way2go.service.UserService;
@@ -14,7 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -24,7 +26,7 @@ import java.util.concurrent.Executors;
 @RestController
 @RequestMapping("/api/simulation")
 public class SimulationController {
-    private static final int NB_THREADS = 10;
+    private static final int NB_THREADS = 20;
     private static final ExecutorService POOL = Executors.newFixedThreadPool(NB_THREADS);
     private final SimulationService simulationService;
     private final UserService userService;
@@ -56,12 +58,13 @@ public class SimulationController {
         var user = userOptional.get();
         if(simulationRequest.getDistance()<100 || !simulationRequest.checkBounds() || simulationRequest.getRoadTypes().isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        var simulation = new SimulationEntity(simulationRequest.getName(), user, simulationRequest.getDesc(), "test",simulationRequest.getRoadTypes());
+        var simulation = new SimulationEntity(simulationRequest.getName(), user, simulationRequest.getDesc(), simulationRequest.getDistance(),  simulationRequest.getScript(), simulationRequest.getRoadTypes());
         var simulationSave = simulationService.save(simulation);
         var midPoint= new MapController.Point(simulationRequest.getCenter());
         POOL.execute(() -> {
             simulationSave.setBeginDate(Calendar.getInstance());
-            simulationService.save(simulation);
+            simulationSave.setStatus("En cours");
+            simulationService.save(simulationSave);
             scriptPythonService.executeScript(user, simulationSave, midPoint,simulationRequest);
         });
         return new ResponseEntity<>(new SimulationIdResponse(simulationSave.getSimulationId()), HttpStatus.ACCEPTED);
@@ -127,5 +130,20 @@ public class SimulationController {
         }
         simulationService.deleteSimulation(simulation);
         return new ResponseEntity<>(Boolean.TRUE, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/map")
+    public ResponseEntity<SimulationMapResponse> getSimulationForMap(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
+       var userEntityOptional = userService.getUser(jwtUtils.getUsersFromHeaders(headers));
+        if (userEntityOptional.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        var user = userEntityOptional.get();
+        var simulationEntityOptional = simulationService.find(id);
+        if (simulationEntityOptional.isEmpty())
+            throw new SimulationNotFoundException();
+        var simulation = simulationEntityOptional.get();
+        if (!simulation.getUser().equals(user))
+            throw new SimulationForbidden();
+        return new ResponseEntity<>(new SimulationMapResponse(simulation), HttpStatus.OK);
     }
 }

@@ -7,6 +7,7 @@ import Toast from "vue-toastification";
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'vue3-easy-data-table/dist/style.css';
 import "vue-toastification/dist/index.css";
+import 'leaflet-geosearch/dist/geosearch.css';
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
