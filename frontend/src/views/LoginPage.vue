@@ -17,7 +17,7 @@
                   </div>
                   <div class="mb-3">
                     <input id="inputPassword" v-model="form.password"
-                           class="form-control rounded-pill border-0 shadow-sm px-4 text-primary" placeholder="Mor de passe"
+                           class="form-control rounded-pill border-0 shadow-sm px-4 text-primary" placeholder="Mot de passe"
                            required=""
                            type="password"/>
                   </div>
