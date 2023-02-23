@@ -50,8 +50,7 @@ import {useToast} from "vue-toastification";
 export default {
   computed: {
     minDist() {
-      let min=Math.max(this.length*0.6, 100);
-      return min;
+      return Math.max(this.length * 0.6, 100);
     },
   },
   watch: {
@@ -122,7 +121,7 @@ export default {
       this.start = [e.waypoints[0].latLng.lng, e.waypoints[0].latLng.lat];
       this.end = [e.waypoints[e.waypoints.length - 1].latLng.lng, e.waypoints[e.waypoints.length - 1].latLng.lat];
       this.length = e.routes[0] ? e.routes[0].summary.totalDistance : 0;
-      this.center=this.getCenter(e.routes[0].coordinates.map(coord => [coord.lat, coord.lng]));
+      this.center = this.getCenter(e.routes[0].coordinates.map(coord => [coord.lat, coord.lng]));
       console.log(this.center)
     });
   },
@@ -161,18 +160,21 @@ export default {
       }
       if (this.dist < this.length * 0.6 || this.dist < 100) {
         this.toast.error("Generation distance cannot be less than 100 or less that 60% of the route length")
+        this.dist = this.minDist
+        return;
       }
-
+      console.log("length = " + this.length * 0.6)
+      console.log("dist = " + this.dist)
       try {
-        let center=this.center;
+        let center = this.center;
         let name = this.$data.name;
         let desc = this.$data.desc;
         let start = this.start;
         let end = this.end;
-        let distance = 100;
+        let distance = this.dist;
         let roadTypes = this.$data.selectedRoadTypes;
         let script = this.$data.script;
-        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script,center});
+        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center});
         const response = await fetch('/api/simulation', {
           method: 'POST',
           headers: authHeader(),

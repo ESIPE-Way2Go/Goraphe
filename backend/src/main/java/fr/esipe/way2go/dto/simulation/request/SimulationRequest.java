@@ -6,13 +6,13 @@ import java.util.List;
 public class SimulationRequest {
 
     String name;
-    double [] start;
-    double [] end;
+    double[] start;
+    double[] end;
     int distance;
     String desc;
     String script;
     List<String> roadTypes;
-    double [] center;
+    double[] center;
 
     public String getName() {
         return name;
@@ -90,5 +90,12 @@ public class SimulationRequest {
                 ", roadTypes=" + roadTypes +
                 ", center=" + Arrays.toString(center) +
                 '}';
+    }
+
+    public boolean checkBounds() {
+        // Check if each coordinate is within the world bounds
+        return start[0]>=-90 && start[0]<= 90 && start[1]>=-180 && start[1]<=180 &&
+                end[0]>=-90 && end[0]<= 90 && end[1]>=-180 && end[1]<=180 &&
+                center[0]>=-90 && center[0]<= 90 && center[1]>=-180 && center[1]<=180;
     }
 }

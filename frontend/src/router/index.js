@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-
-
 // 2. Define some routes
 // Each route should map to a component.
 // We'll talk about nested routes later.
@@ -13,16 +11,34 @@ const routes = [
         meta: { requiresAuth: true, layout: 'content' }
     },
     {
+        path: '/login',
+        name: "login",
+        component: () => import('@/views/LoginPage.vue'),
+        meta: { requiresAuth: false, layout: 'blank' }
+    },
+    {
         path: '/map',
         name: "map",
         component: () => import('@/views/TestSearch.vue'),
         meta: { requiresAuth: true, layout: 'map' }
     },
     {
-        path: '/login',
-        name: "login",
-        component: () => import('@/views/LoginPage.vue'),
-        meta: {requiresAuth: false, layout: 'blank'}
+        path: '/createAccount/:token',
+        name: "createAccount",
+        component: () => import('@/views/user/CreateAccountPage.vue'),
+        meta: { requiresAuth: false, layout: 'blank' }
+    },
+    {
+        path: '/forgetPassword/',
+        name: "forgetPassword",
+        component: () => import('@/views/user/PasswordForgotPage.vue'),
+        meta: { requiresAuth: false, layout: 'blank' }
+    },
+    {
+        path: '/updatePassword/:token',
+        name: "updatePassword",
+        component: () => import('@/views/user/ChangePasswordPage.vue'),
+        meta: { requiresAuth: false, layout: 'blank' }
     },
     {
         path: '/simulation/:id',
@@ -36,11 +52,18 @@ const routes = [
         component: () => import('@/views/SimulationMap.vue'),
         meta: { requiresAuth: true, layout: 'map' }
     },
+    {
+        path: '/admin/',
+        name: "admin",
+        component: () => import('@/views/admin/AdminPage.vue'),
+        meta: { requiresAuth: true, layout: 'content'}
+    },
     {   path: '/:pathMatch(.*)*',
         name: "error-404",
         component: () => import('@/views/Error404.vue'),
         meta: { requiresAuth: false, layout: 'blank' }
     },
+    
 ]
 
 // 3. Create the router instance and pass the `routes` option
@@ -53,12 +76,13 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-
     const loggedIn = localStorage.getItem('user');
     const isLogged = loggedIn !== null;
+
+ 
     if (!to.meta.requiresAuth) {
         next();
-        //nedd to be logged
+        //need to be logged
     } else if (!isLogged) {
         next({ name: "login" });
         //token expire
@@ -74,10 +98,10 @@ router.beforeEach((to, from, next) => {
 
 export default router;
 
-function parseJwt (token) {
+function parseJwt(token) {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
 

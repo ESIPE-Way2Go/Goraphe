@@ -4,7 +4,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "log", schema = "public", catalog = "goraphe")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class LogEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -30,7 +29,7 @@ public class LogEntity {
 
     public LogEntity(SimulationEntity simulation, String script) {
         this.simulation = simulation;
-        this.status = "EN COURS";
+        this.status = "PAS LANCE";
         this.script = script;
     }
 

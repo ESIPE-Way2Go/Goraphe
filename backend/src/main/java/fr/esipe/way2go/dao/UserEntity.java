@@ -1,24 +1,20 @@
 package fr.esipe.way2go.dao;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "user", schema = "public", catalog = "goraphe")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(name = "username", unique = true)
     private String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -27,11 +23,19 @@ public class UserEntity {
     @Column(name = "role", nullable = false)
     private String role;
 
+    @Column(name = "token", unique = true)
+    private String token;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private List<SimulationEntity> simulations;
 
     public UserEntity() {
+    }
+
+    public UserEntity(String email, String role) {
+        this.email = email;
+        this.role = role;
     }
 
     public UserEntity(String username, String password, String email, String role) {
@@ -84,6 +88,10 @@ public class UserEntity {
      */
     public String getPassword() {
         return password;
+    }
+
+    public String getToken() {
+        return token;
     }
 
     /**
@@ -147,6 +155,10 @@ public class UserEntity {
      */
     public void setSimulation(List<SimulationEntity> simulations) {
         this.simulations = simulations;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     @Override

@@ -54,6 +54,8 @@ public class SimulationController {
         if (userOptional.isEmpty())
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         var user = userOptional.get();
+        if(simulationRequest.getDistance()<100 || !simulationRequest.checkBounds() || simulationRequest.getRoadTypes().isEmpty())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         var simulation = new SimulationEntity(simulationRequest.getName(), user, simulationRequest.getDesc(), "test",simulationRequest.getRoadTypes());
         var simulationSave = simulationService.save(simulation);
         var midPoint= new MapController.Point(simulationRequest.getCenter());
