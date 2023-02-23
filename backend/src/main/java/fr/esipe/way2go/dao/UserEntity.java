@@ -1,16 +1,10 @@
 package fr.esipe.way2go.dao;
 
-import fr.esipe.way2go.exception.UserEmailFound;
-import org.apache.catalina.User;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "user", schema = "public", catalog = "goraphe")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

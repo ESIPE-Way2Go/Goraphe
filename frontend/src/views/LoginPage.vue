@@ -13,14 +13,20 @@
                 <p class="text-muted mb-4">The road to success.</p>
                 <form @submit.prevent="handleLogin">
                   <div class="mb-3">
-                    <input id="inputEmail" type="text" v-model="form.username" placeholder="username" required="" autofocus="" class="form-control rounded-pill border-0 shadow-sm px-4" />
+                    <input id="inputEmail" type="text" v-model="form.username" placeholder="username" required=""
+                      autofocus="" class="form-control rounded-pill border-0 shadow-sm px-4" />
                   </div>
                   <div class="mb-3">
-                    <input id="inputPassword" type="password" v-model="form.password" placeholder="Password" required="" class="form-control rounded-pill border-0 shadow-sm px-4 text-primary" />
+                    <input id="inputPassword" type="password" v-model="form.password" placeholder="Password" required=""
+                      class="form-control rounded-pill border-0 shadow-sm px-4 text-primary" />
                   </div>
-
+                  <div class="text-center">
+                    <v-btn variant="text"  color="blue" @click="this.$router.push({ name: 'forgetPassword'})">
+                      Mot de passe oublié ?
+                    </v-btn>
+                  </div>
                   <div class="d-grid gap-2 mt-2">
-                    <button  class="btn btn-primary btn-block text-uppercase mb-2 rounded-pill shadow-sm" >Sign in</button>
+                    <button class="btn btn-primary btn-block text-uppercase mb-2 rounded-pill shadow-sm">Sign in</button>
                   </div>
 
                 </form>
@@ -40,27 +46,27 @@ import { useToast } from "vue-toastification";
 
 export default {
   name: 'LoginPage',
-  setup(){
+  setup() {
     const toast = useToast();
     return { toast }
   },
   data() {
     return {
-      form: {username: "", password: ""},
+      form: { username: "", password: "" },
       errors: {}
     }
   },
   methods: {
 
-    handleLogin(){
-        this.$store.dispatch("auth/login", this.form).then((response) => {
-              if(response.email) {
-                this.$router.push({name: 'home'});
-                return;
-              }
-              this.toast.error(response.message)
-            },
-        );
+    handleLogin() {
+      this.$store.dispatch("auth/login", this.form).then((response) => {
+        if (response.email) {
+          this.$router.push({ name: 'home' });
+          return;
+        }
+        this.toast.error(response.message)
+      },
+      );
     },
   }
 }
@@ -71,6 +77,7 @@ export default {
 .image {
   min-height: 100vh;
 }
+
 .bg-image {
   background-image: url('@/assets/login.png');
   background-size: cover;

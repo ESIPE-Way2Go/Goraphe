@@ -3,12 +3,8 @@ package fr.esipe.way2go.service.impl;
 import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.repository.UserRepository;
 import fr.esipe.way2go.service.UserService;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.sql.Array;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,9 +34,7 @@ public class UserServicesImpl implements UserService {
 
     @Override
     public List<UserEntity> getAllUsers() {
-        var list= new ArrayList<UserEntity>();
-        userRepository.findAll().forEach(list::add);
-        return list;
+        return userRepository.findUsersAuthenticate();
     }
 
     @Override

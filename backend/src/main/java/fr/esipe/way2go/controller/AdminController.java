@@ -10,8 +10,8 @@ import fr.esipe.way2go.dto.user.request.UpdatePasswordRequest;
 import fr.esipe.way2go.dto.user.request.UserRequest;
 import fr.esipe.way2go.dto.user.response.UserInfoResponse;
 import fr.esipe.way2go.dto.user.response.UserResponse;
-import fr.esipe.way2go.exception.WrongEmailFormatException;
 import fr.esipe.way2go.exception.UserEmailFound;
+import fr.esipe.way2go.exception.WrongEmailFormatException;
 import fr.esipe.way2go.exception.WrongPasswordFormatException;
 import fr.esipe.way2go.exception.invite.InviteNotFoundException;
 import fr.esipe.way2go.exception.user.UserNotFoundException;
@@ -23,6 +23,7 @@ import fr.esipe.way2go.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
@@ -51,12 +52,16 @@ public class AdminController {
     }
 
     private void checkEmail(String email) {
-        var regex =  "^\\w[\\w.%+-]*@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        if(! Pattern.compile(regex).matcher(email).matches()) throw new WrongEmailFormatException();
+        var regex = "^\\w[\\w.%+-]*@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        if (!Pattern.compile(regex).matcher(email).matches()) throw new WrongEmailFormatException();
     }
-    private void checkPassword(String password){
+
+    private void checkPassword(String password) {
         var regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$";
-        if(! password.matches(regex)) throw new WrongPasswordFormatException();
+        if (!password.matches(regex)) throw new WrongPasswordFormatException();
+    }
+    private String generateToken() {
+        return UUID.randomUUID().toString();
     }
 
     @PermitAll
@@ -76,7 +81,7 @@ public class AdminController {
     public ResponseEntity<Boolean> createAccount(@RequestBody UserRequest userRequest) {
         checkEmail(userRequest.getEmail());
         checkPassword(userRequest.getPassword());
-        if(userRequest.getUsername().strip().isBlank()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (userRequest.getUsername().strip().isBlank()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         var user = userService.getUser(userRequest.getUsername());
         if (user.isPresent())
             throw new UsernameExistAlreadyException();
@@ -134,7 +139,7 @@ public class AdminController {
     }
 
 
-    @PermitAll
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users")
     public ResponseEntity<List<UserInfoResponse>> getAllUsers() {
         var users = userService.getAllUsers();
@@ -143,7 +148,7 @@ public class AdminController {
         return new ResponseEntity<>(usersInfo, HttpStatus.OK);
     }
 
-    @PermitAll
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/user/{id}")
     public ResponseEntity<Object> deleteUser(@PathVariable Long id) {
         var userOptional = userService.getUserById(id);
@@ -157,11 +162,11 @@ public class AdminController {
     @GetMapping("/invitations")
     public ResponseEntity<List<InvitationResponse>> getInvitations() {
         var invites = new ArrayList<InvitationResponse>();
-        inviteService.getAll().forEach(invite ->  invites.add(new InvitationResponse(invite.getInviteId(), invite.getUser().getEmail(), invite.getFirstMailSent(), invite.getMailCount())));
+        inviteService.getAll().forEach(invite -> invites.add(new InvitationResponse(invite.getInviteId(), invite.getUser().getEmail(), invite.getFirstMailSent(), invite.getMailCount())));
         return new ResponseEntity<>(invites, HttpStatus.OK);
     }
 
-    @PermitAll
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/invitation/{id}")
     public ResponseEntity<Object> deleteInvitation(@PathVariable Long id) {
         var inviteEntityOptional = inviteService.findById(id);
@@ -172,8 +177,8 @@ public class AdminController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PermitAll
-    //  @PreAuthorize("hasRole('ROLE_ADMIN')")
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/invitation")
     public void sendInvitation(@RequestBody UserBeforeInvitationRequest userBeforeInvitationRequest) {
         var email = userBeforeInvitationRequest.getEmail();
@@ -190,7 +195,7 @@ public class AdminController {
         emailSenderService.sendInvitation(email, saveInvite);
     }
 
-    @PermitAll
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/invitation/{id}")
     public ResponseEntity<Object> reSendInvitation(@PathVariable Long id) {
         var inviteEntityOptional = inviteService.findById(id);
@@ -203,10 +208,6 @@ public class AdminController {
         inviteService.save(invite);
         emailSenderService.sendInvitation(invite.getUser().getEmail(), invite);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    private String generateToken() {
-        return UUID.randomUUID().toString();
     }
 }
 

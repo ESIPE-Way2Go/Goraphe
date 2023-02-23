@@ -4,7 +4,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "log", schema = "public", catalog = "goraphe")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class LogEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

@@ -2,13 +2,11 @@ package fr.esipe.way2go.dao;
 
 import fr.esipe.way2go.dao.converter.CalendarConverter;
 import fr.esipe.way2go.dao.converter.StringListConverter;
-
 import javax.persistence.*;
 import java.util.*;
 
 @Entity
 @Table(name = "simulation", schema = "public", catalog = "goraphe")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class SimulationEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -34,7 +32,7 @@ public class SimulationEntity {
     @Column(name = "generation_distance", nullable = false)
     private Double generationDistance;
 
-    @Column(name = "random_points", nullable = false)
+    @Column(name = "random_points")
     private String randomPoints;
     @Column(name = "road_type", nullable = false)
     @Convert(converter = StringListConverter.class)
@@ -58,6 +56,14 @@ public class SimulationEntity {
     private String statistics;
     @Column(name = "status", nullable = false)
     private String status;
+
+    @Column(name = "result", length = 10000000)
+    private String result;
+
+    @Column(name = "road", length = 10000000)
+    private String road;
+
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "simulation")
     private List<LogEntity> logs;
 
@@ -79,6 +85,14 @@ public class SimulationEntity {
         this.shareLink = String.valueOf(randomNumber);
         this.statistics = "statistics";
         this.status = "NOT LAUNCH";
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 
     /**

@@ -1,15 +1,12 @@
 package fr.esipe.way2go.dao;
 
 import fr.esipe.way2go.dao.converter.CalendarConverter;
-import org.apache.catalina.User;
-
 import javax.persistence.*;
 import java.sql.Date;
 import java.util.Calendar;
 
 @Entity
 @Table(name = "invite", schema = "public", catalog = "goraphe")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class InviteEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
