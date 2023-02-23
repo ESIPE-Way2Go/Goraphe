@@ -1,9 +1,9 @@
 <template>
   <div class="d-flex align-center fill-height bg-image">
-    <v-card class="mx-auto pa-6 bg-white rounded-xl outline" max-height="60%" style="border-color: blue" variant="outlined"
-            width="30%">
+    <v-card class="mx-auto pa-6 bg-white rounded-xl outline" max-height="750px" style="border-color: blue" variant="outlined"
+            width="500px">
       <v-img :src=imageGoraphe class="mx-auto" cover width="50%"></v-img>
-      <v-card-title class="text-center ma-5 text-blue-accent-3 font-weight-bold">
+      <v-card-title class="text-center ma-5 text-blue-accent-3 font-weight-bold" max>
         Mot de passe oublié
       </v-card-title>
       <v-card-text>
