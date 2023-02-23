@@ -135,6 +135,7 @@ export default {
         L.latLng(48.83935609413248, 2.585938493701621),
         L.latLng(48.84009439586693, 2.586180556928124)
       ],
+      router: L.Routing.mapbox('pk.eyJ1IjoibWV4aW1hIiwiYSI6ImNsZWd2djNkdDBwc3gzcXR0ZXB3Nmt6dDQifQ.GeKKqQmsdu8WhrePgFj2ww')
     }).addTo(map);
     this.control.on('routesfound', (e) => {
       this.waypoints = e.waypoints.map(w => [w.latLng.lat, w.latLng.lng]);
