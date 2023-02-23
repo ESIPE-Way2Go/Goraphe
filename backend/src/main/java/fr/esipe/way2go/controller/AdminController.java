@@ -91,11 +91,12 @@ public class AdminController {
         var userGet = userSave.get();
 
         var passwordEncoder = webSecurityConfiguration.passwordEncoder();
-
         userGet.setUsername(userRequest.getUsername());
-        userGet.setPassword(passwordEncoder.encode(userGet.getPassword()));
-        userService.saveUser(userGet);
+        userGet.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        userGet.setToken(null);
 
+
+        userService.saveUser(userGet);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

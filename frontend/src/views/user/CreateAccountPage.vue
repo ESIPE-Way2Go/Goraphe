@@ -87,7 +87,7 @@ export default {
         },
         createAccount() {
             fetch("/api/administration/createAccount", {
-                method: 'POST',
+                method: 'PUT',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(this.form)
             })

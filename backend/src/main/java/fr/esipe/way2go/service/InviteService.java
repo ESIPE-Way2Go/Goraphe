@@ -16,5 +16,4 @@ public interface InviteService {
     List<InviteEntity> getAll();
 
     void delete(InviteEntity inviteEntity);
-
 }

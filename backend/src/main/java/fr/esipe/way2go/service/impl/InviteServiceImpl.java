@@ -28,6 +28,8 @@ public class InviteServiceImpl implements InviteService {
         return  inviteRepository.findByToken(token);
     }
 
+
+
     @Override
     public Optional<InviteEntity> findById(Long id) {
         return inviteRepository.findById(id);
