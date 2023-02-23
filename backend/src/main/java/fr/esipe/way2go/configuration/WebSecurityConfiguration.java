@@ -66,6 +66,7 @@ public class WebSecurityConfiguration {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/signin").permitAll()
+                .antMatchers("/api/administration/**").permitAll()
                 // Ici on rajoute les routes qu'on veux permetrre sans authentification comme au dessus, en sachant que
                 // les "**" marche pour du pattern matching.
                 .antMatchers("/api/**").authenticated()
