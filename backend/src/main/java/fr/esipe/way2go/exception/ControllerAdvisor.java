@@ -1,5 +1,6 @@
 package fr.esipe.way2go.exception;
 
+import fr.esipe.way2go.exception.invite.InviteNotFoundException;
 import fr.esipe.way2go.exception.user.UserNotFoundException;
 import fr.esipe.way2go.exception.user.UserTokenNotFoundException;
 import fr.esipe.way2go.exception.user.UsernameExistAlreadyException;
@@ -81,4 +82,12 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         body.put(MESSAGE, ex.getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(InviteNotFoundException.class)
+    public ResponseEntity<Object> handleInviteNotFound(InviteNotFoundException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
 }

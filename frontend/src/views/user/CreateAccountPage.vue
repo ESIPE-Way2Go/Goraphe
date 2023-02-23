@@ -1,107 +1,109 @@
 <template>
-    <div class="d-flex align-center fill-height">
-        <v-card width="20%" class="mx-auto pa-6 bg-white" style="border-color: blue" variant="outlined" rounded-lg>
-            <v-img class="align-end text-white" :src=imageGoraphe cover></v-img>
-            <v-card-title class="text-center" style="color: blue">
-                Création de compte
-            </v-card-title>
-            <v-card-text>
-                <v-form fast-fail @submit.prevent="createAccount" v-model="isFormValid">
-                    <v-text-field variant="outlined" v-model="form.email" label="Mail" readonly></v-text-field>
-                    <v-text-field variant="outlined" v-model="form.username" label="Pseudo"
+  <div class="d-flex align-center fill-height">
+    <v-card width="25%" class="mx-auto pa-6 bg-white" style="border-color: blue" variant="outlined" rounded-lg>
+      <v-img class="align-end text-white" :src=imageGoraphe cover></v-img>
+      <v-card-title class="text-center" style="color: blue">
+        Création de compte
+      </v-card-title>
+      <v-card-text>
+        <v-form fast-fail @submit.prevent="createAccount" v-model="isFormValid">
+          <v-text-field variant="outlined" v-model="mail" label="Mail" readonly></v-text-field>
+          <v-text-field variant="outlined" v-model="form.username" label="Pseudo"
                         :rules="usernameRules"></v-text-field>
 
-                    <v-text-field variant="outlined" v-model="form.password"
+          <v-text-field variant="outlined" v-model="form.password"
                         :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :rules="passwordRules"
                         :type="show1 ? 'text' : 'password'" label="Mot de passe "
                         hint="Au moins 8 caractères avec au moins une majuscule, une minuscule et un chifffre" counter
                         @click:append="show1 = !show1"></v-text-field>
 
-                    <v-text-field variant="outlined" v-model="confirmPassword"
+          <v-text-field variant="outlined" v-model="confirmPassword"
                         :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'" :rules="confirmPasswordRules"
                         :type="show2 ? 'text' : 'password'" label="Confirmation de mot de passe"
                         @click:append="show2 = !show2"></v-text-field>
 
-                    <v-btn type="submit" color=primary block class="mt-2" :disabled="!isFormValid" rounded>Valider</v-btn>
-                </v-form>
-            </v-card-text>
-        </v-card>
-    </div>
+          <v-btn type="submit" color=primary block class="mt-2" :disabled="!isFormValid" rounded>Valider</v-btn>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </div>
 </template>
 
 <script>
-import { useToast } from "vue-toastification";
+import {useToast} from "vue-toastification";
 
 export default {
-    setup() {
-        const toast = useToast();
-        return { toast }
-    },
-    data() {
-        return {
-            mail: '',
-            show1: false,
-            show2: false,
-            usernameRules: [
-                value => {
-                    if (value !== '') return true
-                    return 'Le pseudo ne doit pas être vide'
-                },
-            ],
-            passwordRules: [
-                value => {
-                    if ((/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/).test(value)) return true
-                    return 'Le mot de passe doit avoir au moins huits caractères, une majuscule, une minuscule et un chiffre'
-                },
-            ],
-            confirmPassword: '',
-            confirmPasswordRules: [
-                value => {
-                    if (value === this.form.password) return true
-                    return "La confirmation du mot de passe n'est pas identique au mot de passe"
-                },
-            ],
+  setup() {
+    const toast = useToast();
+    return {toast}
+  },
+  data() {
+    return {
+      mail: '',
+      show1: false,
+      show2: false,
+      usernameRules: [
+        value => {
+          if (value !== '') return true
+          return 'Le pseudo ne doit pas être vide'
+        },
+      ],
+      passwordRules: [
+        value => {
+          if ((/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/).test(value)) return true
+          return 'Le mot de passe doit avoir au moins huits caractères, une majuscule, une minuscule et un chiffre'
+        },
+      ],
+      confirmPassword: '',
+      confirmPasswordRules: [
+        value => {
+          if (value === this.form.password) return true
+          return "La confirmation du mot de passe n'est pas identique au mot de passe"
+        },
+      ],
 
-            form: { email: "", username: "", password: "" },
-            isFormValid: false
-        }
-    },
-    computed: {
-        formIsValid() {
-            return this.$refs.form.validate()
-        },
-    },
-    methods: {
-        checkAutorization() {
-            var token = this.$route.params.token
-            fetch("/api/administration/checkAccount/" + token, {
-                method: "GET",
-            }).then(response => response.json()).then(
-                data => {
-                    var email = data['email']
-                    if (email === null)
-                        this.$router.push({ name: 'login' })
-                    this.form.email = email
-                }
-            );
-        },
-        createAccount() {
-            fetch("/api/administration/createAccount", {
-                method: 'PUT',
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(this.form)
-            })
-                .then(response => {
-                    if (response.ok)
-                        this.$router.push({ name: 'login' })
-                    response.json().then(data => {
-                        this.toast.error(data['message'])
-                    })
-                })
-        },
-    },
-    mounted() {
-        this.checkAutorization()
+      form: {email: "", username: "", password: ""},
+      isFormValid: false,
+      imageGoraphe: require('@/assets/Goraphe_small.png'),
     }
+  },
+  computed: {
+    formIsValid() {
+      return this.$refs.form.validate()
+    },
+  },
+  methods: {
+    checkAutorization() {
+      var token = this.$route.params.token
+      fetch("/api/administration/checkAccount/" + token, {
+        method: "GET",
+      }).then(response => response.json()).then(
+          data => {
+            let email = data['email']
+            if (email === undefined)
+              this.$router.push({name: 'login'})
+            this.form.email = email
+            this.mail = email
+          }
+      );
+    },
+    createAccount() {
+      fetch("/api/administration/createAccount", {
+        method: 'PUT',
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(this.form)
+      })
+          .then(response => {
+            if (response.ok)
+              this.$router.push({name: 'login'})
+            response.json().then(data => {
+              this.toast.error(data['message'])
+            })
+          })
+    },
+  },
+  mounted() {
+    this.checkAutorization()
+  }
 }
 </script>
