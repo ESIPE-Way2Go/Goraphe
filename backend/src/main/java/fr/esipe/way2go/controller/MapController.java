@@ -8,6 +8,9 @@ import java.util.List;
 @RequestMapping("/api/map")
 public class MapController {
     public record Point(double x, double y){
+        public Point(double[] point){
+            this(point[0], point[1]);
+        }
         @Override
         public String toString() {
             return x+","+y;

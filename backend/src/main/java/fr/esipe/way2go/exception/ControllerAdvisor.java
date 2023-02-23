@@ -1,5 +1,9 @@
 package fr.esipe.way2go.exception;
 
+import fr.esipe.way2go.exception.invite.InviteNotFoundException;
+import fr.esipe.way2go.exception.user.UserNotFoundException;
+import fr.esipe.way2go.exception.user.UserTokenNotFoundException;
+import fr.esipe.way2go.exception.user.UsernameExistAlreadyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -41,5 +45,49 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(UsernameExistAlreadyException.class)
+    public ResponseEntity<Object> handleUsernameAlreadyExists(UsernameExistAlreadyException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(UserTokenNotFoundException.class)
+    public ResponseEntity<Object> handleUsernameTokenNotFound(UserTokenNotFoundException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(UserEmailFound.class)
+    public ResponseEntity<Object> handleUserEmailFound(UserEmailFound ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+    @ExceptionHandler(WrongEmailFormatException.class)
+    public ResponseEntity<Object> handleWrongEmailFormat(WrongEmailFormatException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(WrongPasswordFormatException.class)
+    public ResponseEntity<Object> handleWrongPasswordFormat(WrongPasswordFormatException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(InviteNotFoundException.class)
+    public ResponseEntity<Object> handleInviteNotFound(InviteNotFoundException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
 
 }

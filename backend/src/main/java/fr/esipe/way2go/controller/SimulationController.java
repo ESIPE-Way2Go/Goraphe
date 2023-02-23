@@ -54,11 +54,11 @@ public class SimulationController {
         if (userOptional.isEmpty())
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         var user = userOptional.get();
+        if(simulationRequest.getDistance()<100 || !simulationRequest.checkBounds() || simulationRequest.getRoadTypes().isEmpty())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         var simulation = new SimulationEntity(simulationRequest.getName(), user, simulationRequest.getDesc(), "test",simulationRequest.getRoadTypes());
         var simulationSave = simulationService.save(simulation);
-        var midPoint= MapController.Point.midPoint(new MapController.Point(simulationRequest.getStartX(), simulationRequest.getStartY()),
-                new MapController.Point(simulationRequest.getEndX(),simulationRequest.getEndY()));
-
+        var midPoint= new MapController.Point(simulationRequest.getCenter());
         POOL.execute(() -> {
             simulationSave.setBeginDate(Calendar.getInstance());
             simulationService.save(simulation);
