@@ -61,7 +61,7 @@ public class HandleExceptionTests {
         @Test
          void returnStatus() {
             // Arrange
-            SimulationNotFoundException ex = new SimulationNotFoundException(1L);
+            SimulationNotFoundException ex = new SimulationNotFoundException();
             ControllerAdvisor advisor = new ControllerAdvisor();
             // Act
             ResponseEntity<Object> result = advisor.handleSimulationNotFound(ex);
@@ -72,7 +72,7 @@ public class HandleExceptionTests {
         @Test
          void returnBody() {
             // Arrange
-            SimulationNotFoundException ex = new SimulationNotFoundException(1L);
+            SimulationNotFoundException ex = new SimulationNotFoundException();
             ControllerAdvisor advisor = new ControllerAdvisor();
 
             // Act
