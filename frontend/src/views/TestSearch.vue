@@ -152,7 +152,7 @@ export default {
       this.end = [e.waypoints[e.waypoints.length - 1].latLng.lng, e.waypoints[e.waypoints.length - 1].latLng.lat];
       this.length = e.routes[0] ? e.routes[0].summary.totalDistance : 0;
       this.center = this.getCenter(e.routes[0].coordinates.map(coord => [coord.lat, coord.lng]));
-
+      console.log(this.center);
     });
   this.map = map;
   },
@@ -176,13 +176,11 @@ export default {
       if(value.length<1) return;
      // console.log(this.value)
       this.map.setView([value[0].y,value[0].x], 15);
-      console.log(value)
       this.control.setWaypoints([
         L.latLng(value[0].y, value[0].x),
         L.latLng(value[0].y, value[0].x)
       ])
       console.log(this.control.waypoints)
-      //this.center = [value[0].y,value[0].x]
     },
 
     //end search bar
