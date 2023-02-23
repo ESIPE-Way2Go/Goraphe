@@ -1,12 +1,30 @@
 import logging
+import os
+
 import networkx as nx
 import pandas as pd
 import time
 import openpyxl #Shows as not used but is needed to export .xlsx files
 
+#Need to be duplicated from filter3 because of error "circular import"
+def setup_logger(name, log_file, level=logging.DEBUG):
+    """To setup as many loggers as you want"""
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    handler = logging.FileHandler(log_file)
+    handler.setFormatter(formatter)
 
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    logger.addHandler(handler)
 
-def compute(graph_proj,rand_nodes,source_node,dest_node):
+    return logger
+
+def compute(graph_proj,rand_nodes,source_node,dest_node,user,sim):
+    # Creation of logger
+    os.makedirs("scripts/" + user, exist_ok=True)
+    LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_3.log"
+    logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
+    logger.info("Init of compute")
     time_start = time.perf_counter()
     # base shortest paths
     routes_traveltimes = dict([])
@@ -39,7 +57,7 @@ def compute(graph_proj,rand_nodes,source_node,dest_node):
                 route_traveltimes = nx.shortest_path(graph_proj, source=origin, target=destination, weight='traveltimes')
                 routes_traveltimes[origin][destination] = route_traveltimes
             except nx.NetworkXNoPath:
-                logging.info("no route beetween :"+str(origin)+" and "+str(destination))
+                logger.info("no route beetween :"+str(origin)+" and "+str(destination))
 
             timetravel_shortest_path = 0
             roads_traveltimesSP = dict()
@@ -146,4 +164,5 @@ def compute(graph_proj,rand_nodes,source_node,dest_node):
 
     # calculate computational time
     time_elapsed = (time.perf_counter() - time_start)
-    logging.info("Computing time : " + str(time_elapsed))
+    logger.info("Computing time : " + str(time_elapsed))
+    logger.info("End of compute")
