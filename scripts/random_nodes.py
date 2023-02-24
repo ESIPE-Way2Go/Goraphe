@@ -63,7 +63,7 @@ def random_nodes(G_proj, G_not_proj, x1, y1, x2, y2,user ,sim,dist):
     # create a list of colors to highlight the random points
     node_colors = ['blue' if node in random_points else 'gray' for node in G_proj.nodes()]
     # plot the graph with highlighted random points
-    ox.plot_graph(G_proj,node_color=node_colors ,node_size=50 ,show=True)
+    #ox.plot_graph(G_proj,node_color=node_colors ,node_size=50 ,show=True)
     logger.info("End of random_nodes")
     return random_points
 
