@@ -39,7 +39,7 @@ def shortest_path_geojson(G, point1, point2, weight):
     edges = G.subgraph(nodes)
     features = gpd.GeoDataFrame(edges.edges(keys=True))
     features['geometry'] = features.apply(
-        lambda x: LineString([(G.nodes[x[0]]['x'], G.nodes[x[0]]['y']), (G.nodes[x[1]]['x'], G.nodes[x[1]]['y'])]),
+        lambda x: LineString([(G.nodes[x[0]]['lon'], G.nodes[x[0]]['lat']), (G.nodes[x[1]]['lon'], G.nodes[x[1]]['lat'])]),
         axis=1)
     features['osmid'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('osmid', ''), axis=1)
     features['name'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('name', ''), axis=1)
