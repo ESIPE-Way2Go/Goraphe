@@ -1,9 +1,8 @@
 <template>
-    <v-container class="bg-blue-grey-lighten-5" >
-        <h2>En cours</h2>
+    <v-container class="bg-blue-grey-lighten-5">
+        <h2 align-center>En cours</h2>
         <div v-if="simulationsInLoad.length === 0">
-            <v-alert type="info" title="Info"
-                text="Pas de simulation en cours"></v-alert>
+            <v-alert type="info" title="Info" text="Pas de simulation en cours"></v-alert>
         </div>
         <v-row no-gutters>
             <v-col v-for="simulation in simulationsInLoad" :key=simulation.id cols="12" sm="3" lg="2">
@@ -15,8 +14,8 @@
                     </v-card-title>
                     <v-card-subtitle> {{ simulation.date }}</v-card-subtitle>
                     <v-card-actions class="justify-space-between">
-                        <v-btn color="orange" @click="goSimulation(simulation.id)">
-                            Détails
+                        <v-btn color="orange" @click="goLogs(simulation.id)">
+                            Logs
                         </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -26,21 +25,34 @@
     <v-container class="bg-light-green-accent-1">
         <h2>Terminé</h2>
         <div v-if="simulations.length === 0">
-            <v-alert type="info" title="Info"
-                text="Aucune simulation"></v-alert>
+            <v-alert type="info" title="Info" text="Aucune simulation"></v-alert>
         </div>
         <v-row no-gutters>
             <v-col v-for="simulation in simulations" :key=simulation.id cols="12" sm="3" lg="2">
                 <v-card class="ma-2">
                     <v-img class="align-end text-white" height="200" :src=imageTest cover></v-img>
-                    <v-card-title class="pt-4">
-                        {{ simulation.title }}
+                    <v-card-title class="pt-4 d-flex align-items-center justify-content-between">
+                      {{ simulation.title }}
+                      <div class="ma-2 pa-1 h5  text-caption text-uppercase font-weight-bold">
+
+                        <v-badge
+                            :color="(simulation.status === 'ERROR') ? 'error' : 'success'"
+                            content=""
+                            dot
+                            inline
+                        ></v-badge>
+                        {{ (simulation.status === 'ERROR') ? 'error' : 'success' }}
+                      </div>
                     </v-card-title>
                     <v-card-subtitle> {{ simulation.date }}</v-card-subtitle>
                     <v-card-actions class="justify-space-between">
-                        <v-btn color="orange" @click="goSimulation(simulation.id)">
+                        <v-btn color="orange" @click="goSimulation(simulation.id)" v-if="simulation.status==='SUCCESS'">
                             Détails
                         </v-btn>
+                      <v-btn color="orange" @click="goLogs(simulation.id)" >
+                        Logs
+                      </v-btn>
+
                         <v-btn icon="mdi-trash-can-outline" @click="deleteSimulationDialog(simulation)"></v-btn>
                     </v-card-actions>
                 </v-card>
@@ -97,6 +109,8 @@ export default {
 
     methods: {
         getSimuations() {
+            const simulationsInLoad = []
+            const simulations = []
             fetch("/api/simulation/", {
                 method: "GET",
                 headers: authHeader(),
@@ -104,25 +118,29 @@ export default {
                 .then(response => response.json())
                 .then(data => {
                     data.forEach(element => {
-                        let elt = { id: element['id'], title: element['title'], date: this.getFormatDate(element['beginDate']) };
+                        let elt = { id: element['id'], title: element['title'], date: this.getFormatDate(element['beginDate']),status: element['status'] };
                         if (element['endDate'] === null)
-                            this.simulationsInLoad.push(elt)
+                            simulationsInLoad.push(elt)
                         else
-                            this.simulations.push(elt)
+                            simulations.push(elt)
                     });
-                });
 
+                    this.simulationsInLoad = simulationsInLoad
+                    this.simulations = simulations
+                });
         },
         goSimulation(id) {
-            this.$router.push({ name: 'simulation', params: { id: id } });
+            this.$router.push({ name: 'simulationMap', params: { id: id } });
         },
+        goLogs(id) {
+        this.$router.push({ name: 'simulation', params: { id: id } });
+      },
         getFormatDate(date) {
             let d = new Date(date);
             const year = d.getFullYear();
             const month = d.getMonth() + 1;
             const day = d.getDate();
-            return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
-
+           return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
         },
         deleteSimulationDialog(simulation) {
             this.simulationId = simulation.id
@@ -138,7 +156,7 @@ export default {
                 .then(data => {
                     if (data === true) {
                         this.toast.success(`Suppression de la simulation réussi`)
-                        this.simulations=[]
+                        this.simulations = []
                         this.getSimuations()
                     } else {
                         this.toast.error(`Suppression de la simulation pas réussi`)

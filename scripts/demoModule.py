@@ -16,5 +16,5 @@ coords = args.coords
 #create the graph
 G = ox.graph_from_point(coords, dist)
 
-edges = ox.graph_to_gdfs(G,nodes=False,edges=True)
+nodes, edges = ox.graph_to_gdfs(G,nodes=False,edges=True)
 print(edges.to_json())

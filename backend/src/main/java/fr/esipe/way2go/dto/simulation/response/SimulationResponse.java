@@ -1,8 +1,10 @@
 package fr.esipe.way2go.dto.simulation.response;
 
+import fr.esipe.way2go.dao.LogEntity;
 import fr.esipe.way2go.dao.SimulationEntity;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 
 public class SimulationResponse {
@@ -54,7 +56,7 @@ public class SimulationResponse {
     public SimulationResponse(SimulationEntity simulation) {
         this.name = simulation.getName();
         this.description = simulation.getDescription();
-        this.status = simulation.getStatistics();
+        this.status = simulation.getStatus();
         this.computingScript = simulation.getComputingScript();
         this.roads = simulation.getRoadType();
         this.distance = simulation.getGenerationDistance();
@@ -62,10 +64,12 @@ public class SimulationResponse {
         this.endDate = simulation.getEndDate();
         this.logResponses = new ArrayList<>();
 
+        simulation.getLogs().sort(Comparator.comparingLong(LogEntity::getLogId));
         for (var log : simulation.getLogs()) {
             var content = log.getContent() == null ? new String[]{} : log.getContent().split("\n");
             logResponses.add(new LogResponse(log.getStatus(), log.getScript(), content));
         }
+
     }
     public String getDescription() {
         return description;

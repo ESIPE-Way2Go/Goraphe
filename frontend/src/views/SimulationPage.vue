@@ -12,12 +12,12 @@
             </div>
             <div class="ma-2 pa-1 h5  text-caption text-uppercase font-weight-bold">
               <v-badge
-                  :color="(status === 'ERROR') ? 'error' : 'success' "
+                  :color="(status === 'ERROR') ? 'error' : (status === 'SUCCESS')? 'success' : 'warning'"
                   content=""
                   dot
                   inline
               ></v-badge>
-              {{status}}
+              {{ status }}
             </div>
           </div>
             <div class="flex-column">
@@ -74,7 +74,7 @@
                 <div class="mr-2">
                   <v-icon icon="mdi-check-circle" color="success" v-if="log.status === 'SUCCESS'"></v-icon>
                   <v-icon icon="mdi-close" color="error" v-else-if="log.status === 'ERROR'"></v-icon>
-                  <v-progress-circular color="dark-blue" style="height: 18px" indeterminate width="3" v-else ></v-progress-circular>
+                  <v-progress-circular color="dark-blue" style="height: 18px" indeterminate width="3" v-else-if="log.status !== 'PAS LANCE'" ></v-progress-circular>
                 </div>
                 <div>{{ log.script }}</div>
               </template>
@@ -133,13 +133,13 @@ export default {
             this.computingScript = data['computingScript']
             this.roads = data['roads']
             this.distance = data['distance']
+            this.status = data['status']
             this.getDuration(data)
             this.allLog = []
             this.logs = []
             data['logResponses'].forEach(elt => {
               this.logs.push({script: elt['scriptName'], status: elt['status'], content: elt['content']})
               this.allLog.push(elt['scriptName'])
-              this.status = elt['status']
             });
             if (this.logs !== []) {
               this.progession = this.logs.length / 3 * 100
