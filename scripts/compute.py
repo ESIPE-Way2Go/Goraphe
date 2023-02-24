@@ -153,12 +153,12 @@ def compute(graph_proj,rand_nodes,source_node,dest_node,user,sim):
 
     # transform results dictionary in dataframes to save as xlsx file
 
-    df_Results = pd.DataFrame.from_dict(results, orient='columns')
-    df_Results.to_excel("Set_extremenodes_EVIs_test1.xlsx")
-    df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
-    df_Res_traveltimeSP.to_excel("Set_37_traveltimesSP_test1.xlsx")
-    df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
-    df_essential_mw_edges.to_excel("Set_37_essential_mw_edges_test1.xlsx")
+    # df_Results = pd.DataFrame.from_dict(results, orient='columns')
+    # df_Results.to_excel("Set_extremenodes_EVIs_test1.xlsx")
+    # df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
+    # df_Res_traveltimeSP.to_excel("Set_37_traveltimesSP_test1.xlsx")
+    # df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
+    # df_essential_mw_edges.to_excel("Set_37_essential_mw_edges_test1.xlsx")
 
     nx.set_edge_attributes(graph_proj, evi_local_dict, "evi_local")
 

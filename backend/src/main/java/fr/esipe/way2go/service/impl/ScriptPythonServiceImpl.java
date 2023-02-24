@@ -74,9 +74,12 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
                 logEntity1.setContent(logEntity1.getContent() + errorLogs);
             }
             else if (logEntity3.getContent().equals("")) {
+                logEntity1.setStatus("SUCCESS");
                 logEntity2.setStatus(status);
                 logEntity2.setContent(logEntity2.getContent() + errorLogs);
             } else {
+                logEntity1.setStatus("SUCCESS");
+                logEntity2.setStatus("SUCCESS");
                 logEntity3.setStatus(status);
                 logEntity3.setContent(logEntity3.getContent() + errorLogs);
             }

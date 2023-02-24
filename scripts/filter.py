@@ -39,12 +39,14 @@ def shortest_path_geojson(G, point1, point2, weight):
     edges = G.subgraph(nodes)
     features = gpd.GeoDataFrame(edges.edges(keys=True))
     features['geometry'] = features.apply(
-        lambda x: LineString([(G.nodes[x[0]]['x'], G.nodes[x[0]]['y']), (G.nodes[x[1]]['x'], G.nodes[x[1]]['y'])]),
+        lambda x: LineString([(G.nodes[x[0]]['lon'], G.nodes[x[0]]['lat']), (G.nodes[x[1]]['lon'], G.nodes[x[1]]['lat'])]),
         axis=1)
+    features['osmid'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('osmid', ''), axis=1)
     features['name'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('name', ''), axis=1)
     features['maxspeed'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('fixedmaxspeed', ''), axis=1)
     features['timetravel'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('traveltimes', ''), axis=1)
     features['evi_local'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('evi_local', ''), axis=1)
+
     return features.to_json()
 
 #################SELECTION OF THE ROADNETWORK#######################################################
@@ -152,7 +154,7 @@ nx.set_edge_attributes(g, traveltimes, "traveltimes")
 time_elapsed = (time.perf_counter() - time_start)
 logger.info("Filtering time : " + str(time_elapsed))
 logger.info("End of filter")
-rand_nodes = random_nodes.random_nodes(g, g_not_proj,point1[0],point1[1],point2[0],point2[1],user,sim)
+rand_nodes = random_nodes.random_nodes(g, g_not_proj,point1[0],point1[1],point2[0],point2[1],user,sim,dist)
 rand_nodes_geojson = get_nodes_geojson(g,rand_nodes)
 # with open('rand_nodes.geojson', 'w') as f:
 #     f.write(rand_nodes_geojson)
