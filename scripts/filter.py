@@ -38,6 +38,8 @@ def get_nodes_geojson(graph, osmid_list):
 def shortest_path_geojson(G, point1, point2, weight):
     route = nx.shortest_path(G, point1, point2, weight=weight)
     nodes = set(route)
+    logger.info(route)
+    logger.info(nodes)
     edges = G.subgraph(nodes)
     features = gpd.GeoDataFrame(edges.edges(keys=True))
     features['geometry'] = features.apply(
@@ -178,5 +180,4 @@ selected_route_geojson = shortest_path_geojson(g, source_node, dest_node, 'trave
 # with open('selected_route.geojson', 'w') as f:
 #     f.write(selected_route_geojson)
 print(selected_route_geojson)
-logger.info("Number of edges in selected route : " + str(len(selected_route_geojson)))
 logger.info("Total time : " + str((time.perf_counter() - time_start)))
