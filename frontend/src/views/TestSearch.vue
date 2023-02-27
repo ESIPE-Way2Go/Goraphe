@@ -13,7 +13,7 @@
             <v-autocomplete
                 v-model="select"
                 :loading="loading"
-                :items="items.map(items => items.label).filter((val,i)=>i<4)"
+                :items="items.map(i => i.label).filter((val,i)=>i<4)"
                 v-model:search="search"
                 class="mx-4"
                 density="default"
@@ -27,6 +27,7 @@
           <v-row align="start" class="mt-1">
             <v-col cols="10">
             <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
+              <div @click="swapPoints">SWAP</div>
             </v-col>
             <v-col cols="2" align-self="start">
               <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="large"></v-btn>
@@ -34,7 +35,7 @@
           </v-row>
           <v-text-field variant="outlined" v-model="desc" label="Description"></v-text-field>
           <v-text-field variant="outlined" v-model.number="dist" label="Distance (mètre)" type="number" :min="minDist"
-                        max="100000" step="10"></v-text-field>
+                        max="100000" step="10" @change="circleChange"></v-text-field>
           <v-select
               variant="outlined"
               chips
@@ -72,6 +73,7 @@ export default {
   },
   watch: {
     minDist(newVal) {
+
       if (this.dist < newVal) {
         this.dist = newVal;
       }
@@ -116,6 +118,9 @@ export default {
       length: 0,
       start: [],
       end: [],
+      //test
+      circle_center: [],
+
     };
   },
   mounted() {
@@ -123,7 +128,7 @@ export default {
       maxBounds: [[-90, -180], [90, 180]],
       maxZoom: 18,
       minZoom: 3,
-      zoomControl: false
+      zoomControl: false,
     }).setView([48.83935609413248, 2.585938493701621], 16);
     L.control.zoom({
       position: 'bottomright'
@@ -140,6 +145,18 @@ export default {
       lineOptions: {
         addWaypoints: false
       },
+      createMarker: function(i, wp) {
+          return L.marker(wp.latLng, {
+            draggable: true,
+            icon:L.icon({
+              iconUrl: (i===0) ? require('@/assets/pin.png') :require('@/assets/flag.png') ,
+              iconSize:     [40, 40], // size of the icon
+              iconAnchor:  (i===1) ? [6, 38] : [20, 40], // point of the icon which will correspond to marker's location
+              shadowAnchor: [4, 62],  // the same for the shadow
+            }),
+          });
+        },
+      waypointMode:'snap',
       waypoints: [
         L.latLng(48.83935609413248, 2.585938493701621),
         L.latLng(48.84009439586693, 2.586180556928124)
@@ -147,16 +164,25 @@ export default {
       router: L.Routing.mapbox('pk.eyJ1IjoibWV4aW1hIiwiYSI6ImNsZWd2djNkdDBwc3gzcXR0ZXB3Nmt6dDQifQ.GeKKqQmsdu8WhrePgFj2ww')
     }).addTo(map);
 
+    this.circle_center =  L.circle(this.center, {radius: 200}).addTo(map);
+
     this.control.on('routesfound', (e) => {
       this.start = [e.waypoints[0].latLng.lng, e.waypoints[0].latLng.lat];
       this.end = [e.waypoints[e.waypoints.length - 1].latLng.lng, e.waypoints[e.waypoints.length - 1].latLng.lat];
       this.length = e.routes[0] ? e.routes[0].summary.totalDistance : 0;
       this.center = this.getCenter(e.routes[0].coordinates.map(coord => [coord.lat, coord.lng]));
       console.log(this.center);
+      this.circle_center.remove();
+      this.circle_center =  L.circle(this.center, {radius: this.minDist}).addTo(map);
     });
   this.map = map;
   },
   methods: {
+
+    circleChange(){
+      this.circle_center.remove();
+      this.circle_center =  L.circle(this.center, {radius: this.dist}).addTo(this.map);
+    },
 
     //search bar
     async querySelections (v) {
@@ -169,6 +195,15 @@ export default {
       this.items = await provider.search({ query: v });
       this.loading = false
     },
+
+    swapPoints(){
+      console.log(this.control._plan._waypoints)
+      this.control.setWaypoints([
+        L.latLng(this.control._plan._waypoints[1].latLng.lat,this.control._plan._waypoints[1].latLng.lng),
+        L.latLng(this.control._plan._waypoints[0].latLng.lat,this.control._plan._waypoints[0].latLng.lng)
+      ])
+    },
+
     selectedSearch(){
       //console.log(this.select)
       if(this.select===null) return;
