@@ -58,7 +58,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
                 "--roads", String.join(",", simulationRequest.getRoadTypes()),
                 "--point1", new MapController.Point(simulationRequest.getStart()).toString(),
                 "--point2", new MapController.Point(simulationRequest.getEnd()).toString()
-//                ,"--randomPoints", Integer.toString(simulationRequest.getNbRandomPoint())
+                ,"--random", Integer.toString(simulationRequest.getRandomPoints())
         );
         try {
             var process = builder.start();

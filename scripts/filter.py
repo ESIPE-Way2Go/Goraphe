@@ -162,7 +162,9 @@ nx.set_edge_attributes(g, traveltimes, "traveltimes")
 time_elapsed = (time.perf_counter() - time_start)
 logger.info("Filtering time : " + str(time_elapsed))
 logger.info("End of filter")
-rand_nodes = random_nodes.random_nodes(g, g_not_proj, point1[0], point1[1], point2[0], point2[1], user, sim, dist,random)
+logger.info("Number of edges in graph : " + str(len(edges_proj)))
+rand_nodes = random_nodes.random_nodes(g, g_not_proj, point1[0], point1[1], point2[0], point2[1], user, sim, dist,
+                                       random)
 rand_nodes_geojson = get_nodes_geojson(g, rand_nodes)
 # with open('rand_nodes.geojson', 'w') as f:
 #     f.write(rand_nodes_geojson)
@@ -176,5 +178,5 @@ selected_route_geojson = shortest_path_geojson(g, source_node, dest_node, 'trave
 # with open('selected_route.geojson', 'w') as f:
 #     f.write(selected_route_geojson)
 print(selected_route_geojson)
-
+logger.info("Number of edges in selected route : " + str(len(selected_route_geojson)))
 logger.info("Total time : " + str((time.perf_counter() - time_start)))

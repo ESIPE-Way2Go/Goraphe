@@ -4,9 +4,10 @@ import os
 import networkx as nx
 import pandas as pd
 import time
-import openpyxl #Shows as not used but is needed to export .xlsx files
+import openpyxl  # Shows as not used but is needed to export .xlsx files
 
-#Need to be duplicated from filter3 because of error "circular import"
+
+# Need to be duplicated from filter3 because of error "circular import"
 def setup_logger(name, log_file, level=logging.DEBUG):
     """To setup as many loggers as you want"""
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -19,7 +20,8 @@ def setup_logger(name, log_file, level=logging.DEBUG):
 
     return logger
 
-def compute(graph_proj,rand_nodes,source_node,dest_node,user,sim):
+
+def compute(graph_proj, rand_nodes, source_node, dest_node, user, sim):
     # Creation of logger
     os.makedirs("scripts/" + user, exist_ok=True)
     LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_3.log"
@@ -45,6 +47,7 @@ def compute(graph_proj,rand_nodes,source_node,dest_node,user,sim):
 
     def edge_to_str(item):
         return str(item[0]) + "_" + str(item[1])
+
     for origin in rand_nodes:
         routes_traveltimes[origin] = dict([])
         timetravel_shortest_paths[origin] = dict([])
@@ -54,10 +57,11 @@ def compute(graph_proj,rand_nodes,source_node,dest_node,user,sim):
             # Calculate the shortest path
             # TODO attention des fois aucun trajet trouvé entre source et target    raise nx.NetworkXNoPath(f"No path between {source} and {target}.")      networkx.exception.NetworkXNoPath: No path between 686687464 and 259190165.
             try:
-                route_traveltimes = nx.shortest_path(graph_proj, source=origin, target=destination, weight='traveltimes')
+                route_traveltimes = nx.shortest_path(graph_proj, source=origin, target=destination,
+                                                     weight='traveltimes')
                 routes_traveltimes[origin][destination] = route_traveltimes
             except nx.NetworkXNoPath:
-                logger.info("no route beetween :"+str(origin)+" and "+str(destination))
+                logger.info("no route beetween :" + str(origin) + " and " + str(destination))
 
             timetravel_shortest_path = 0
             roads_traveltimesSP = dict()
@@ -69,7 +73,7 @@ def compute(graph_proj,rand_nodes,source_node,dest_node,user,sim):
 
             for item in indMW:
                 G6 = graph_proj.copy()
-                G6.remove_edge(item[0],item[1])
+                G6.remove_edge(item[0], item[1])
                 # Retrieve only edges from the new graph
                 G6_proj = G6
                 # Get new Edges
@@ -139,7 +143,6 @@ def compute(graph_proj,rand_nodes,source_node,dest_node,user,sim):
         ref_ratio_traveltimes = ((beta_traveltimes - ref_alpha_traveltimes) / ref_alpha_traveltimes) * 100
         evi_local = ((beta_traveltimes - alpha_traveltimes) / alpha_traveltimes) * 100
 
-
         evi_local_dict[(edge[0], edge[1], 0)] = float(evi_local)
         evi_average_nip = ((beta_traveltimes - alpha_traveltimes) / nip)
 
@@ -153,12 +156,12 @@ def compute(graph_proj,rand_nodes,source_node,dest_node,user,sim):
 
     # transform results dictionary in dataframes to save as xlsx file
 
-    # df_Results = pd.DataFrame.from_dict(results, orient='columns')
-    # df_Results.to_excel("Set_extremenodes_EVIs_test1.xlsx")
-    # df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
-    # df_Res_traveltimeSP.to_excel("Set_37_traveltimesSP_test1.xlsx")
-    # df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
-    # df_essential_mw_edges.to_excel("Set_37_essential_mw_edges_test1.xlsx")
+    df_Results = pd.DataFrame.from_dict(results, orient='columns')
+    df_Results.to_excel("scripts/" + user + "/" + sim + "_extremenodes_EVIs.xlsx")
+    df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
+    df_Res_traveltimeSP.to_excel("scripts/" + user + "/" + sim + "_traveltimesSP.xlsx")
+    df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
+    df_essential_mw_edges.to_excel("scripts/" + user + "/" + sim + "_essential_mw_edges.xlsx")
 
     nx.set_edge_attributes(graph_proj, evi_local_dict, "evi_local")
 
