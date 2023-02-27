@@ -26,6 +26,8 @@
 
           <v-row align="start" class="mt-1">
             <v-col cols="10">
+              <v-text-field variant="outlined" v-model="start" label="Start" @input="updateWaypoints"></v-text-field>
+              <v-text-field variant="outlined" v-model="end" label="End" @input="updateWaypoints"></v-text-field>
             <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
             </v-col>
             <v-col cols="2" align-self="start">
@@ -181,6 +183,14 @@ export default {
         L.latLng(value[0].y, value[0].x)
       ])
       console.log(this.control.waypoints)
+    },
+    updateWaypoints() {
+      const startLatLng = this.start.split(',').reverse().map(parseFloat);
+      const endLatLng = this.end.split(',').reverse().map(parseFloat);
+      this.control.setWaypoints([
+        L.latLng(startLatLng[0], startLatLng[1]),
+        L.latLng(endLatLng[0], endLatLng[1])
+      ]);
     },
 
     //end search bar
