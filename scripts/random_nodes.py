@@ -25,7 +25,7 @@ def random_nodes(G_proj, G_not_proj, x1, y1, x2, y2,user ,sim,dist):
     logger.info("Init of random_nodes")
     # define the number of random points that will be used (this number will be around the first chosen node AND around
     # the second chosen node ; so there will be random points equals to 2 times the number chosen below in total)
-    n_random_points = 3
+    n_random_points = 1
     # define a distance around each one of the 2 chosen nodes to create random points
     distance = dist/1000000
 
