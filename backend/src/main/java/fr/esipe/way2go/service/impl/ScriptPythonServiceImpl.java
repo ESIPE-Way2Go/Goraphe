@@ -8,21 +8,23 @@ import fr.esipe.way2go.dto.simulation.request.SimulationRequest;
 import fr.esipe.way2go.service.LogService;
 import fr.esipe.way2go.service.ScriptPythonService;
 import fr.esipe.way2go.service.SimulationService;
+import fr.esipe.way2go.utils.StatusScript;
+import fr.esipe.way2go.utils.StatusSimulation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.util.Calendar;
+import java.nio.file.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class ScriptPythonServiceImpl implements ScriptPythonService {
 
     private final LogService logService;
     private final SimulationService simulationService;
-
 
     @Autowired
     public ScriptPythonServiceImpl(LogService logService, SimulationService simulationService) {
@@ -41,19 +43,23 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
     public void executeScript(UserEntity user, SimulationEntity simulation, MapController.Point coords, SimulationRequest simulationRequest) {
         var sep = System.getProperty("file.separator");
         var pathGeneric = System.getProperty("user.dir") + sep + "scripts" + sep;
-        var genericPathLog = pathGeneric + user.getUsername() + sep + simulation.getName();
-        var pathLog1 = genericPathLog + "_1.log";
-        var pathLog2 = genericPathLog + "_2.log";
-        var pathLog3 = genericPathLog + "_3.log";
+        var formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        var simulationName = simulation.getName() + "_" + formatter.format(new Date());
+        var genericPathLog = pathGeneric + user.getUsername() + sep + simulationName;
+        var logs = new ArrayList<LogEntity>();
         var logEntity1 = logService.save(new LogEntity(simulation, "filter"));
         var logEntity2 = logService.save(new LogEntity(simulation, "random_nodes"));
         var logEntity3 = logService.save(new LogEntity(simulation, "compute"));
+
+        logs.add(logEntity1);
+        logs.add(logEntity2);
+        logs.add(logEntity3);
 
         var builder = new ProcessBuilder("python3", pathGeneric + "filter.py",
                 "--dist", Integer.toString(simulationRequest.getDistance()),
                 "--coords", coords.toString(),
                 "--user", user.getUsername(),
-                "--sim", simulation.getName(),
+                "--sim", simulationName,
                 "--roads", String.join(",", simulationRequest.getRoadTypes()),
                 "--point1", new MapController.Point(simulationRequest.getStart()).toString(),
                 "--point2", new MapController.Point(simulationRequest.getEnd()).toString()
@@ -61,29 +67,33 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
 
         try {
             var process = builder.start();
+            var logMap = new HashMap<String, LogEntity>();
+            logMap.put("filter", logEntity1);
+            logMap.put("random", logEntity2);
+            logMap.put("compute", logEntity3);
+
+            var thread = new Thread(() -> {
+                readLogFile(Paths.get(genericPathLog), logMap);
+            });
+            thread.start();
             int exitCode = process.waitFor();
-            var status = exitCode == 0 ? "SUCCESS" : "ERROR";
+            thread.interrupt();
+            var status = exitCode == 0 ? StatusSimulation.SUCCESS : StatusSimulation.ERROR;
             var errorLogs = new String(process.getErrorStream().readAllBytes());
-
-            logEntity1.setContent(readFile(Path.of(pathLog1).toString()));
-            logEntity2.setContent(readFile(Path.of(pathLog2).toString()));
-            logEntity3.setContent(readFile(Path.of(pathLog3).toString()));
-
-            if (logEntity2.getContent().equals("")) {
-                logEntity1.setStatus(status);
-                logEntity1.setContent(logEntity1.getContent() + errorLogs);
-            }
-            else if (logEntity3.getContent().equals("")) {
-                logEntity2.setStatus(status);
-                logEntity2.setContent(logEntity2.getContent() + errorLogs);
-            } else {
-                logEntity3.setStatus(status);
-                logEntity3.setContent(logEntity3.getContent() + errorLogs);
-            }
-
-            logService.save(logEntity1);
-            logService.save(logEntity2);
-            logService.save(logEntity3);
+            logs.forEach(log -> {
+                if (log.getStatus().equals(StatusScript.LOAD.getDescription())) {
+                    switch (status) {
+                        case SUCCESS:
+                            log.setStatus(StatusScript.SUCCESS.getDescription());
+                            break;
+                        case ERROR:
+                            log.setStatus(StatusScript.ERROR.getDescription());
+                            log.setContent(log.getContent() + errorLogs);
+                            break;
+                    }
+                }
+                logService.save(log);
+            });
 
             var stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
             var randomPoints = stdInput.readLine();
@@ -91,10 +101,43 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             simulation.setEndDate(Calendar.getInstance());
             simulation.setRandomPoints(randomPoints);
             simulation.setShortestPath(shortestPath);
-            simulation.setStatus(status);
-            simulationService.save(simulation);
+            simulation.setStatus(status.getDescription());
+            endSimulation(simulation, StatusSimulation.SUCCESS);
+        } catch (IOException | InterruptedException e) {
+            endSimulation(simulation, StatusSimulation.CANCEL);
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void readLogFile(Path path, Map<String, LogEntity> logs) {
+        try {
+            if (!Files.exists(path))
+                Files.createDirectory(path);
+            var watchService = path.getFileSystem().newWatchService();
+            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
+            WatchKey key;
+            while ((key = watchService.take()) != null) {
+                for (var event : key.pollEvents()) {
+                    var filename = event.context().toString();
+                    if (filename.endsWith(".log")) {
+                        var filenameModify = (Path) event.context();
+                        var content = readFile(path + "/" + filenameModify);
+                        var logEntity = logs.get(filenameModify.toString().replace(".log", ""));
+                        logEntity.setContent(content);
+                        logEntity.setStatus(StatusScript.LOAD.getDescription());
+                        logService.save(logEntity);
+                    }
+                }
+                key.reset();
+            }
         } catch (IOException | InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private void endSimulation(SimulationEntity simulation, StatusSimulation status) {
+        simulation.setEndDate(Calendar.getInstance());
+        simulation.setStatus(status.getDescription());
+        simulationService.save(simulation);
     }
 }

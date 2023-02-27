@@ -78,7 +78,6 @@ import { useToast } from "vue-toastification";
 export default {
     setup() {
         const toast = useToast();
-
         return { toast }
     },
     data() {
@@ -89,7 +88,6 @@ export default {
             deleteDialog: false,
             simulationId: -1,
             simulationTitle: "",
-
         }
     },
 

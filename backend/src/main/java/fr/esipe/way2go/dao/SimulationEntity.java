@@ -2,6 +2,8 @@ package fr.esipe.way2go.dao;
 
 import fr.esipe.way2go.dao.converter.CalendarConverter;
 import fr.esipe.way2go.dao.converter.StringListConverter;
+import fr.esipe.way2go.utils.StatusSimulation;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -72,7 +74,7 @@ public class SimulationEntity {
         this.roadType = roadTypes;
         this.shareLink = UUID.randomUUID();
         this.statistics = "statistics";
-        this.status = "NOT LAUNCH";
+        this.status = StatusSimulation.WAIT.getDescription();
     }
 
     public UUID getShareLink() {

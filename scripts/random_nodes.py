@@ -17,12 +17,23 @@ def setup_logger(name, log_file, level=logging.DEBUG):
 
     return logger
 
-def random_nodes(G_proj, G_not_proj, x1, y1, x2, y2,user ,sim):
+def test(user ,sim):
+    #os.makedirs("scripts/" + user, exist_ok=True)
+    #os.makedirs("scripts/" + user + "/" + sim, exist_ok=True)
+    LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "/random.log"
+    logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
+    logger.info("Init of random_nodes")
+
+    logger.info("random")
+
+
+def random_nodes(G_proj, G_not_proj, x1, y1, x2, y2, user ,sim):
     # Creation of logger
     os.makedirs("scripts/" + user, exist_ok=True)
     LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_2.log"
     logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
     logger.info("Init of random_nodes")
+
     # define the number of random points that will be used (this number will be around the first chosen node AND around
     # the second chosen node ; so there will be random points equals to 2 times the number chosen below in total)
     n_random_points = 3

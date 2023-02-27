@@ -1,5 +1,7 @@
 package fr.esipe.way2go.dao;
 
+import fr.esipe.way2go.utils.StatusScript;
+
 import javax.persistence.*;
 
 @Entity
@@ -20,7 +22,7 @@ public class LogEntity {
     @Column(name = "script", nullable = false)
     private String script;
 
-    @Column(name = "content", length = 10000)
+    @Column(name = "content", length = 100000)
     private String content;
 
 
@@ -29,7 +31,7 @@ public class LogEntity {
 
     public LogEntity(SimulationEntity simulation, String script) {
         this.simulation = simulation;
-        this.status = "PAS LANCE";
+        this.status = StatusScript.NOT_LAUNCHED.getDescription();
         this.script = script;
     }
 

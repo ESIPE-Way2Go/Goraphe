@@ -12,14 +12,14 @@ import fr.esipe.way2go.exception.SimulationNotFoundException;
 import fr.esipe.way2go.service.ScriptPythonService;
 import fr.esipe.way2go.service.SimulationService;
 import fr.esipe.way2go.service.UserService;
+import fr.esipe.way2go.utils.StatusSimulation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,12 +33,15 @@ public class SimulationController {
     private final ScriptPythonService scriptPythonService;
     private final JwtUtils jwtUtils;
 
+    private Map<Long, Thread> threadSimulations;
+
     @Autowired
     public SimulationController(SimulationService simulationService, UserService userService, ScriptPythonService scriptPythonService, JwtUtils jwtUtils) {
         this.simulationService = simulationService;
         this.userService = userService;
         this.scriptPythonService = scriptPythonService;
         this.jwtUtils = jwtUtils;
+        this.threadSimulations = new HashMap<>();
     }
 
     /**
@@ -61,12 +64,16 @@ public class SimulationController {
         var simulation = new SimulationEntity(simulationRequest.getName(), user, simulationRequest.getDesc(), simulationRequest.getDistance(),  simulationRequest.getScript(), simulationRequest.getRoadTypes());
         var simulationSave = simulationService.save(simulation);
         var midPoint= new MapController.Point(simulationRequest.getCenter());
-        POOL.execute(() -> {
+        var thread = new Thread(() -> {
             simulationSave.setBeginDate(Calendar.getInstance());
-            simulationSave.setStatus("En cours");
+            simulationSave.setStatus(StatusSimulation.LOAD.getDescription());
             simulationService.save(simulationSave);
-            scriptPythonService.executeScript(user, simulationSave, midPoint,simulationRequest);
+            scriptPythonService.executeScript(user, simulationSave, midPoint, simulationRequest);
         });
+        thread.start();
+        threadSimulations.putIfAbsent(simulationSave.getSimulationId(), thread);
+
+
         return new ResponseEntity<>(new SimulationIdResponse(simulationSave.getSimulationId()), HttpStatus.ACCEPTED);
     }
 
@@ -75,7 +82,7 @@ public class SimulationController {
      *
      * @param headers : params where it is the token
      * @param id      id of the simulation
-     * @return
+     * @return the details of the simulation
      */
     @GetMapping(value = "/{id}")
     public ResponseEntity<SimulationResponse> getSimulation(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
@@ -145,5 +152,13 @@ public class SimulationController {
         if (!simulation.getUser().equals(user))
             throw new SimulationForbidden();
         return new ResponseEntity<>(new SimulationMapResponse(simulation), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}/cancel")
+    public ResponseEntity<Object> cancelSimulation(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
+        var thread = threadSimulations.get(id);
+        thread.interrupt();
+        threadSimulations.remove(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
