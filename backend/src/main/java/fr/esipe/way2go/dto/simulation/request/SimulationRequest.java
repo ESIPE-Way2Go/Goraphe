@@ -13,6 +13,15 @@ public class SimulationRequest {
     String script;
     List<String> roadTypes;
     double[] center;
+    int nbRandomPoint;
+
+    public int getNbRandomPoint() {
+        return nbRandomPoint;
+    }
+
+    public void setNbRandomPoint(int nbRandomPoint) {
+        this.nbRandomPoint = nbRandomPoint;
+    }
 
     public String getName() {
         return name;

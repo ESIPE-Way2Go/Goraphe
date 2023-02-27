@@ -26,8 +26,6 @@
 
           <v-row align="start" class="mt-1">
             <v-col cols="10">
-              <v-text-field variant="outlined" v-model="start" label="Start" @update:modelValue="updateStart"></v-text-field>
-              <v-text-field variant="outlined" v-model="end" label="End" @update:modelValue="updateEnd"></v-text-field>
             <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
               <div @click="swapPoints">SWAP</div>
             </v-col>
@@ -35,6 +33,11 @@
               <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="large"></v-btn>
             </v-col>
           </v-row>
+          <v-text-field variant="outlined" v-model="start" label="Start" @update:modelValue="updateStart"></v-text-field>
+          <v-text-field variant="outlined" v-model="end" label="End" @update:modelValue="updateEnd"></v-text-field>
+          <v-text-field variant="outlined" v-model="center" label="Center" @update:modelValue="circleUpdate"></v-text-field>
+          <v-text-field variant="outlined" label="Nb Random Points" type="number" :min="2"
+                        max="100" step="1"></v-text-field>
           <v-text-field variant="outlined" v-model="desc" label="Description"></v-text-field>
           <v-text-field variant="outlined" v-model.number="dist" label="Distance (mètre)" type="number" :min="minDist"
                         max="100000" step="10" @change="circleChange"></v-text-field>
@@ -159,8 +162,8 @@ export default {
         },
       waypointMode:'snap',
       waypoints: [
-        L.latLng(48.83935609413248, 2.585938493701621),
-        L.latLng(48.84009439586693, 2.586180556928124)
+        L.latLng(48.8393560, 2.5859384),
+        L.latLng(48.8400943, 2.5861805)
       ],
       router: L.Routing.mapbox('pk.eyJ1IjoibWV4aW1hIiwiYSI6ImNsZWd2djNkdDBwc3gzcXR0ZXB3Nmt6dDQifQ.GeKKqQmsdu8WhrePgFj2ww')
     }).addTo(map);
@@ -179,6 +182,12 @@ export default {
   this.map = map;
   },
   methods: {
+    circleUpdate(){
+      this.center=this.center.split(',').map(parseFloat);
+      console.log(this.center);
+      this.circle_center.remove();
+      this.circle_center =  L.circle(this.center, {radius: this.dist}).addTo(this.map);
+    },
 
     circleChange(){
       this.circle_center.remove();
@@ -237,28 +246,23 @@ export default {
 
     //end search bar
     getCenter(coordinates) {
-      let x = 0, y = 0, z = 0;
+      const lats = coordinates.map(coord => coord[0]);
+      const lngs = coordinates.map(coord => coord[1]);
 
-      for (const coordinate of coordinates) {
-        const lat = coordinate[0] * Math.PI / 180;
-        const lng = coordinate[1] * Math.PI / 180;
+      const topLeft = [Math.max(...lats), Math.min(...lngs)];
+      const bottomRight = [Math.min(...lats), Math.max(...lngs)];
 
-        x += Math.cos(lat) * Math.cos(lng);
-        y += Math.cos(lat) * Math.sin(lng);
-        z += Math.sin(lat);
-      }
+      const lat1 = topLeft[0] * Math.PI / 180;
+      const lng1 = topLeft[1] * Math.PI / 180;
+      const lat2 = bottomRight[0] * Math.PI / 180;
+      const lng2 = bottomRight[1] * Math.PI / 180;
 
-      const total = coordinates.length;
+      const Bx = Math.cos(lat2) * Math.cos(lng2 - lng1);
+      const By = Math.cos(lat2) * Math.sin(lng2 - lng1);
+      const lat3 = Math.atan2(Math.sin(lat1) + Math.sin(lat2), Math.sqrt((Math.cos(lat1) + Bx) * (Math.cos(lat1) + Bx) + By * By));
+      const lng3 = lng1 + Math.atan2(By, Math.cos(lat1) + Bx);
 
-      x = x / total;
-      y = y / total;
-      z = z / total;
-
-      const centralLongitude = Math.atan2(y, x);
-      const centralSquareRoot = Math.sqrt(x * x + y * y);
-      const centralLatitude = Math.atan2(z, centralSquareRoot);
-
-      return [centralLatitude * 180 / Math.PI, centralLongitude * 180 / Math.PI];
+      return [lat3 * 180 / Math.PI, lng3 * 180 / Math.PI];
     },
 
     uncheckRoadTypes() {
@@ -270,13 +274,18 @@ export default {
         return;
       }
       if (this.dist < this.length * 0.6 || this.dist < 100) {
-        this.toast.error("Generation distance cannot be less than 100 or less that 60% of the route length")
-        this.dist = this.minDist
+        this.toast.error("Generation distance cannot be less than 100 or less that 60% of the route length");
+        this.dist = this.minDist;
+        return;
+      }
+      if(this.randomPoints<2 || this.randomPoints > 100){
+        this.toast.error("Number of random points must be between 2 and 100");
         return;
       }
       console.log("length = " + this.length * 0.6)
       console.log("dist = " + this.dist)
       try {
+        let randomPoints=parseInt(this.$data.randomPoints);
         let center = this.center;
         let name = this.$data.name;
         let desc = this.$data.desc;
@@ -285,7 +294,7 @@ export default {
         let distance = this.dist;
         let roadTypes = this.$data.selectedRoadTypes;
         let script = this.$data.script;
-        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center});
+        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center,randomPoints});
         const response = await fetch('/api/simulation', {
           method: 'POST',
           headers: authHeader(),
