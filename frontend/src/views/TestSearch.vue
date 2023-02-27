@@ -26,7 +26,7 @@
 
           <v-row align="start" class="mt-1">
             <v-col cols="10">
-            <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
+            <v-text-field variant="outlined" v-model.trim="name" label="Name"></v-text-field>
               <div @click="swapPoints">SWAP</div>
             </v-col>
             <v-col cols="2" align-self="start">
@@ -36,9 +36,9 @@
           <v-text-field variant="outlined" v-model="start" label="Start" @update:modelValue="updateStart"></v-text-field>
           <v-text-field variant="outlined" v-model="end" label="End" @update:modelValue="updateEnd"></v-text-field>
           <v-text-field variant="outlined" v-model="center" label="Center" @update:modelValue="circleUpdate"></v-text-field>
-          <v-text-field variant="outlined" label="Nb Random Points" type="number" :min="2"
+          <v-text-field variant="outlined" v-model.number="randomPoints" label="Nb Random Points" type="number" :min="2"
                         max="100" step="1"></v-text-field>
-          <v-text-field variant="outlined" v-model="desc" label="Description"></v-text-field>
+          <v-text-field variant="outlined" v-model.trim="desc" label="Description"></v-text-field>
           <v-text-field variant="outlined" v-model.number="dist" label="Distance (mètre)" type="number" :min="minDist"
                         max="100000" step="10" @change="circleChange"></v-text-field>
           <v-select
@@ -51,7 +51,7 @@
               clearable
               closable-chips
           ></v-select>
-          <v-text-field variant="outlined" v-model="script" label="Computing Script" disabled ></v-text-field>
+          <v-text-field variant="outlined" v-model.trim="script" label="Computing Script" disabled ></v-text-field>
           <v-btn type="submit" color="primary" v-if="selectedRoadTypes.length>0">Lancer la simulation</v-btn>
         </v-form>
       </v-card>
@@ -124,6 +124,7 @@ export default {
       end: [],
       //test
       circle_center: [],
+      randomPoints : 2,
 
     };
   },
@@ -285,7 +286,7 @@ export default {
       console.log("length = " + this.length * 0.6)
       console.log("dist = " + this.dist)
       try {
-        let randomPoints=parseInt(this.$data.randomPoints);
+        let randomPoints=this.$data.randomPoints;
         let center = this.center;
         let name = this.$data.name;
         let desc = this.$data.desc;

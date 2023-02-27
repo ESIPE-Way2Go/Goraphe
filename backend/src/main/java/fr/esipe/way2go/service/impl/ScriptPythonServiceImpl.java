@@ -19,6 +19,7 @@ import java.util.Calendar;
 
 @Service
 public class ScriptPythonServiceImpl implements ScriptPythonService {
+    private enum State{SUCCESS,ERROR}
 
     private final LogService logService;
     private final SimulationService simulationService;
@@ -62,7 +63,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
         try {
             var process = builder.start();
             int exitCode = process.waitFor();
-            var status = exitCode == 0 ? "SUCCESS" : "ERROR";
+            var status = exitCode == 0 ? State.SUCCESS : State.ERROR;
             var errorLogs = new String(process.getErrorStream().readAllBytes());
 
             logEntity1.setContent(readFile(Path.of(pathLog1).toString()));
@@ -70,17 +71,17 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             logEntity3.setContent(readFile(Path.of(pathLog3).toString()));
 
             if (logEntity2.getContent().equals("")) {
-                logEntity1.setStatus(status);
+                logEntity1.setStatus(status.name());
                 logEntity1.setContent(logEntity1.getContent() + errorLogs);
             }
             else if (logEntity3.getContent().equals("")) {
-                logEntity1.setStatus("SUCCESS");
-                logEntity2.setStatus(status);
+                logEntity1.setStatus(State.SUCCESS.name());
+                logEntity2.setStatus(status.name());
                 logEntity2.setContent(logEntity2.getContent() + errorLogs);
             } else {
-                logEntity1.setStatus("SUCCESS");
-                logEntity2.setStatus("SUCCESS");
-                logEntity3.setStatus(status);
+                logEntity1.setStatus(State.SUCCESS.name());
+                logEntity2.setStatus(State.SUCCESS.name());
+                logEntity3.setStatus(status.name());
                 logEntity3.setContent(logEntity3.getContent() + errorLogs);
             }
 
@@ -94,7 +95,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             simulation.setEndDate(Calendar.getInstance());
             simulation.setRandomPoints(randomPoints);
             simulation.setShortestPath(shortestPath);
-            simulation.setStatus(status);
+            simulation.setStatus(status.name());
             simulationService.save(simulation);
         } catch (IOException | InterruptedException e) {
             Thread.currentThread().interrupt();
