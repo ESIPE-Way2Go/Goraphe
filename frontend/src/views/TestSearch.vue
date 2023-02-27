@@ -26,8 +26,8 @@
 
           <v-row align="start" class="mt-1">
             <v-col cols="10">
-              <v-text-field variant="outlined" v-model="start" label="Start" @input="updateWaypoints"></v-text-field>
-              <v-text-field variant="outlined" v-model="end" label="End" @input="updateWaypoints"></v-text-field>
+              <v-text-field variant="outlined" v-model="start" label="Start" @update:modelValue="updateStart"></v-text-field>
+              <v-text-field variant="outlined" v-model="end" label="End" @update:modelValue="updateEnd"></v-text-field>
             <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
             </v-col>
             <v-col cols="2" align-self="start">
@@ -126,7 +126,7 @@ export default {
       maxZoom: 18,
       minZoom: 3,
       zoomControl: false
-    }).setView([48.83935609413248, 2.585938493701621], 16);
+    }).setView([48.8393560, 2.5859384], 16);
     L.control.zoom({
       position: 'bottomright'
     }).addTo(map);
@@ -143,8 +143,8 @@ export default {
         addWaypoints: false
       },
       waypoints: [
-        L.latLng(48.83935609413248, 2.585938493701621),
-        L.latLng(48.84009439586693, 2.586180556928124)
+        L.latLng(48.8393560, 2.5859384),
+        L.latLng(48.8400943, 2.5861805)
       ],
       router: L.Routing.mapbox('pk.eyJ1IjoibWV4aW1hIiwiYSI6ImNsZWd2djNkdDBwc3gzcXR0ZXB3Nmt6dDQifQ.GeKKqQmsdu8WhrePgFj2ww')
     }).addTo(map);
@@ -184,8 +184,16 @@ export default {
       ])
       console.log(this.control.waypoints)
     },
-    updateWaypoints() {
+    updateStart() {
       const startLatLng = this.start.split(',').reverse().map(parseFloat);
+      const endLatLng = this.end.toString().split(',').reverse().map(parseFloat);
+      this.control.setWaypoints([
+        L.latLng(startLatLng[0], startLatLng[1]),
+        L.latLng(endLatLng[0], endLatLng[1])
+      ]);
+    },
+    updateEnd() {
+      const startLatLng = this.start.toString().split(',').reverse().map(parseFloat);
       const endLatLng = this.end.split(',').reverse().map(parseFloat);
       this.control.setWaypoints([
         L.latLng(startLatLng[0], startLatLng[1]),
@@ -197,9 +205,9 @@ export default {
     getCenter(coordinates) {
       let x = 0, y = 0, z = 0;
 
-      for (let i = 0; i < coordinates.length; i++) {
-        let lat = coordinates[i][0] * Math.PI / 180;
-        let lng = coordinates[i][1] * Math.PI / 180;
+      for (const coordinate of coordinates) {
+        const lat = coordinate[0] * Math.PI / 180;
+        const lng = coordinate[1] * Math.PI / 180;
 
         x += Math.cos(lat) * Math.cos(lng);
         y += Math.cos(lat) * Math.sin(lng);
