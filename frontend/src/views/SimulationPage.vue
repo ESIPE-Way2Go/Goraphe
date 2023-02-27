@@ -47,7 +47,8 @@
             </div>
           </div>
         </div>
-        <v-btn color="danger" class="ma-4 align-self-center" @click="cancelSimulation" variant="outlined" v-if="(status === 'En Cours')">
+        <v-btn color="danger" class="ma-4 align-self-center" @click="cancelSimulation" variant="outlined"
+          v-if="(status === 'Simulation en cours')">
           Annuler la simualtion
         </v-btn>
       </div>
@@ -138,7 +139,7 @@ export default {
         headers: authHeader(),
       })
         .then(response => response.json())
-        .then(data => {
+        .then(data => {        
           this.name = data['name']
           this.description = data['description']
           this.computingScript = data['computingScript']

@@ -10,15 +10,16 @@ import fr.esipe.way2go.dto.user.request.UpdatePasswordRequest;
 import fr.esipe.way2go.dto.user.request.UserRequest;
 import fr.esipe.way2go.dto.user.response.UserInfoResponse;
 import fr.esipe.way2go.dto.user.response.UserResponse;
-import fr.esipe.way2go.exception.UserEmailFound;
-import fr.esipe.way2go.exception.WrongEmailFormatException;
-import fr.esipe.way2go.exception.WrongPasswordFormatException;
+import fr.esipe.way2go.exception.user.UserEmailFound;
+import fr.esipe.way2go.exception.user.WrongEmailFormatException;
+import fr.esipe.way2go.exception.user.WrongPasswordFormatException;
 import fr.esipe.way2go.exception.invite.InviteNotFoundException;
 import fr.esipe.way2go.exception.user.UserNotFoundException;
 import fr.esipe.way2go.exception.user.UserTokenNotFoundException;
 import fr.esipe.way2go.exception.user.UsernameExistAlreadyException;
 import fr.esipe.way2go.service.EmailService;
 import fr.esipe.way2go.service.InviteService;
+import fr.esipe.way2go.service.SimulationService;
 import fr.esipe.way2go.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,17 +39,19 @@ public class AdminController {
     private EmailService emailSenderService;
 
     private UserService userService;
+    private SimulationService simulationService;
 
     private InviteService inviteService;
 
     private WebSecurityConfiguration webSecurityConfiguration;
 
     @Autowired
-    public AdminController(EmailService emailSenderService, UserService userService, InviteService inviteService, WebSecurityConfiguration webSecurityConfiguration) {
+    public AdminController(EmailService emailSenderService, UserService userService, SimulationService simulationService, InviteService inviteService, WebSecurityConfiguration webSecurityConfiguration) {
         this.emailSenderService = emailSenderService;
         this.userService = userService;
         this.inviteService = inviteService;
         this.webSecurityConfiguration = webSecurityConfiguration;
+        this.simulationService = simulationService;
     }
 
     private void checkEmail(String email) {
@@ -149,7 +152,11 @@ public class AdminController {
         var userOptional = userService.getUserById(id);
         if (userOptional.isEmpty())
             throw new UserNotFoundException();
-        userService.deleteUser(userOptional.get());
+
+        var user = userOptional.get();
+        var simulations = simulationService.getSimulationsOfUser(user);
+        simulations.forEach(simulation -> simulationService.deleteSimulation(simulation));
+        userService.deleteUser(user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -1,9 +1,10 @@
 package fr.esipe.way2go.exception;
 
 import fr.esipe.way2go.exception.invite.InviteNotFoundException;
-import fr.esipe.way2go.exception.user.UserNotFoundException;
-import fr.esipe.way2go.exception.user.UserTokenNotFoundException;
-import fr.esipe.way2go.exception.user.UsernameExistAlreadyException;
+import fr.esipe.way2go.exception.simulation.SimulationForbidden;
+import fr.esipe.way2go.exception.simulation.SimulationNotFoundException;
+import fr.esipe.way2go.exception.simulation.SimulationTooLaunch;
+import fr.esipe.way2go.exception.user.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -84,6 +85,14 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     }
     @ExceptionHandler(InviteNotFoundException.class)
     public ResponseEntity<Object> handleInviteNotFound(InviteNotFoundException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(SimulationTooLaunch.class)
+    public ResponseEntity<Object> handleSimulationTooLaunch(SimulationTooLaunch ex){
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(TIMESTAMP, LocalDateTime.now());
         body.put(MESSAGE, ex.getMessage());

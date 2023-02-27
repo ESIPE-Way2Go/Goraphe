@@ -3,65 +3,48 @@
     <v-row class="d-flex">
       <div id="map" class="map"></div>
 
-      <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5" @click.stop="close= !close"
-             v-if="close"></v-btn>
+      <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5" @click.stop="close = !close"
+        v-if="close"></v-btn>
       <v-slide-y-transition>
-      <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 " :class="{'panel-map-lg' : lgAndUp,'panel-map-md': md}"
-               v-if="!close">
-        <v-form @submit.prevent="makePostRequest" v-if="!close">
-          <v-row align="start" class="mt-1">
-            <v-autocomplete
-                v-model="select"
-                :loading="loading"
-                :items="items.map(items => items.label).filter((val,i)=>i<4)"
-                v-model:search="search"
-                class="mx-4"
-                density="default"
-                label="Rechercher une déstination"
-                clearable
-                variant="outlined"
-                @update:modelValue="selectedSearch"
-            ></v-autocomplete>
-          </v-row>
+        <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 " :class="{ 'panel-map-lg': lgAndUp, 'panel-map-md': md }"
+          v-if="!close">
+          <v-form @submit.prevent="makePostRequest" v-if="!close">
+            <v-row align="start" class="mt-1">
+              <v-autocomplete v-model="select" :loading="loading"
+                :items="items.map(items => items.label).filter((val, i) => i < 4)" v-model:search="search" class="mx-4"
+                density="default" label="Rechercher une déstination" clearable variant="outlined"
+                @update:modelValue="selectedSearch"></v-autocomplete>
+            </v-row>
 
-          <v-row align="start" class="mt-1">
-            <v-col cols="10">
-            <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
-            </v-col>
-            <v-col cols="2" align-self="start">
-              <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="large"></v-btn>
-            </v-col>
-          </v-row>
-          <v-text-field variant="outlined" v-model="desc" label="Description"></v-text-field>
-          <v-text-field variant="outlined" v-model.number="dist" label="Distance (mètre)" type="number" :min="minDist"
-                        max="100000" step="10"></v-text-field>
-          <v-select
-              variant="outlined"
-              chips
-              label="Type de routes"
-              :items=roadTypes
-              v-model="selectedRoadTypes"
-              multiple
-              clearable
-              closable-chips
-          ></v-select>
-          <v-text-field variant="outlined" v-model="script" label="Computing Script" disabled ></v-text-field>
-          <v-btn type="submit" color="primary" v-if="selectedRoadTypes.length>0">Lancer la simulation</v-btn>
-        </v-form>
-      </v-card>
+            <v-row align="start" class="mt-1">
+              <v-col cols="10">
+                <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
+              </v-col>
+              <v-col cols="2" align-self="start">
+                <v-btn prepend-icon="mdi-chevron-left" @click.stop="close = !close" flat size="large"></v-btn>
+              </v-col>
+            </v-row>
+            <v-text-field variant="outlined" v-model="desc" label="Description"></v-text-field>
+            <v-text-field variant="outlined" v-model.number="dist" label="Distance (mètre)" type="number" :min="minDist"
+              max="100000" step="10"></v-text-field>
+            <v-select variant="outlined" chips label="Type de routes" :items=roadTypes v-model="selectedRoadTypes"
+              multiple clearable closable-chips></v-select>
+            <v-text-field variant="outlined" v-model="script" label="Computing Script" disabled></v-text-field>
+            <v-btn type="submit" color="primary" v-if="selectedRoadTypes.length > 0">Lancer la simulation</v-btn>
+          </v-form>
+        </v-card>
 
       </v-slide-y-transition>
     </v-row>
   </v-container>
-
 </template>
 <script>
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 import authHeader from "@/services/auth-header";
-import {useDisplay, useTheme} from "vuetify";
-import {useToast} from "vue-toastification";
-import {OpenCageProvider} from "leaflet-geosearch";
+import { useDisplay, useTheme } from "vuetify";
+import { useToast } from "vue-toastification";
+import { OpenCageProvider } from "leaflet-geosearch";
 
 
 export default {
@@ -76,14 +59,14 @@ export default {
         this.dist = newVal;
       }
     },
-    search (val) {
+    search(val) {
       val && val !== this.select && this.querySelections(val)
     },
   },
   setup() {
     const theme = useTheme();
     const toast = useToast();
-    const {sm, md, lgAndUp} = useDisplay()
+    const { sm, md, lgAndUp } = useDisplay()
     return {
       theme,
       toggleTheme: () => theme.global.name.value = theme.global.current.value.dark ? 'myCustomLightTheme' : 'dark',
@@ -95,14 +78,14 @@ export default {
   data() {
     return {
       //search bar
-      center : [48.8405364, 2.5843466],
+      center: [48.8405364, 2.5843466],
       loading: false,
       items: [],
       search: null,
       select: null,
       //end
 
-      control:null,
+      control: null,
 
       name: "",
       desc: "",
@@ -154,12 +137,12 @@ export default {
       this.center = this.getCenter(e.routes[0].coordinates.map(coord => [coord.lat, coord.lng]));
       console.log(this.center);
     });
-  this.map = map;
+    this.map = map;
   },
   methods: {
 
     //search bar
-    async querySelections (v) {
+    async querySelections(v) {
       const provider = new OpenCageProvider({
         params: {
           key: 'ab736f9a32a2477aaf2036de1dc4340d',
@@ -169,13 +152,13 @@ export default {
       this.items = await provider.search({ query: v });
       this.loading = false
     },
-    selectedSearch(){
+    selectedSearch() {
       //console.log(this.select)
-      if(this.select===null) return;
+      if (this.select === null) return;
       let value = this.items.filter(i => i.label === this.select);
-      if(value.length<1) return;
-     // console.log(this.value)
-      this.map.setView([value[0].y,value[0].x], 15);
+      if (value.length < 1) return;
+      // console.log(this.value)
+      this.map.setView([value[0].y, value[0].x], 15);
       this.control.setWaypoints([
         L.latLng(value[0].y, value[0].x),
         L.latLng(value[0].y, value[0].x)
@@ -233,7 +216,7 @@ export default {
         let distance = this.dist;
         let roadTypes = this.$data.selectedRoadTypes;
         let script = this.$data.script;
-        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center});
+        let body = JSON.stringify({ start, end, distance, name, desc, roadTypes, script, center });
         const response = await fetch('/api/simulation', {
           method: 'POST',
           headers: authHeader(),
@@ -241,12 +224,15 @@ export default {
         });
 
         if (!response.ok) {
-          throw new Error(`Request failed with status code: ${response.status}`);
+          let data = await response.json();
+          this.toast.error(data['message'])
+          return
         }
 
         const data = await response.json();
-        console.log(data['simulationId']);
-        this.$router.push({name: 'simulation', params: {id: data['simulationId']}});
+
+     
+        this.$router.push({ name: 'simulation', params: { id: data['simulationId'] } });
       } catch (error) {
         console.error(error);
       }
@@ -286,15 +272,15 @@ export default {
 }
 
 
-.panel-search-bar{
+.panel-search-bar {
   width: 300px;
   height: 40px;
   left: 50%;
-  margin-left: -250px; /* Negative half of width. */
+  margin-left: -250px;
+  /* Negative half of width. */
 }
-.panel-burger{
+
+.panel-burger {
   z-index: 999;
 }
-
-
 </style>

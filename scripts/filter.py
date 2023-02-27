@@ -87,10 +87,6 @@ LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "/" +  "filter.log
 logger = setup_logger("logger", LOG_FILENAME)
 logger.info("Init of filter")
 
-time.sleep(2)
-logger.info("End of filter")
-random_nodes.test(user, sim)
-'''
 # motorway,trunk,primary,secondary,tertiary,residential,service
 cf = '["highway"~"' + '|'.join(roads) + '"]'
 
@@ -161,6 +157,8 @@ nx.set_edge_attributes(g, traveltimes, "traveltimes")
 time_elapsed = (time.perf_counter() - time_start)
 logger.info("Filtering time : " + str(time_elapsed))
 logger.info("End of filter")
+
+print(edges_proj.to_json())
 rand_nodes = random_nodes.random_nodes(g, g_not_proj, point1[0], point1[1], point2[0], point2[1], user, sim)
 rand_nodes_geojson = get_nodes_geojson(g, rand_nodes)
 # with open('rand_nodes.geojson', 'w') as f:
@@ -177,4 +175,3 @@ selected_route_geojson = shortest_path_geojson(g, source_node, dest_node, 'trave
 print(selected_route_geojson)
 
 logger.info("Total time : " + str((time.perf_counter() - time_start)))
-'''

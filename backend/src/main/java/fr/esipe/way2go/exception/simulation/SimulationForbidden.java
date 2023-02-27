@@ -1,4 +1,4 @@
-package fr.esipe.way2go.exception;
+package fr.esipe.way2go.exception.simulation;
 
 public class SimulationForbidden extends RuntimeException {
     public SimulationForbidden() {
