@@ -38,6 +38,7 @@ def random_nodes(G_proj, G_not_proj, x1, y1, x2, y2,user ,sim,dist):
     # distance <= "distance")
     for i in range(n_random_points):
         # TODO à perfectionner
+
         rx1 = random.uniform(-distance, distance)
         ry1 = random.uniform(-distance, distance)
         rx2 = random.uniform(-distance, distance)
