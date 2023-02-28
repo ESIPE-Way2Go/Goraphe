@@ -4,8 +4,8 @@
       <v-card-title>
         Simulation : {{ name }}
       </v-card-title>
-      <v-card-subtitle>
-        Description : {{ description }}
+      <v-card-subtitle v-if="description !== null">
+        {{ description }}
       </v-card-subtitle>
       <div class="d-flex">
         <v-img class="ma-2 rounded-1" max-height="300" max-width="35%" :src=imageTest cover></v-img>

@@ -22,7 +22,7 @@ public class LogEntity {
     @Column(name = "script", nullable = false)
     private String script;
 
-    @Column(name = "content", length = 100000)
+    @Column(name = "content", columnDefinition = "text")
     private String content;
 
 

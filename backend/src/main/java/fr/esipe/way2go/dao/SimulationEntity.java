@@ -58,9 +58,10 @@ public class SimulationEntity {
     @Column(name = "random_points", length = 10000000)
     private String randomPoints;
 
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "simulation")
     private List<LogEntity> logs;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "simulation")
+    private List<ResultEntity> resultEntities;
 
     public SimulationEntity() {
     }
@@ -295,6 +296,14 @@ public class SimulationEntity {
 
     public void setShortestPath(String shortestPath) {
         this.shortestPath = shortestPath;
+    }
+
+    public List<ResultEntity> getResultEntities() {
+        return resultEntities;
+    }
+
+    public void setResultEntities(List<ResultEntity> resultEntities) {
+        this.resultEntities = resultEntities;
     }
 
     @Override

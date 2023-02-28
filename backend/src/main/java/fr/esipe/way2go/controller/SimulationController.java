@@ -8,6 +8,7 @@ import fr.esipe.way2go.dto.simulation.response.SimulationIdResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationMapResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationResponse;
 import fr.esipe.way2go.exception.simulation.SimulationForbidden;
+import fr.esipe.way2go.exception.simulation.SimulationNameFormatWrong;
 import fr.esipe.way2go.exception.simulation.SimulationNotFoundException;
 import fr.esipe.way2go.exception.simulation.SimulationTooLaunch;
 import fr.esipe.way2go.service.ScriptPythonService;
@@ -55,6 +56,9 @@ public class SimulationController {
     public ResponseEntity<SimulationIdResponse> createSimulation(@RequestHeader HttpHeaders headers, @RequestBody SimulationRequest simulationRequest) {
         if (THREAD_SIMULATIONS.size() == nbThreads)
             throw new SimulationTooLaunch();
+        if (simulationRequest.getName().contains(" "))
+            throw new SimulationNameFormatWrong();
+
         var userName = jwtUtils.getUsersFromHeaders(headers);
         var userOptional = userService.getUser(userName);
         if (userOptional.isEmpty())

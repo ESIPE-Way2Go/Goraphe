@@ -1,51 +1,64 @@
 <template>
-    <v-container class="bg-blue-grey-lighten-5">
-        <h2 align-center>En cours</h2>
-        <div v-if="simulationsInLoad.length == 0">
-            <v-alert type="info" title="Info" text="Pas de simulation en cours"></v-alert>
+    <div class="w-75 center">
+        <div>
+            <div v-if="simulationsInLoad.length === 0">
+                <v-alert type="info" title="Info" text="Aucune simulation en cours"></v-alert>
+            </div>
+            <div v-if="simulationsInLoad.length !== 0">
+                <v-sheet class="mx-auto toto" elevation="8">
+                    <v-slide-group v-model="simulationsInLoad" class="pa-4" selected-class="bg-success" show-arrows>
+                        <v-slide-group-item v-for="simulation in simulationsInLoad" :key="simulation">
+                            <v-card class="ma-2" width="25%">
+                                <v-img class="align-end text-white" height="200" :src=imageTest cover>
+                                </v-img>
+                                <v-card-title class="pt-4">
+                                    {{ simulation.title }}
+                                </v-card-title>
+                                <v-card-subtitle> {{ simulation.date }}</v-card-subtitle>
+                                <v-card-actions class="justify-space-between">
+                                    <v-btn color="orange" @click="goSimulation(simulation.id)">
+                                        Détails
+                                    </v-btn>
+                                </v-card-actions>
+                            </v-card>
+                            <div class="d-flex fill-height align-center justify-center">
+                                <v-scale-transition>
+                                    <v-icon v-if="isSelected" color="white" size="48"
+                                        icon="mdi-close-circle-outline"></v-icon>
+                                </v-scale-transition>
+                            </div>
+                        </v-slide-group-item>
+                    </v-slide-group>
+                </v-sheet>
+            </div>
         </div>
-        <v-row no-gutters>
-            <v-col v-for="simulation in simulationsInLoad" :key=simulation.id cols="12" sm="3" lg="2">
-                <v-card class="ma-2">
-                    <v-img class="align-end text-white" height="200" :src=imageTest cover>
-                    </v-img>
-                    <v-card-title class="pt-4">
-                        {{ simulation.title }}
-                    </v-card-title>
-                    <v-card-subtitle> {{ simulation.date }}</v-card-subtitle>
-                    <v-card-actions class="justify-space-between">
-                        <v-btn color="orange" @click="goSimulation(simulation.id)">
-                            Détails
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-col>
-        </v-row>
-    </v-container>
-    <v-container class="bg-light-green-accent-1">
-        <h2>Terminé</h2>
-        <div v-if="simulations.length == 0">
-            <v-alert type="info" title="Info" text="Aucune simulation"></v-alert>
+        <div>
+            <v-sheet class="mx-auto" elevation="8">
+                <v-slide-group v-model="simulations" class="pa-4" selected-class="bg-success" show-arrows>
+                    <v-slide-group-item v-for="simulation in simulations" :key="simulation">
+                        <v-card class="ma-2">
+                            <v-img class="align-end text-white" height="200" :src=imageTest cover></v-img>
+                            <v-card-title class="pt-4">
+                                {{ simulation.title }}
+                            </v-card-title>
+                            <v-card-subtitle> {{ simulation.date }}</v-card-subtitle>
+                            <v-card-actions class="justify-space-between">
+                                <v-btn color="orange" @click="goSimulation(simulation.id)">
+                                    Détails
+                                </v-btn>
+                                <v-btn icon="mdi-trash-can-outline" @click="deleteSimulationDialog(simulation)"></v-btn>
+                            </v-card-actions>
+                        </v-card>
+                        <div class="d-flex fill-height align-center justify-center">
+                            <v-scale-transition>
+                                <v-icon v-if="isSelected" color="white" size="48" icon="mdi-close-circle-outline"></v-icon>
+                            </v-scale-transition>
+                        </div>
+                    </v-slide-group-item>
+                </v-slide-group>
+            </v-sheet>
         </div>
-        <v-row no-gutters>
-            <v-col v-for="simulation in simulations" :key=simulation.id cols="12" sm="3" lg="2">
-                <v-card class="ma-2">
-                    <v-img class="align-end text-white" height="200" :src=imageTest cover></v-img>
-                    <v-card-title class="pt-4">
-                        {{ simulation.title }}
-                    </v-card-title>
-                    <v-card-subtitle> {{ simulation.date }}</v-card-subtitle>
-                    <v-card-actions class="justify-space-between">
-                        <v-btn color="orange" @click="goSimulation(simulation.id)">
-                            Détails
-                        </v-btn>
-                        <v-btn icon="mdi-trash-can-outline" @click="deleteSimulationDialog(simulation)"></v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-col>
-        </v-row>
-    </v-container>
-
+    </div>
     <v-dialog v-model="deleteDialog" max-width="600">
         <v-card>
             <v-toolbar color="primary">
