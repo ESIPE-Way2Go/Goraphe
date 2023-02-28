@@ -54,7 +54,6 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim):
     LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_3.log"
     logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
     logger.info("Init of compute")
-
     time_start = time.perf_counter()
 
     source_node = ox.distance.nearest_nodes(graph_not_proj, point1[0], point1[1])
@@ -226,12 +225,12 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim):
                 final_evi_local_dict[(edge[0],edge[1],0)] = float(evi_local)
         # transform results dictionary in dataframes to save as xlsx file
 
-        # df_Results = pd.DataFrame.from_dict(results, orient='columns')
-        # df_Results.to_excel("Set_extremenodes_EVIs_test1.xlsx")
-        # df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
-        # df_Res_traveltimeSP.to_excel("Set_37_traveltimesSP_test1.xlsx")
-        # df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
-        # df_essential_mw_edges.to_excel("Set_37_essential_mw_edges_test1.xlsx")
+    df_Results = pd.DataFrame.from_dict(results, orient='columns')
+    df_Results.to_excel("scripts/" + user + "/" + sim + "_extremenodes_EVIs.xlsx")
+    df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
+    df_Res_traveltimeSP.to_excel("scripts/" + user + "/" + sim + "_traveltimesSP.xlsx")
+    df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
+    df_essential_mw_edges.to_excel("scripts/" + user + "/" + sim + "_essential_mw_edges.xlsx")
 
         nx.set_edge_attributes(graph_proj, evi_local_dict, "evi_local")
 

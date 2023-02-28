@@ -12,6 +12,7 @@ from shapely import LineString
 import compute
 import random_nodes
 
+
 def setup_logger(name, log_file, level=logging.DEBUG):
     """To setup as many loggers as you want"""
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -36,11 +37,12 @@ parser.add_argument("--coords", type=lambda x: tuple(map(float, x.split(','))), 
 parser.add_argument("--point1", type=lambda x: tuple(map(float, x.split(','))), required=True)
 # coordinates point 2
 parser.add_argument("--point2", type=lambda x: tuple(map(float, x.split(','))), required=True)
-
 # Type of roads accepted in the graph
 parser.add_argument("--roads", type=lambda x: x.split(','), required=True)
 # generation distance for the graph
-parser.add_argument("--dist", type=int,required=True)
+parser.add_argument("--dist", type=int, required=True)
+# Number of random points generated for each iteration
+parser.add_argument("--random", type=int, required=True)
 # Parse the command-line arguments
 args = parser.parse_args()
 
@@ -52,19 +54,24 @@ roads = args.roads
 dist = args.dist
 user = args.user
 sim = args.sim
+random = args.random
 
-#Creation of logger
+# Creation of logger
 os.makedirs("scripts/" + user, exist_ok=True)
 LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_1.log"
-logger = setup_logger(LOG_FILENAME,LOG_FILENAME)
+logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
 logger.info("Init of filter")
-
+if random < 2 or random > 100:
+    logger.error("Number of random points cannot be less than 2 or more than 100")
+    exit(0)
 # motorway,trunk,primary,secondary,tertiary,residential,service
 cf = '["highway"~"' + '|'.join(roads) + '"]'
 
-logger.info(f"Location: {location}")
+logger.info(f"Center point used for generation : {location}")
 logger.info(f"Roads accepted : {roads}")
 logger.info(f"Generation distance : {dist}")
+logger.info(f"Starting point : {point1}")
+logger.info(f"Destination point : {point2}")
 time_start = time.perf_counter()
 
 g_not_proj = ox.graph_from_point(location, dist, simplify=False, network_type='drive', custom_filter=cf)
@@ -130,6 +137,6 @@ time_elapsed = (time.perf_counter() - time_start)
 logger.info("Filtering time : " + str(time_elapsed))
 logger.info("End of filter")
 
+logger.info("Number of edges in graph : " + str(len(edges_proj)))
 compute.compute(g, g_not_proj,point1,point2,dist,user,sim)
-
 logger.info("Total time : " + str((time.perf_counter() - time_start)))
