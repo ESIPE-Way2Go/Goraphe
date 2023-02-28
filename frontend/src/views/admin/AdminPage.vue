@@ -102,7 +102,7 @@
             <v-form fast-fail @submit.prevent="sendInvitation" v-model="isFormValid">
 
                 <v-card-text>
-                    <v-text-field v-model="form.email" :rules="emailRules" label="Email" required></v-text-field>
+                    <v-text-field v-model.trim="form.email" :rules="emailRules" label="Email" required></v-text-field>
                 </v-card-text>
 
                 <v-card-actions >
