@@ -64,16 +64,16 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
     # source_node = ox.distance.nearest_nodes(graph_not_proj, point1[0], point1[1])
     # dest_node = ox.distance.nearest_nodes(graph_not_proj, point2[0], point2[1])
     wgs84_crs = pyproj.CRS("EPSG:4326")
-    x, y = ox.projection.project(point1[0], point1[1], to_crs=wgs84_crs)
-    source_node = ox.nearest_nodes(graph_proj, point1[0], point1[1])
-    x, y = ox.projection.project(point2[0], point2[1], to_crs=wgs84_crs)
-    dest_node = ox.nearest_nodes(graph_proj, x, y)
-    if projection.is_projected(graph_proj.graph["crs"]):
-        nodes = utils_graph.graph_to_gdfs(graph_proj, edges=False, node_geometry=False)[["x", "y"]]
-        print("NODES : "+str(nodes))
-        print("CRS : "+str(graph_proj.graph["crs"]))
-        print("SOURCE : "+str(source_node)+"DESTINATION : "+str(dest_node))
+    projected_crs = pyproj.CRS(str(graph_proj.graph["crs"]))
+    transformer = pyproj.Transformer.from_crs(wgs84_crs,projected_crs)
 
+    x, y = transformer.transform(point1[1], point1[0])
+    print("X : "+str(x)+" Y : "+str(y))
+    source_node = ox.nearest_nodes(graph_proj, x, y)
+
+    x, y = transformer.transform(point2[1], point2[0])
+    print("X : "+str(x)+" Y : "+str(y))
+    dest_node = ox.nearest_nodes(graph_proj, x, y)
 
     final_rand_nodes = []
     final_results = dict([])
