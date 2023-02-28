@@ -7,10 +7,7 @@ import fr.esipe.way2go.dto.simulation.response.SimulationHomeResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationIdResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationMapResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationResponse;
-import fr.esipe.way2go.exception.simulation.SimulationForbidden;
-import fr.esipe.way2go.exception.simulation.SimulationNameFormatWrong;
-import fr.esipe.way2go.exception.simulation.SimulationNotFoundException;
-import fr.esipe.way2go.exception.simulation.SimulationTooLaunch;
+import fr.esipe.way2go.exception.simulation.*;
 import fr.esipe.way2go.service.ScriptPythonService;
 import fr.esipe.way2go.service.SimulationService;
 import fr.esipe.way2go.service.UserService;
@@ -58,6 +55,8 @@ public class SimulationController {
             throw new SimulationTooLaunch();
         if (simulationRequest.getName().contains(" "))
             throw new SimulationNameFormatWrong();
+        if (simulationRequest.getName().matches("^[0-9]*"))
+            throw new SimulationNameNotBeginByNumberException();
 
         var userName = jwtUtils.getUsersFromHeaders(headers);
         var userOptional = userService.getUser(userName);

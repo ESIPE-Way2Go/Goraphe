@@ -79,8 +79,9 @@ user = args.user
 sim = args.sim
 
 #Creation of logger
-os.makedirs("scripts/" + user, exist_ok=True)
-LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_1.log"
+os.makedirs("scripts/" + user , exist_ok=True)
+os.makedirs("scripts/" + user + "/" + sim, exist_ok=True)
+LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "/filter.log"
 logger = setup_logger(LOG_FILENAME,LOG_FILENAME)
 logger.info("Init of filter")
 
@@ -154,10 +155,15 @@ nx.set_edge_attributes(g, traveltimes, "traveltimes")
 time_elapsed = (time.perf_counter() - time_start)
 logger.info("Filtering time : " + str(time_elapsed))
 logger.info("End of filter")
+
+print("graphe")
+print(edges_proj.to_json())
+
 rand_nodes = random_nodes.random_nodes(g, g_not_proj,point1[0],point1[1],point2[0],point2[1],user,sim,dist)
 rand_nodes_geojson = get_nodes_geojson(g,rand_nodes)
 # with open('rand_nodes.geojson', 'w') as f:
 #     f.write(rand_nodes_geojson)
+print("random_nodes")
 print(rand_nodes_geojson)
 
 source_node = ox.distance.nearest_nodes(g_not_proj, point1[0], point1[1])
@@ -167,6 +173,7 @@ compute.compute(g, rand_nodes,source_node,dest_node,user,sim)
 selected_route_geojson = shortest_path_geojson(g, source_node, dest_node, 'traveltimes')
 # with open('selected_route.geojson', 'w') as f:
 #     f.write(selected_route_geojson)
+print("route selected")
 print(selected_route_geojson)
 
 logger.info("Total time : " + str((time.perf_counter() - time_start)))

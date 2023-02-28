@@ -90,7 +90,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             errorLogs = new String(process.getErrorStream().readAllBytes());
             updateStatus(simulation, status, logs, errorLogs);
             var stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
+            System.out.println("Status " + status + " errors : " + errorLogs);
             String line;
             String key = "";
             while ((line = stdInput.readLine()) != null) {
@@ -104,6 +104,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             simulation.setStatus(status.getDescription());
             endSimulation(simulation, status);
         } catch (IOException | InterruptedException e) {
+            System.out.println("IO EXCEPTION MAINLY");
             endSimulation(simulation, StatusSimulation.CANCEL);
             updateStatus(simulation, StatusSimulation.CANCEL, logs, errorLogs);
             Thread.currentThread().interrupt();
