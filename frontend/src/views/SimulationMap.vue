@@ -74,6 +74,7 @@
         </v-card>
       </v-slide-y-transition>
 
+
       <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5 panel-map-right" @click.stop="closeright= !closeright"
              v-if="closeright"></v-btn>
       <v-slide-y-transition>
