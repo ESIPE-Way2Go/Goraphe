@@ -161,6 +161,8 @@ public class SimulationController {
     @DeleteMapping("/{id}/cancel")
     public ResponseEntity<Object> cancelSimulation(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
         var thread = THREAD_SIMULATIONS.get(id);
+        if (thread == null)
+            return new ResponseEntity<>(HttpStatus.OK);
         thread.interrupt();
         THREAD_SIMULATIONS.remove(id);
         return new ResponseEntity<>(HttpStatus.OK);

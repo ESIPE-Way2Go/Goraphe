@@ -3,48 +3,125 @@
     <v-row class="d-flex">
       <div id="map" class="map"></div>
 
-      <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5" @click.stop="close = !close"
-        v-if="close"></v-btn>
+      <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5" @click.stop="close= !close"
+             v-if="close"></v-btn>
       <v-slide-y-transition>
-        <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 " :class="{ 'panel-map-lg': lgAndUp, 'panel-map-md': md }"
-          v-if="!close">
+        <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 " :class="{'panel-map-lg' : lgAndUp,'panel-map-md': md}"
+                v-if="!close">
           <v-form @submit.prevent="makePostRequest" v-if="!close">
             <v-row align="start" class="mt-1">
-              <v-autocomplete v-model="select" :loading="loading"
-                :items="items.map(items => items.label).filter((val, i) => i < 4)" v-model:search="search" class="mx-4"
-                density="default" label="Rechercher une déstination" clearable variant="outlined"
-                @update:modelValue="selectedSearch"></v-autocomplete>
+              <v-autocomplete
+                  v-model="select"
+                  :loading="loading"
+                  :items="items.map(i => i.label).filter((val,i)=>i<4)"
+                  v-model:search="search"
+                  class="mx-4"
+                  density="default"
+                  label="Rechercher une déstination"
+                  clearable
+                  variant="outlined"
+                  @update:modelValue="selectedSearch"
+              ></v-autocomplete>
             </v-row>
+
+          <v-row align="start" class="mt-1">
+            <v-col cols="10">
+            <v-text-field variant="outlined" v-model.trim="name" label="Name"></v-text-field>
+              <div @click="swapPoints">SWAP</div>
+            </v-col>
+            <v-col cols="2" align-self="start">
+              <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="large"></v-btn>
+            </v-col>
+          </v-row>
+          <v-text-field variant="outlined" v-model="start" label="Start" @update:modelValue="updateStart"></v-text-field>
+          <v-text-field variant="outlined" v-model="end" label="End" @update:modelValue="updateEnd"></v-text-field>
+          <v-text-field variant="outlined" v-model="center" label="Center" @update:modelValue="circleUpdate"></v-text-field>
+          <v-text-field variant="outlined" v-model.number="randomPoints" label="Nb Random Points" type="number" :min="2"
+                        max="100" step="1"></v-text-field>
+          <v-text-field variant="outlined" v-model.trim="desc" label="Description"></v-text-field>
+          <v-text-field variant="outlined" v-model.number="dist" label="Distance (mètre)" type="number" :min="minDist"
+                        max="100000" step="10" @change="circleChange"></v-text-field>
+          <v-select
+              variant="outlined"
+              chips
+              label="Type de routes"
+              :items=roadTypes
+              v-model="selectedRoadTypes"
+              multiple
+              clearable
+              closable-chips
+          ></v-select>
+          <v-text-field variant="outlined" v-model.trim="script" label="Computing Script" disabled ></v-text-field>
+          <v-btn type="submit" color="primary" v-if="selectedRoadTypes.length>0">Lancer la simulation</v-btn>
+        </v-form>
+      </v-card>
 
             <v-row align="start" class="mt-1">
               <v-col cols="10">
-                <v-text-field variant="outlined" v-model="name" label="Name"></v-text-field>
+                <v-text-field variant="outlined" v-model="name" label="Nom de la simulation"></v-text-field>
+
               </v-col>
               <v-col cols="2" align-self="start">
-                <v-btn prepend-icon="mdi-chevron-left" @click.stop="close = !close" flat size="large"></v-btn>
+                <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="large"></v-btn>
               </v-col>
             </v-row>
-            <v-text-field variant="outlined" v-model="desc" label="Description"></v-text-field>
-            <v-text-field variant="outlined" v-model.number="dist" label="Distance (mètre)" type="number" :min="minDist"
-              max="100000" step="10"></v-text-field>
-            <v-select variant="outlined" chips label="Type de routes" :items=roadTypes v-model="selectedRoadTypes"
-              multiple clearable closable-chips></v-select>
-            <v-text-field variant="outlined" v-model="script" label="Computing Script" disabled></v-text-field>
-            <v-btn type="submit" color="primary" v-if="selectedRoadTypes.length > 0">Lancer la simulation</v-btn>
+
+            <v-select
+                variant="outlined"
+                chips
+                label="Type de routes"
+                :items=roadTypes
+                v-model="selectedRoadTypes"
+                multiple
+                clearable
+                closable-chips
+            ></v-select>
+            <v-btn variant="text" class="mb-3" :prepend-icon="(optionsOpen)? 'mdi-chevron-up':'mdi-chevron-down'"
+                   @click.stop="optionsOpen= !optionsOpen">Options avancées
+            </v-btn>
+            <v-scroll-y-transition>
+              <div class="d-flex flex-column justify-content-between" v-if="optionsOpen">
+
+                <v-text-field variant="outlined" v-model="start" label="Début" density="compact"
+                              @update:modelValue="updateStart"></v-text-field>
+                <v-btn density="compact" class="mb-3" variant="text" prepend-icon="mdi-swap-vertical"
+                       @click="swapPoints"></v-btn>
+                <v-text-field variant="outlined" v-model="end" label="Fin" density="compact"
+                              @update:modelValue="updateEnd"></v-text-field>
+                <v-text-field variant="outlined" v-model="center" label="Centre" density="compact"
+                              @update:modelValue="circleUpdate"></v-text-field>
+                <v-text-field variant="outlined" v-model.number="randomPoints" label="Nombres de points Random"
+                              type="number" density="compact"
+                              :min="2"
+                              max="100" step="1"></v-text-field>
+
+                <v-text-field variant="outlined" v-model="desc" label="Description" density="compact"></v-text-field>
+                <div class="d-flex align-start">
+                  <v-text-field class="w-75" variant="outlined" v-model.number="dist" label="Distance (mètre)"
+                                density="compact"
+                                type="number" :min="minDist"
+                                max="100000" step="10" @change="circleChange"></v-text-field>
+                  <v-btn class="w-25 pt-1" prepend-icon="mdi-refresh" @click.stop="dist = minDist; circleChange()" flat
+                         size="large"></v-btn>
+                </div>
+              </div>
+            </v-scroll-y-transition>
+
+            <v-btn type="submit" color="primary" v-if="selectedRoadTypes.length>0">Lancer la simulation</v-btn>
           </v-form>
         </v-card>
-
       </v-slide-y-transition>
     </v-row>
   </v-container>
+
 </template>
 <script>
 import L from 'leaflet';
 import 'leaflet-routing-machine';
 import authHeader from "@/services/auth-header";
-import { useDisplay, useTheme } from "vuetify";
-import { useToast } from "vue-toastification";
-import { OpenCageProvider } from "leaflet-geosearch";
+import {useDisplay, useTheme} from "vuetify";
+import {useToast} from "vue-toastification";
+import {OpenCageProvider} from "leaflet-geosearch";
 
 
 export default {
@@ -57,6 +134,8 @@ export default {
     minDist(newVal) {
       if (this.dist < newVal) {
         this.dist = newVal;
+        this.circle_center.remove();
+        this.circle_center = L.circle(this.center, {radius: this.dist}).addTo(this.map);
       }
     },
     search(val) {
@@ -66,7 +145,7 @@ export default {
   setup() {
     const theme = useTheme();
     const toast = useToast();
-    const { sm, md, lgAndUp } = useDisplay()
+    const {sm, md, lgAndUp} = useDisplay()
     return {
       theme,
       toggleTheme: () => theme.global.name.value = theme.global.current.value.dark ? 'myCustomLightTheme' : 'dark',
@@ -83,10 +162,9 @@ export default {
       items: [],
       search: null,
       select: null,
-      //end
-
+      //end search bar
+      optionsOpen: false,
       control: null,
-
       name: "",
       desc: "",
       map: null,
@@ -99,6 +177,9 @@ export default {
       length: 0,
       start: [],
       end: [],
+      //test
+      circle_center: [],
+      randomPoints: 2,
     };
   },
   mounted() {
@@ -107,7 +188,7 @@ export default {
       maxZoom: 18,
       minZoom: 3,
       zoomControl: false
-    }).setView([48.83935609413248, 2.585938493701621], 16);
+    }).setView([48.8393560, 2.5859384], 16);
     L.control.zoom({
       position: 'bottomright'
     }).addTo(map);
@@ -115,7 +196,8 @@ export default {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
-    this.control = L.Routing.control({
+
+    const control = L.Routing.control({
       show: false,
       showInstructions: false,
       routeWhileDragging: false,
@@ -123,35 +205,106 @@ export default {
       lineOptions: {
         addWaypoints: false
       },
+      createMarker: function (i, wp) {
+        return L.marker(wp.latLng, {
+          draggable: true,
+          icon: L.icon({
+            iconUrl: (i === 0) ? require('@/assets/pin.png') : require('@/assets/flag-2.png'),
+            iconSize: [40, 40], // size of the icon
+            iconAnchor: (i === 1) ? [6, 38] : [20, 40], // point of the icon which will correspond to marker's location
+            shadowAnchor: [4, 62],  // the same for the shadow
+          }),
+        });
+      },
+      waypointMode: 'snap',
       waypoints: [
-        L.latLng(48.83935609413248, 2.585938493701621),
-        L.latLng(48.84009439586693, 2.586180556928124)
+        L.latLng(48.8393560, 2.5859384),
+        L.latLng(48.8400943, 2.5861805)
       ],
-      router: L.Routing.mapbox('pk.eyJ1IjoibWV4aW1hIiwiYSI6ImNsZWd2djNkdDBwc3gzcXR0ZXB3Nmt6dDQifQ.GeKKqQmsdu8WhrePgFj2ww')
+      router: L.Routing.mapbox(process.env.VUE_APP_MAPBOX_KEY)
     }).addTo(map);
+
+    this.control = control;
+    //need instance of circle with value
+    this.circle_center = L.circle(this.center, {radius: 200}).addTo(map);
 
     this.control.on('routesfound', (e) => {
       this.start = [e.waypoints[0].latLng.lng, e.waypoints[0].latLng.lat];
       this.end = [e.waypoints[e.waypoints.length - 1].latLng.lng, e.waypoints[e.waypoints.length - 1].latLng.lat];
       this.length = e.routes[0] ? e.routes[0].summary.totalDistance : 0;
       this.center = this.getCenter(e.routes[0].coordinates.map(coord => [coord.lat, coord.lng]));
-      console.log(this.center);
+
+      //remove circle and update it
+      this.circle_center.remove();
+      this.circle_center = L.circle(this.center, {radius: this.dist}).addTo(map);
     });
+
+    //create btn with DOM (please kill me)
+    function createButton(label, container) {
+      let btn = L.DomUtil.create('button', 'v-btn pa-2 ma-2 bg-accent', container);
+      btn.setAttribute('type', 'button');
+      btn.innerHTML = label;
+      return btn;
+    }
+
+    //btn for change start or and of the Path with click interaction
+    map.on('click', function (e) {
+      let container = L.DomUtil.create('div', 'popup'),
+          startBtn = createButton('Start ', container),
+          destBtn = createButton('Fin', container);
+
+      L.popup()
+          .setContent(container)
+          .setLatLng(e.latlng)
+          .openOn(map);
+
+      L.DomEvent.on(startBtn, 'click', function () {
+        control.spliceWaypoints(0, 1, e.latlng);
+        map.closePopup();
+      });
+
+      L.DomEvent.on(destBtn, 'click', function () {
+        control.spliceWaypoints(control.getWaypoints().length - 1, 1, e.latlng);
+        map.closePopup();
+      });
+    });
+
+
     this.map = map;
   },
   methods: {
+    circleUpdate() {
+      this.center = this.center.split(',').map(parseFloat);
+      console.log(this.center);
+      this.circle_center.remove();
+      this.circle_center = L.circle(this.center, {radius: this.dist}).addTo(this.map);
+    },
+
+    circleChange() {
+      this.circle_center.remove();
+      this.circle_center = L.circle(this.center, {radius: this.dist}).addTo(this.map);
+    },
 
     //search bar
     async querySelections(v) {
       const provider = new OpenCageProvider({
         params: {
-          key: 'ab736f9a32a2477aaf2036de1dc4340d',
+          key: process.env.VUE_APP_SEARCH_KEY,
         },
       });
       this.loading = true
-      this.items = await provider.search({ query: v });
+      this.items = await provider.search({query: v});
       this.loading = false
     },
+
+    swapPoints() {
+      console.log(this.control._plan._waypoints)
+      this.control.setWaypoints([
+        L.latLng(this.control._plan._waypoints[1].latLng.lat, this.control._plan._waypoints[1].latLng.lng),
+        L.latLng(this.control._plan._waypoints[0].latLng.lat, this.control._plan._waypoints[0].latLng.lng)
+      ])
+    },
+
     selectedSearch() {
       //console.log(this.select)
       if (this.select === null) return;
@@ -165,31 +318,42 @@ export default {
       ])
       console.log(this.control.waypoints)
     },
+    updateStart() {
+      const startLatLng = this.start.split(',').reverse().map(parseFloat);
+      const endLatLng = this.end.toString().split(',').reverse().map(parseFloat);
+      this.control.setWaypoints([
+        L.latLng(startLatLng[0], startLatLng[1]),
+        L.latLng(endLatLng[0], endLatLng[1])
+      ]);
+    },
+    updateEnd() {
+      const startLatLng = this.start.toString().split(',').reverse().map(parseFloat);
+      const endLatLng = this.end.split(',').reverse().map(parseFloat);
+      this.control.setWaypoints([
+        L.latLng(startLatLng[0], startLatLng[1]),
+        L.latLng(endLatLng[0], endLatLng[1])
+      ]);
+    },
 
     //end search bar
     getCenter(coordinates) {
-      let x = 0, y = 0, z = 0;
+      const lats = coordinates.map(coord => coord[0]);
+      const lngs = coordinates.map(coord => coord[1]);
 
-      for (let i = 0; i < coordinates.length; i++) {
-        let lat = coordinates[i][0] * Math.PI / 180;
-        let lng = coordinates[i][1] * Math.PI / 180;
+      const topLeft = [Math.max(...lats), Math.min(...lngs)];
+      const bottomRight = [Math.min(...lats), Math.max(...lngs)];
 
-        x += Math.cos(lat) * Math.cos(lng);
-        y += Math.cos(lat) * Math.sin(lng);
-        z += Math.sin(lat);
-      }
+      const lat1 = topLeft[0] * Math.PI / 180;
+      const lng1 = topLeft[1] * Math.PI / 180;
+      const lat2 = bottomRight[0] * Math.PI / 180;
+      const lng2 = bottomRight[1] * Math.PI / 180;
 
-      const total = coordinates.length;
+      const Bx = Math.cos(lat2) * Math.cos(lng2 - lng1);
+      const By = Math.cos(lat2) * Math.sin(lng2 - lng1);
+      const lat3 = Math.atan2(Math.sin(lat1) + Math.sin(lat2), Math.sqrt((Math.cos(lat1) + Bx) * (Math.cos(lat1) + Bx) + By * By));
+      const lng3 = lng1 + Math.atan2(By, Math.cos(lat1) + Bx);
 
-      x = x / total;
-      y = y / total;
-      z = z / total;
-
-      const centralLongitude = Math.atan2(y, x);
-      const centralSquareRoot = Math.sqrt(x * x + y * y);
-      const centralLatitude = Math.atan2(z, centralSquareRoot);
-
-      return [centralLatitude * 180 / Math.PI, centralLongitude * 180 / Math.PI];
+      return [lat3 * 180 / Math.PI, lng3 * 180 / Math.PI];
     },
 
     uncheckRoadTypes() {
@@ -201,13 +365,18 @@ export default {
         return;
       }
       if (this.dist < this.length * 0.6 || this.dist < 100) {
-        this.toast.error("Generation distance cannot be less than 100 or less that 60% of the route length")
-        this.dist = this.minDist
+        this.toast.error("Generation distance cannot be less than 100 or less that 60% of the route length");
+        this.dist = this.minDist;
+        return;
+      }
+      if (this.randomPoints < 2 || this.randomPoints > 100) {
+        this.toast.error("Number of random points must be between 2 and 100");
         return;
       }
       console.log("length = " + this.length * 0.6)
       console.log("dist = " + this.dist)
       try {
+        let randomPoints = this.$data.randomPoints;
         let center = this.center;
         let name = this.$data.name;
         let desc = this.$data.desc;
@@ -216,7 +385,7 @@ export default {
         let distance = this.dist;
         let roadTypes = this.$data.selectedRoadTypes;
         let script = this.$data.script;
-        let body = JSON.stringify({ start, end, distance, name, desc, roadTypes, script, center });
+        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center,randomPoints});
         const response = await fetch('/api/simulation', {
           method: 'POST',
           headers: authHeader(),
@@ -224,15 +393,12 @@ export default {
         });
 
         if (!response.ok) {
-          let data = await response.json();
-          this.toast.error(data['message'])
-          return
+          throw new Error(`Request failed with status code: ${response.status}`);
         }
 
         const data = await response.json();
-
-     
-        this.$router.push({ name: 'simulation', params: { id: data['simulationId'] } });
+        console.log(data['simulationId']);
+        this.$router.push({name: 'simulation', params: {id: data['simulationId']}});
       } catch (error) {
         console.error(error);
       }
@@ -243,6 +409,12 @@ export default {
 </script>
 
 <style>
+
+.popup {
+  display: flex;
+  flex-direction: column;
+}
+
 #map {
   position: relative;
   height: 100vh;
@@ -261,13 +433,13 @@ export default {
 }
 
 .panel-map-md {
-  width: 30% !important;
+  width: 35% !important;
   z-index: 999;
 
 }
 
 .panel-map-lg {
-  width: 20% !important;
+  width: 25% !important;
   z-index: 999;
 }
 
@@ -276,11 +448,12 @@ export default {
   width: 300px;
   height: 40px;
   left: 50%;
-  margin-left: -250px;
-  /* Negative half of width. */
+  margin-left: -250px; /* Negative half of width. */
 }
 
 .panel-burger {
   z-index: 999;
 }
+
+
 </style>

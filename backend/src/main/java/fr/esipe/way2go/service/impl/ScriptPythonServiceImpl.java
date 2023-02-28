@@ -2,18 +2,15 @@ package fr.esipe.way2go.service.impl;
 
 import fr.esipe.way2go.controller.MapController;
 import fr.esipe.way2go.dao.LogEntity;
-import fr.esipe.way2go.dao.ResultEntity;
 import fr.esipe.way2go.dao.SimulationEntity;
 import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.dto.simulation.request.SimulationRequest;
 import fr.esipe.way2go.service.LogService;
-import fr.esipe.way2go.service.ResultService;
 import fr.esipe.way2go.service.ScriptPythonService;
 import fr.esipe.way2go.service.SimulationService;
-import fr.esipe.way2go.utils.StatusScript;
-import fr.esipe.way2go.utils.StatusSimulation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -71,10 +68,10 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
                 "--sim", simulationName,
                 "--roads", String.join(",", simulationRequest.getRoadTypes()),
                 "--point1", new MapController.Point(simulationRequest.getStart()).toString(),
-                "--point2", new MapController.Point(simulationRequest.getEnd()).toString()
+                "--point2", new MapController.Point(simulationRequest.getEnd()).toString(),
+                "--random", Integer.toString(simulationRequest.getRandomPoints())
         );
 
-        String errorLogs = null;
         try {
             var process = builder.start();
             var logMap = new HashMap<String, LogEntity>();
@@ -89,8 +86,8 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             var status = exitCode == 0 ? StatusSimulation.SUCCESS : StatusSimulation.ERROR;
             errorLogs = new String(process.getErrorStream().readAllBytes());
             updateStatus(simulation, status, logs, errorLogs);
+            System.out.println("ERRORS LOGS " + status + " " + errorLogs);
             var stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            System.out.println("Status " + status + " errors : " + errorLogs);
             String line;
             String key = "";
             while ((line = stdInput.readLine()) != null) {
@@ -104,7 +101,6 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             simulation.setStatus(status.getDescription());
             endSimulation(simulation, status);
         } catch (IOException | InterruptedException e) {
-            System.out.println("IO EXCEPTION MAINLY");
             endSimulation(simulation, StatusSimulation.CANCEL);
             updateStatus(simulation, StatusSimulation.CANCEL, logs, errorLogs);
             Thread.currentThread().interrupt();
