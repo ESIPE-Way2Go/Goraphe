@@ -127,3 +127,4 @@ def random_nodes(G_proj, G_not_proj, source_node, destination_node, user, sim, d
     logger.info("End of random_nodes")
     print(random_nodes)
     return random_nodes
+
