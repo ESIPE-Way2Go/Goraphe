@@ -30,7 +30,7 @@ def random_node_is_too_close(random_node, path_nodes, G_not_proj, min_distance):
     return False
 
 
-def random_nodes(G_proj, G_not_proj, x1, y1, x2, y2, user, sim, dist, nb_random_nodes):
+def random_nodes(G_proj, G_not_proj, source_node, destination_node, user, sim, dist, nb_random_nodes):
     # Creation of logger
     os.makedirs("scripts/" + user, exist_ok=True)
     LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_2.log"
@@ -44,9 +44,6 @@ def random_nodes(G_proj, G_not_proj, x1, y1, x2, y2, user, sim, dist, nb_random_
     # create the random nodes list
     random_nodes = []
 
-    # define the source node, the destination node and all the nodes that are on the shortest path between those 2 nodes
-    source_node = ox.distance.nearest_nodes(G_not_proj, x1, y1)
-    destination_node = ox.distance.nearest_nodes(G_not_proj, x2, y2)
     # we will use those two path_nodes lists to have a better random selection of all the nodes that are on the shortest
     # path between the source and destination nodes
     path_nodes_src_to_dst = nx.shortest_path(G_proj, source=source_node, target=destination_node)
@@ -57,7 +54,7 @@ def random_nodes(G_proj, G_not_proj, x1, y1, x2, y2, user, sim, dist, nb_random_
     # possible
     if nb_random_nodes > len(path_nodes_src_to_dst):
         logger.info("Can't generate " + str(nb_random_nodes) + " random nodes (too much for our shortest path), only a "
-                    "maximum of " + str(len(path_nodes_src_to_dst)) + " will be generated")
+                                                               "maximum of " + str(len(path_nodes_src_to_dst)) + " will be generated")
         nb_random_nodes = len(path_nodes_src_to_dst)
 
     shortest_path_nodes_src_to_dst = random.sample(path_nodes_src_to_dst, nb_random_nodes // 2)
