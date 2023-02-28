@@ -19,9 +19,10 @@ def get_nodes_geojson(graph, osmid_list):
     return nodes_geojson
 
 
-def shortest_path_geojson(G, point1, point2, weight):
+def shortest_path_geojson(G, point1, point2, weight,logger):
     route = nx.shortest_path(G, point1, point2, weight=weight)
     nodes = set(route)
+    logger.info("Number of edges in selected route : " + str(len(route)))
     edges = G.subgraph(nodes)
     features = gpd.GeoDataFrame(edges.edges(keys=True))
     features['geometry'] = features.apply(
@@ -48,7 +49,7 @@ def setup_logger(name, log_file, level=logging.DEBUG):
 
     return logger
 
-def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim):
+def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
     # Creation of logger
     os.makedirs("scripts/" + user, exist_ok=True)
     LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_3.log"
@@ -68,8 +69,8 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim):
     nb_iteration = 2
     for _ in range(nb_iteration):
         rand_nodes = random_nodes.random_nodes(graph_proj, graph_not_proj, point1[0], point1[1], point2[0], point2[1], user, sim,
-                                               dist)
-        final_rand_nodes.append(rand_nodes)
+                                               dist,nbPoints)
+        final_rand_nodes.extend(rand_nodes)
         rand_nodes_geojson = get_nodes_geojson(graph_proj, rand_nodes)
         # with open('rand_nodes.geojson', 'w') as f:
         #     f.write(rand_nodes_geojson)
@@ -225,16 +226,16 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim):
                 final_evi_local_dict[(edge[0],edge[1],0)] = float(evi_local)
         # transform results dictionary in dataframes to save as xlsx file
 
-    df_Results = pd.DataFrame.from_dict(results, orient='columns')
-    df_Results.to_excel("scripts/" + user + "/" + sim + "_extremenodes_EVIs.xlsx")
-    df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
-    df_Res_traveltimeSP.to_excel("scripts/" + user + "/" + sim + "_traveltimesSP.xlsx")
-    df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
-    df_essential_mw_edges.to_excel("scripts/" + user + "/" + sim + "_essential_mw_edges.xlsx")
+        df_Results = pd.DataFrame.from_dict(results, orient='columns')
+        df_Results.to_excel("scripts/" + user + "/" + sim + "_extremenodes_EVIs.xlsx")
+        df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
+        df_Res_traveltimeSP.to_excel("scripts/" + user + "/" + sim + "_traveltimesSP.xlsx")
+        df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
+        df_essential_mw_edges.to_excel("scripts/" + user + "/" + sim + "_essential_mw_edges.xlsx")
 
         nx.set_edge_attributes(graph_proj, evi_local_dict, "evi_local")
 
-        selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes')
+        selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes',logger)
         # with open('selected_route.geojson', 'w') as f:
         #     f.write(selected_route_geojson)
         print(selected_route_geojson)
@@ -248,13 +249,12 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim):
         final_results[edge_name]["evi_average_nip"] /= counter
         splited = edge_name.split("_",2)
         final_evi_local_dict[(float(splited[0]),float(splited[1]),0)] /= counter
-
     rand_nodes_geojson = get_nodes_geojson(graph_proj, final_rand_nodes)
     print(rand_nodes_geojson)
 
     nx.set_edge_attributes(graph_proj, final_evi_local_dict, "evi_local")
 
-    selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes')
+    selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes',logger)
     print(selected_route_geojson)
 
     # calculate computational time
