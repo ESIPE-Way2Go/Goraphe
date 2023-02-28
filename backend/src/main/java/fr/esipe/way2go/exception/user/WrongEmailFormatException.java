@@ -1,4 +1,4 @@
-package fr.esipe.way2go.exception;
+package fr.esipe.way2go.exception.user;
 
 public class WrongEmailFormatException extends RuntimeException {
     public WrongEmailFormatException() {

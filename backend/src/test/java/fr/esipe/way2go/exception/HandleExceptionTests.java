@@ -1,6 +1,8 @@
 package fr.esipe.way2go.exception;
 
 import fr.esipe.way2go.Way2GoApplication;
+import fr.esipe.way2go.exception.simulation.SimulationForbidden;
+import fr.esipe.way2go.exception.simulation.SimulationNotFoundException;
 import fr.esipe.way2go.exception.user.UserNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

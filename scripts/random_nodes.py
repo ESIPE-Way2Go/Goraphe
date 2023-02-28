@@ -33,7 +33,7 @@ def random_node_is_too_close(random_node, path_nodes, G_not_proj, min_distance):
 def random_nodes(G_proj, G_not_proj, source_node, destination_node, user, sim, dist, nb_random_nodes):
     # Creation of logger
     os.makedirs("scripts/" + user, exist_ok=True)
-    LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_2.log"
+    LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "/random.log"
     logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
     logger.info("Init of random_nodes")
 

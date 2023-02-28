@@ -55,7 +55,7 @@ def setup_logger(name, log_file, level=logging.DEBUG):
 def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
     # Creation of logger
     os.makedirs("scripts/" + user, exist_ok=True)
-    LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_3.log"
+    LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "/compute.log"
     logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
     logger.info("Init of compute")
     time_start = time.perf_counter()
