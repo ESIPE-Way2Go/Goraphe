@@ -83,6 +83,8 @@ random = args.random
 
 #Creation of logger
 os.makedirs("scripts/" + user, exist_ok=True)
+os.makedirs("scripts/" + user + "/sim", exist_ok=True)
+
 LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "/filter.log"
 logger = setup_logger(LOG_FILENAME,LOG_FILENAME)
 logger.info("Init of filter")
@@ -165,13 +167,13 @@ rand_nodes_geojson = get_nodes_geojson(g, rand_nodes)
 print("graphe")
 print(edges_proj.to_json())
 
-rand_nodes = random_nodes.random_nodes(g, g_not_proj,point1[0],point1[1],point2[0],point2[1],user,sim,dist)
+rand_nodes = random_nodes.random_nodes(g, g_not_proj,point1[0],point1[1],point2[0],point2[1],user,sim,dist, random)
 rand_nodes_geojson = get_nodes_geojson(g,rand_nodes)
 # with open('rand_nodes.geojson', 'w') as f:
 #     f.write(rand_nodes_geojson)
 print("random_nodes")
 print(rand_nodes_geojson)
-
+logger.info("J'AI RÉUSSI")
 source_node = ox.distance.nearest_nodes(g_not_proj, point1[0], point1[1])
 dest_node = ox.distance.nearest_nodes(g_not_proj, point2[0], point2[1])
 
