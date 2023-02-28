@@ -58,7 +58,7 @@ random = args.random
 
 # Creation of logger
 os.makedirs("scripts/" + user, exist_ok=True)
-LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_1.log"
+LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "/filter.log"
 logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
 logger.info("Init of filter")
 if random < 2 or random > 100:

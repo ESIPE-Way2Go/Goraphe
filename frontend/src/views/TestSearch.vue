@@ -24,38 +24,6 @@
               ></v-autocomplete>
             </v-row>
 
-          <v-row align="start" class="mt-1">
-            <v-col cols="10">
-            <v-text-field variant="outlined" v-model.trim="name" label="Name"></v-text-field>
-              <div @click="swapPoints">SWAP</div>
-            </v-col>
-            <v-col cols="2" align-self="start">
-              <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="large"></v-btn>
-            </v-col>
-          </v-row>
-          <v-text-field variant="outlined" v-model="start" label="Start" @update:modelValue="updateStart"></v-text-field>
-          <v-text-field variant="outlined" v-model="end" label="End" @update:modelValue="updateEnd"></v-text-field>
-          <v-text-field variant="outlined" v-model="center" label="Center" @update:modelValue="circleUpdate"></v-text-field>
-          <v-text-field variant="outlined" v-model.number="randomPoints" label="Nb Random Points" type="number" :min="2"
-                        max="100" step="1"></v-text-field>
-          <v-text-field variant="outlined" v-model.trim="desc" label="Description"></v-text-field>
-          <v-text-field variant="outlined" v-model.number="dist" label="Distance (mètre)" type="number" :min="minDist"
-                        max="100000" step="10" @change="circleChange"></v-text-field>
-          <v-select
-              variant="outlined"
-              chips
-              label="Type de routes"
-              :items=roadTypes
-              v-model="selectedRoadTypes"
-              multiple
-              clearable
-              closable-chips
-          ></v-select>
-          <v-text-field variant="outlined" v-model.trim="script" label="Computing Script" disabled ></v-text-field>
-          <v-btn type="submit" color="primary" v-if="selectedRoadTypes.length>0">Lancer la simulation</v-btn>
-        </v-form>
-      </v-card>
-
             <v-row align="start" class="mt-1">
               <v-col cols="10">
                 <v-text-field variant="outlined" v-model="name" label="Nom de la simulation"></v-text-field>
@@ -385,7 +353,7 @@ export default {
         let distance = this.dist;
         let roadTypes = this.$data.selectedRoadTypes;
         let script = this.$data.script;
-        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center,randomPoints});
+        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center, randomPoints});
         const response = await fetch('/api/simulation', {
           method: 'POST',
           headers: authHeader(),
