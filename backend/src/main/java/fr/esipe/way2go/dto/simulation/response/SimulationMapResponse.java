@@ -8,6 +8,9 @@ public class SimulationMapResponse {
     private String title;
     private String description;
     private String status;
+
+    private String script;
+
     private List<String> roads;
     private String path;
     private String randomPoints;
@@ -19,8 +22,16 @@ public class SimulationMapResponse {
         this.path = simulation.getShortestPath();
         this.randomPoints = simulation.getRandomPoints();
         this.roads = simulation.getRoadType();
+        this.script = simulation.getComputingScript();
     }
 
+    public void setScript(String script) {
+        this.script = script;
+    }
+
+    public String getScript() {
+        return script;
+    }
     public String getTitle() {
         return title;
     }

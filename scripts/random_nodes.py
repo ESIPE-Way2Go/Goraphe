@@ -16,18 +16,18 @@ def setup_logger(name, log_file, level=logging.DEBUG):
     logger.addHandler(handler)
 
     return logger
-def random_nodes(G_proj, G_not_proj, x1, y1, x2, y2, user ,sim):
+
+def random_nodes(G_proj, G_not_proj, x1, y1, x2, y2,user ,sim,dist):
     # Creation of logger
     os.makedirs("scripts/" + user, exist_ok=True)
     LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "_2.log"
     logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
     logger.info("Init of random_nodes")
-
     # define the number of random points that will be used (this number will be around the first chosen node AND around
     # the second chosen node ; so there will be random points equals to 2 times the number chosen below in total)
     n_random_points = 3
     # define a distance around each one of the 2 chosen nodes to create random points
-    distance = 0.0125
+    distance = dist/1000000
 
     # create the random points list, consisting of 2 "n_random_points" size lists in which will be stored our random
     # points ("n_random_points" in the first list and "n_random_points" in the second list ; used to separate our points
