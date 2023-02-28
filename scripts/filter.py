@@ -38,8 +38,7 @@ def get_nodes_geojson(graph, osmid_list):
 def shortest_path_geojson(G, point1, point2, weight):
     route = nx.shortest_path(G, point1, point2, weight=weight)
     nodes = set(route)
-    logger.info(route)
-    logger.info(nodes)
+    logger.info("Number of edges in selected route : "+str(len(route)))
     edges = G.subgraph(nodes)
     features = gpd.GeoDataFrame(edges.edges(keys=True))
     features['geometry'] = features.apply(
@@ -97,9 +96,11 @@ if random < 2 or random > 100:
 # motorway,trunk,primary,secondary,tertiary,residential,service
 cf = '["highway"~"' + '|'.join(roads) + '"]'
 
-logger.info(f"Location: {location}")
+logger.info(f"Center point used for generation : {location}")
 logger.info(f"Roads accepted : {roads}")
 logger.info(f"Generation distance : {dist}")
+logger.info(f"Starting point : {point1}")
+logger.info(f"Destination point : {point2}")
 time_start = time.perf_counter()
 
 g_not_proj = ox.graph_from_point(location, dist, simplify=False, network_type='drive', custom_filter=cf)
