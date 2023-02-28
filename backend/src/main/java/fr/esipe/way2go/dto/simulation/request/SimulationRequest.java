@@ -13,6 +13,15 @@ public class SimulationRequest {
     String script;
     List<String> roadTypes;
     double[] center;
+    int randomPoints;
+
+    public int getRandomPoints() {
+        return randomPoints;
+    }
+
+    public void setRandomPoints(int randomPoints) {
+        this.randomPoints = randomPoints;
+    }
 
     public String getName() {
         return name;
@@ -78,6 +87,7 @@ public class SimulationRequest {
         this.center = center;
     }
 
+
     @Override
     public String toString() {
         return "SimulationRequest{" +
@@ -89,6 +99,7 @@ public class SimulationRequest {
                 ", script='" + script + '\'' +
                 ", roadTypes=" + roadTypes +
                 ", center=" + Arrays.toString(center) +
+                ", randomPoints=" + randomPoints +
                 '}';
     }
 

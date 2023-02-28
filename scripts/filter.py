@@ -39,7 +39,8 @@ def shortest_path_geojson(G, point1, point2, weight):
     edges = G.subgraph(nodes)
     features = gpd.GeoDataFrame(edges.edges(keys=True))
     features['geometry'] = features.apply(
-        lambda x: LineString([(G.nodes[x[0]]['lon'], G.nodes[x[0]]['lat']), (G.nodes[x[1]]['lon'], G.nodes[x[1]]['lat'])]),
+        lambda x: LineString(
+            [(G.nodes[x[0]]['lon'], G.nodes[x[0]]['lat']), (G.nodes[x[1]]['lon'], G.nodes[x[1]]['lat'])]),
         axis=1)
     features['osmid'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('osmid', ''), axis=1)
     features['name'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('name', ''), axis=1)
@@ -61,11 +62,12 @@ parser.add_argument("--coords", type=lambda x: tuple(map(float, x.split(','))), 
 parser.add_argument("--point1", type=lambda x: tuple(map(float, x.split(','))), required=True)
 # coordinates point 2
 parser.add_argument("--point2", type=lambda x: tuple(map(float, x.split(','))), required=True)
-
 # Type of roads accepted in the graph
 parser.add_argument("--roads", type=lambda x: x.split(','), required=True)
 # generation distance for the graph
-parser.add_argument("--dist", type=int,required=True)
+parser.add_argument("--dist", type=int, required=True)
+# Number of random points generated for each iteration
+parser.add_argument("--random", type=int, required=True)
 # Parse the command-line arguments
 args = parser.parse_args()
 
@@ -77,14 +79,16 @@ roads = args.roads
 dist = args.dist
 user = args.user
 sim = args.sim
+random = args.random
 
 #Creation of logger
-os.makedirs("scripts/" + user , exist_ok=True)
-os.makedirs("scripts/" + user + "/" + sim, exist_ok=True)
+os.makedirs("scripts/" + user, exist_ok=True)
 LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "/filter.log"
 logger = setup_logger(LOG_FILENAME,LOG_FILENAME)
 logger.info("Init of filter")
-
+if random < 2 or random > 100:
+    logger.error("Number of random points cannot be less than 2 or more than 100")
+    exit(0)
 # motorway,trunk,primary,secondary,tertiary,residential,service
 cf = '["highway"~"' + '|'.join(roads) + '"]'
 
@@ -155,6 +159,8 @@ nx.set_edge_attributes(g, traveltimes, "traveltimes")
 time_elapsed = (time.perf_counter() - time_start)
 logger.info("Filtering time : " + str(time_elapsed))
 logger.info("End of filter")
+rand_nodes = random_nodes.random_nodes(g, g_not_proj, point1[0], point1[1], point2[0], point2[1], user, sim, dist,random)
+rand_nodes_geojson = get_nodes_geojson(g, rand_nodes)
 
 print("graphe")
 print(edges_proj.to_json())
@@ -169,7 +175,7 @@ print(rand_nodes_geojson)
 source_node = ox.distance.nearest_nodes(g_not_proj, point1[0], point1[1])
 dest_node = ox.distance.nearest_nodes(g_not_proj, point2[0], point2[1])
 
-compute.compute(g, rand_nodes,source_node,dest_node,user,sim)
+compute.compute(g, rand_nodes, source_node, dest_node, user, sim)
 selected_route_geojson = shortest_path_geojson(g, source_node, dest_node, 'traveltimes')
 # with open('selected_route.geojson', 'w') as f:
 #     f.write(selected_route_geojson)
