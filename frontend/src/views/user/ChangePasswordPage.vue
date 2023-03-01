@@ -100,7 +100,7 @@ export default {
 
 <style>
 .bg-image {
-  background-image: url('@/assets/roads_backgroung_img.svg');
+  background-image: url('@/assets/roads_backgroung_img.jpg');
   background-size: cover;
   background-position: center center;
 }
