@@ -17,7 +17,8 @@
                   </div>
                   <div class="mb-3">
                     <input id="inputPassword" v-model="form.password"
-                           class="form-control rounded-pill border-0 shadow-sm px-4 text-primary" placeholder="Mot de passe"
+                           class="form-control rounded-pill border-0 shadow-sm px-4 text-primary"
+                           placeholder="Mot de passe"
                            required=""
                            type="password"/>
                   </div>
@@ -77,7 +78,7 @@ export default {
 }
 
 .bg-image {
-  background-image: url('@/assets/roads_backgroung_img.svg');
+  background-image: url('@/assets/roads_backgroung_img.jpg');
   background-size: cover;
   background-position: center center;
 }
