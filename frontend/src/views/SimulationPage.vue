@@ -49,7 +49,7 @@
         </div>
         <v-btn color="danger" class="ma-4 align-self-center" @click="cancelSimulation" variant="outlined"
           v-if="(status === 'Simulation en cours')">
-          Annuler la simualtion
+          Annuler la simulation
         </v-btn>
       </div>
 

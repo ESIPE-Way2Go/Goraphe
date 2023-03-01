@@ -1,7 +1,6 @@
 <template>
   <v-container fluid style="padding: 10px">
     <v-row class="d-flex">
-
       <div class="vh-100 w-100">
         <l-map ref="map" v-model:zoom="zoom" :center="center" :bounds="bounds"
                :max-bounds="maxBounds" :options="{ zoomControl: false}"
