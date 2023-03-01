@@ -211,7 +211,7 @@ public class SimulationController {
         }
         var resource = new ByteArrayResource(baos.toByteArray());
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + zipFileName.split("_")[0] + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + zipFileName.split("_")[0] + ".zip\"")
                 .contentLength(resource.contentLength())
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(resource);
