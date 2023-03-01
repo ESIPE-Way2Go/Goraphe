@@ -51,6 +51,7 @@
           v-if="(status === 'Simulation en cours')">
           Annuler la simulation
         </v-btn>
+        <v-btn color="primary" @click="downloadFile">Download File</v-btn>
       </div>
 
     </v-card>
@@ -127,6 +128,40 @@ export default {
   },
 
   methods: {
+    downloadFile() {
+      const url = '/api/simulation/'+this.id+'/download';
+      fetch(url, { method: 'GET' , headers : authHeader()})
+          .then(response => {
+            // Check that the response status is in the 200-299 range,
+            // which indicates a successful response.
+            if (response.ok) {
+              // Get the filename from the Content-Disposition header
+              const contentDisposition = response.headers.get('Content-Disposition');
+              const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+              const filename = filenameMatch ? filenameMatch[1] : 'unknown';
+              // Create a new Blob object from the response body
+              return response.blob().then(blob => ({ blob, filename }));
+            } else {
+              throw new Error(`Request failed with status ${response.status}`);
+            }
+          })
+          .then(({ blob, filename }) => {
+            // Create a new URL object for the blob
+            const url = URL.createObjectURL(blob);
+            // Create a new anchor element to trigger the download
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            // Trigger the download by clicking the anchor element
+            link.click();
+            // Clean up the URL object and anchor element
+            URL.revokeObjectURL(url);
+            link.remove();
+          })
+          .catch(error => {
+            console.error(error);
+          });
+    },
     all() {
       this.panel = this.allLog
     },
@@ -139,7 +174,7 @@ export default {
         headers: authHeader(),
       })
         .then(response => response.json())
-        .then(data => {        
+        .then(data => {
           this.name = data['name']
           this.description = data['description']
           this.computingScript = data['computingScript']

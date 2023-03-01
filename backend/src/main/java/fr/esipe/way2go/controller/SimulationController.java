@@ -14,11 +14,24 @@ import fr.esipe.way2go.service.UserService;
 import fr.esipe.way2go.utils.StatusSimulation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import org.springframework.core.io.Resource;
+
 
 @RestController
 @RequestMapping("/api/simulation")
@@ -55,7 +68,7 @@ public class SimulationController {
             throw new SimulationTooLaunch();
         if (simulationRequest.getName().contains(" "))
             throw new SimulationNameFormatWrong();
-        if (simulationRequest.getName().matches("\\d"))
+        if (simulationRequest.getName().matches("^\\d"))
             throw new SimulationNameNotBeginByNumberException();
 
         var userName = jwtUtils.getUsersFromHeaders(headers);
@@ -166,5 +179,41 @@ public class SimulationController {
         thread.interrupt();
         THREAD_SIMULATIONS.remove(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> downloadExcels(@PathVariable Long id) throws IOException {
+        var simulationOptional = simulationService.find(id);
+        if (simulationOptional.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        var simulation=simulationOptional.get();
+        var user=simulation.getUser();
+        var formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        var sep = System.getProperty("file.separator");
+        var pathGeneric = System.getProperty("user.dir") + sep + "scripts" + sep;
+        var simulationName = simulation.getName() + "_" + formatter.format(simulation.getBeginDate().getTime());
+        var excelPath = pathGeneric + user.getUsername() + sep + simulationName;
+        var zipFileName = simulationName+".zip";
+
+        var baos = new ByteArrayOutputStream();
+        try (var zos = new ZipOutputStream(baos)) {
+            Files.list(Paths.get(excelPath)).filter(path -> path.getFileName().toString().endsWith(".xlsx"))
+                    .forEach(path -> {
+                        try {
+                            var zipEntry = new ZipEntry(path.getFileName().toString());
+                            zos.putNextEntry(zipEntry);
+                            Files.copy(path, zos);
+                            zos.closeEntry();
+                        } catch (IOException e) {
+                            throw new RuntimeException();
+                        }
+                    });
+        }
+        var resource = new ByteArrayResource(baos.toByteArray());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + zipFileName.split("_")[0] + ".zip\"")
+                .contentLength(resource.contentLength())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
     }
 }
