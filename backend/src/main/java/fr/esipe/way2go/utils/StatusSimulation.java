@@ -7,5 +7,6 @@ public enum StatusSimulation {
     SUCCESS,
     ERROR,
     CANCEL;
+
 }
 
