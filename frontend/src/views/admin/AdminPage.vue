@@ -1,11 +1,11 @@
 <template>
   <v-card>
-    <div class="d-flex justify-space-between">
+    <div class="d-flex justify-space-between align-center">
       <v-tabs v-model="tab">
         <v-tab value="users">Utilisateurs</v-tab>
-        <v-tab value="invitation">Invitation</v-tab>
+        <v-tab value="invitation">Invitations</v-tab>
       </v-tabs>
-      <v-btn class="ma-3 rounded-3 bg-blue-darken-1" color="blue" positon="right" prepend-icon="mdi-plus"
+      <v-btn class="ma-3 rounded-3 bg-blue-darken-1" positon="right" prepend-icon="mdi-plus"
              @click="inviteDialog = true">Inviter un utilisateur
       </v-btn>
     </div>
@@ -15,25 +15,26 @@
           <v-table>
             <thead>
             <tr>
-              <th class="text-left" scope="col">
+              <th class="text-center pa-1" scope="col">
                 Mail
               </th>
-              <th class="text-left" scope="col">
+              <th class="text-center pa-1" scope="col">
                 Pseudonyme
               </th>
-              <th class="text-left" scope="col">
+              <th class="text-center pa-1" scope="col">
                 Role
               </th>
-              <th class="text-center" scope="col">
+              <th class="text-center pa-1" scope="col">
                 Options
               </th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="user in users" :key="user.id">
-              <td>{{ user.mail }}TOTO</td>
-              <td>{{ user.name }}Romain</td>
-              <td>{{ user.role }}ROLE_ADMIN</td>
+              <!--TODO remove les trucs écrits en dur ici-->
+              <td class="text-center pa-1">{{ user.mail }}TOTO</td>
+              <td class="text-center pa-1">{{ user.name }}Romain</td>
+              <td class="text-center pa-1">{{ user.role }}ROLE_ADMIN</td>
               <td class="text-center pa-1">
                 <v-btn v-if="user.role !== 'ROLE_ADMIN'" color="red"
                        icon="mdi-trash-can-outline" @click="deleteSelectUser(user)"></v-btn>
@@ -59,8 +60,9 @@
             </thead>
             <tbody>
             <tr v-for="invitation in invitations" :key="invitation.id">
-              <td>{{ invitation.email }}</td>
-              <td>{{ format(new Date(invitation.sendDate)) }}</td>
+              <!--TODO remove les trucs écrits en dur ici-->
+              <td>{{ invitation.email }}TOTO</td>
+              <td>{{ format(new Date(invitation.sendDate)) }}DATE</td>
               <td class="text-center d-flex  justify-center pa-1">
                 <v-btn class="mr-6" color="grey" prepend-icon="mdi-redo"
                        @click="reSendInvitation(invitation)">Relancer une invitation
@@ -152,9 +154,11 @@ export default {
   },
   data: () => ({
     tab: [],
+    //TODO remove les trucs en trop dans le tableau
     users: [[], []],
     user: '',
-    invitations: [],
+    //TODO remove les trucs en trop dans le tableau
+    invitations: [[], []],
     invitation: '',
     deleteDialog: false,
     inviteDialog: false,
@@ -298,3 +302,4 @@ export default {
   }
 }
 </script>
+
