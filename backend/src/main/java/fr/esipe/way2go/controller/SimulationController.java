@@ -69,19 +69,14 @@ public class SimulationController {
         var simulation = new SimulationEntity(simulationRequest.getName(), user, simulationRequest.getDesc(), simulationRequest.getDistance(),  simulationRequest.getScript(), simulationRequest.getRoadTypes());
         var simulationSave = simulationService.save(simulation);
         var midPoint= new MapController.Point(simulationRequest.getCenter());
-
-        simulationSave.setBeginDate(Calendar.getInstance());
-        simulationSave.setStatus(StatusSimulation.LOAD);
-        simulationService.save(simulationSave);
-        scriptPythonService.executeScript(user, simulationSave, midPoint, simulationRequest);
-        /*var thread = new Thread(() -> {
+        var thread = new Thread(() -> {
             simulationSave.setBeginDate(Calendar.getInstance());
             simulationSave.setStatus(StatusSimulation.LOAD);
             simulationService.save(simulationSave);
             scriptPythonService.executeScript(user, simulationSave, midPoint, simulationRequest);
         });
         thread.start();
-        THREAD_SIMULATIONS.putIfAbsent(simulationSave.getSimulationId(), thread);*/
+        THREAD_SIMULATIONS.putIfAbsent(simulationSave.getSimulationId(), thread);
         return new ResponseEntity<>(new SimulationIdResponse(simulationSave.getSimulationId()), HttpStatus.ACCEPTED);
     }
 
