@@ -17,7 +17,7 @@
                   v-model.trim:search="search"
                   class="mx-4"
                   density="default"
-                  label="Rechercher une déstination"
+                  label="Rechercher une destination"
                   clearable
                   variant="outlined"
                   @update:modelValue="selectedSearch"
