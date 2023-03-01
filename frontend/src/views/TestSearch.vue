@@ -26,7 +26,7 @@
 
             <v-row align="start" class="mt-1">
               <v-col cols="10">
-                <v-text-field variant="outlined" v-model.trim="name" label="Nom de la simulation"></v-text-field>
+                <v-text-field variant="outlined" v-model.trim="name" :rules="nameRules" label="Nom de la simulation"></v-text-field>
               </v-col>
               <v-col cols="2" align-self="start">
                 <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="large"></v-btn>
@@ -143,6 +143,14 @@ export default {
       //test
       circle_center: [],
       randomPoints: 2,
+      allowedChars: /^[a-zA-Z0-9_-]+$/,
+      nameRules: [
+        value => {
+          if (value === '')
+            return 'Ce champ ne doit pas être vide'
+          return this.allowedChars.test(value)?true:"Name cannot contain any special characters";
+        },
+      ],
     };
   },
   mounted() {
