@@ -53,12 +53,20 @@ def setup_logger(name, log_file, level=logging.DEBUG):
     return logger
 
 def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
+
     # Creation of logger
     os.makedirs("scripts/" + user, exist_ok=True)
     LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "/compute.log"
     logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
     logger.info("Init of compute")
     time_start = time.perf_counter()
+
+    edges_proj = ox.graph_to_gdfs(graph_proj, nodes=False, edges=True)
+    graph_geojson = edges_proj.to_json()
+    print("GRAPH")
+    print(graph_geojson)
+
+
 
     #TODO vérifier si dans graph proj
     # source_node = ox.distance.nearest_nodes(graph_not_proj, point1[0], point1[1])
@@ -82,13 +90,14 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
 
     #TODO Début iteration
     nb_iteration = 2
-    for _ in range(nb_iteration):
+    for index_iteration in range(nb_iteration):
         rand_nodes = random_nodes.random_nodes(graph_proj, graph_not_proj, source_node, dest_node, user, sim,
                                                dist,nbPoints)
         final_rand_nodes.extend(rand_nodes)
         rand_nodes_geojson = get_nodes_geojson(graph_proj, rand_nodes)
         # with open('rand_nodes.geojson', 'w') as f:
         #     f.write(rand_nodes_geojson)
+        print("ITERATION" + str(index_iteration) + "_randomNodes")
         print(rand_nodes_geojson)
         # base shortest paths
         routes_traveltimes = dict([])
@@ -253,6 +262,7 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
         selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes',logger)
         # with open('selected_route.geojson', 'w') as f:
         #     f.write(selected_route_geojson)
+        print("ITERATION" + str(index_iteration) + "_roadSelected")
         print(selected_route_geojson)
     #TODO FIN ITERATION
     for edge_name,counter in final_results_counter.items() :
@@ -264,12 +274,16 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
         final_results[edge_name]["evi_average_nip"] /= counter
         splited = edge_name.split("_",2)
         final_evi_local_dict[(float(splited[0]),float(splited[1]),0)] /= counter
+
+
     rand_nodes_geojson = get_nodes_geojson(graph_proj, final_rand_nodes)
+    print("FINAL_randomNodes")
     print(rand_nodes_geojson)
 
     nx.set_edge_attributes(graph_proj, final_evi_local_dict, "evi_local")
 
     selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes',logger)
+    print("FINAL_roadSelected")
     print(selected_route_geojson)
 
     # calculate computational time

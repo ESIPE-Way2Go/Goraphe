@@ -1,9 +1,9 @@
 package fr.esipe.way2go.service.impl;
 
 import fr.esipe.way2go.controller.MapController;
-import fr.esipe.way2go.dao.LogEntity;
-import fr.esipe.way2go.dao.ResultEntity;
 import fr.esipe.way2go.dao.SimulationEntity;
+import fr.esipe.way2go.dao.ResultEntity;
+import fr.esipe.way2go.dao.LogEntity;
 import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.dto.simulation.request.SimulationRequest;
 import fr.esipe.way2go.service.LogService;
