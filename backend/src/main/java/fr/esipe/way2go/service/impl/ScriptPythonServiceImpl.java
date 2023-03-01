@@ -83,16 +83,18 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             thread.start();
             int exitCode = process.waitFor();
             thread.interrupt();
-
-            getResult(Path.of(genericPathLog +"/json"), simulation);
             var status = exitCode == 0 ? StatusSimulation.SUCCESS : StatusSimulation.ERROR;
             errorLogs = new String(process.getErrorStream().readAllBytes());
             updateStatus(simulation, status, logs, errorLogs);
-
+            getResult(Path.of(genericPathLog + "/json"), simulation);
+            if (!Files.exists(Path.of(genericPathLog + sep + SCRIPT_1 + ".log"))){
+                logEntity1.setContent(errorLogs);
+                logEntity1.setStatus(StatusScript.ERROR);
+                logService.save(logEntity1);
+            }
             simulation.setStatus(status);
             endSimulation(simulation, status);
         } catch (IOException | InterruptedException e) {
-            endSimulation(simulation, StatusSimulation.CANCEL);
             updateStatus(simulation, StatusSimulation.CANCEL, logs, errorLogs);
             Thread.currentThread().interrupt();
         }
@@ -165,7 +167,9 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
 
     private void getResult(Path path, SimulationEntity simulation) {
         var directory = path.toFile();
-        for (var file : directory.listFiles(file -> file.getName().endsWith(".geojson"))) {
+        var list = directory.listFiles(file -> file.getName().endsWith(".geojson"));
+        if (list == null) return;
+        for (var file : list) {
             resultService.save(new ResultEntity(file.getName().replace(".geojson", ""), readFile(file.getAbsolutePath()), simulation));
         }
     }
