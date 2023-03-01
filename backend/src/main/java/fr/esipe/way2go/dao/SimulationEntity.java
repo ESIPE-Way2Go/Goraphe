@@ -2,6 +2,8 @@ package fr.esipe.way2go.dao;
 
 import fr.esipe.way2go.dao.converter.CalendarConverter;
 import fr.esipe.way2go.dao.converter.StringListConverter;
+import fr.esipe.way2go.utils.StatusSimulation;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -20,9 +22,6 @@ public class SimulationEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @Column(name = "graph", nullable = false, length = 100000)
-    private String graph;
-
     @Column(name = "description", nullable = false)
     private String description;
 
@@ -30,16 +29,12 @@ public class SimulationEntity {
     private String computingScript;
 
     @Column(name = "generation_distance", nullable = false)
-    private Double generationDistance;
+    private int generationDistance;
 
-    @Column(name = "random_points")
-    private String randomPoints;
+
     @Column(name = "road_type", nullable = false)
     @Convert(converter = StringListConverter.class)
     private List<String> roadType;
-
-    @Column(name = "log_path", nullable = false)
-    private String logPath;
 
     @Column(name = "begin_date")
     @Convert(converter = CalendarConverter.class)
@@ -50,49 +45,45 @@ public class SimulationEntity {
     private Calendar endDate;
 
     @Column(name = "share_link", nullable = false, unique = true)
-    private String shareLink;
+    private UUID shareLink;
 
     @Column(name = "statistics", nullable = false)
     private String statistics;
     @Column(name = "status", nullable = false)
     private String status;
 
-    @Column(name = "result", length = 10000000)
-    private String result;
+    @Column(name = "shortestPath", length = 10000000)
+    private String shortestPath;
 
-    @Column(name = "road", length = 10000000)
-    private String road;
-
+    @Column(name = "random_points", length = 10000000)
+    private String randomPoints;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "simulation")
     private List<LogEntity> logs;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "simulation")
+    private List<ResultEntity> resultEntities;
 
     public SimulationEntity() {
     }
 
-    public SimulationEntity(String name, UserEntity user, String description, String computingScript, List<String> roadTypes) {
+    public SimulationEntity(String name, UserEntity user, String description, int distance, String computingScript, List<String> roadTypes) {
         this.name = name;
         this.user = user;
-        this.graph = "graph";
         this.description = description;
         this.computingScript = computingScript;
-        this.generationDistance = 5.2;
-        this.randomPoints = "randomPoints";
+        this.generationDistance = distance;
         this.roadType = roadTypes;
-        this.logPath = "logPath";
-        Random rand = new Random();
-        int randomNumber = rand.nextInt(100000) + 1;
-        this.shareLink = String.valueOf(randomNumber);
+        this.shareLink = UUID.randomUUID();
         this.statistics = "statistics";
-        this.status = "NOT LAUNCH";
+        this.status = StatusSimulation.WAIT.getDescription();
     }
 
-    public String getResult() {
-        return result;
+    public UUID getShareLink() {
+        return shareLink;
     }
 
-    public void setResult(String result) {
-        this.result = result;
+    public void setShareLink(UUID shareLink) {
+        this.shareLink = shareLink;
     }
 
     /**
@@ -150,24 +141,6 @@ public class SimulationEntity {
     }
 
     /**
-     * Returns this simulation's graph.
-     *
-     * @return graph This simulation's graph. (String)
-     */
-    public String getGraph() {
-        return graph;
-    }
-
-    /**
-     * Sets a new graph for this simulation.
-     *
-     * @param graph This simulation's new graph. (String)
-     */
-    public void setGraph(String graph) {
-        this.graph = graph;
-    }
-
-    /**
      * Returns this simulation's description.
      *
      * @return description This simulation's description. (String)
@@ -208,7 +181,7 @@ public class SimulationEntity {
      *
      * @return generationDistance This simulation's generation distance. (Double)
      */
-    public Double getGenerationDistance() {
+    public int getGenerationDistance() {
         return generationDistance;
     }
 
@@ -225,7 +198,7 @@ public class SimulationEntity {
      *
      * @param generationDistance This simulation's new generation distance. (Double)
      */
-    public void setGenerationDistance(Double generationDistance) {
+    public void setGenerationDistance(int generationDistance) {
         this.generationDistance = generationDistance;
     }
 
@@ -265,44 +238,12 @@ public class SimulationEntity {
         this.roadType = roadType;
     }
 
-    /**
-     * Returns this simulation's log path.
-     *
-     * @return logPath This simulation's log path. (String)
-     */
-    public String getLogPath() {
-        return logPath;
-    }
-
-    /**
-     * Sets a new log path for this simulation.
-     *
-     * @param logPath This simulation's new log path. (String)
-     */
-    public void setLogPath(String logPath) {
-        this.logPath = logPath;
-    }
-
-    /**
-     * Returns this simulation's share link.
-     *
-     * @return shareLink This simulation's share link. (String)
-     */
-    public String getShareLink() {
-        return shareLink;
+    public String getShortestPath() {
+        return shortestPath;
     }
 
     public String getStatus() {
         return status;
-    }
-
-    /**
-     * Sets a new share link for this simulation.
-     *
-     * @param shareLink This simulation's new shareLink. (String)
-     */
-    public void setShareLink(String shareLink) {
-        this.shareLink = shareLink;
     }
 
     /**
@@ -353,23 +294,35 @@ public class SimulationEntity {
         this.status = status;
     }
 
+    public void setShortestPath(String shortestPath) {
+        this.shortestPath = shortestPath;
+    }
+
+    public List<ResultEntity> getResultEntities() {
+        return resultEntities;
+    }
+
+    public void setResultEntities(List<ResultEntity> resultEntities) {
+        this.resultEntities = resultEntities;
+    }
+
     @Override
     public String toString() {
         return "SimulationEntity{" +
                 "simulationId=" + simulationId +
                 ", name='" + name + '\'' +
                 ", user=" + user +
-                ", graph='" + graph + '\'' +
                 ", description='" + description + '\'' +
                 ", computingScript='" + computingScript + '\'' +
                 ", generationDistance=" + generationDistance +
-                ", randomPoints='" + randomPoints + '\'' +
                 ", roadType=" + roadType +
-                ", logPath='" + logPath + '\'' +
                 ", beginDate=" + beginDate +
                 ", endDate=" + endDate +
-                ", shareLink='" + shareLink + '\'' +
+                ", shareLink=" + shareLink +
                 ", statistics='" + statistics + '\'' +
+                ", status='" + status + '\'' +
+                ", shortestPath='" + shortestPath + '\'' +
+                ", randomPoints='" + randomPoints + '\'' +
                 ", logs=" + logs +
                 '}';
     }

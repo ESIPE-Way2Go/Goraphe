@@ -1,33 +1,34 @@
 <template>
   <div class="mx-auto w-75 mt-5">
     <v-card class="mb-10">
+      <v-card-title>
+        Simulation : {{ name }}
+      </v-card-title>
+      <v-card-subtitle v-if="description !== null">
+        {{ description }}
+      </v-card-subtitle>
       <div class="d-flex">
-            <v-img class="ma-2 rounded-1" max-height="300" max-width="35%" :src=imageTest cover></v-img>
+        <v-img class="ma-2 rounded-1" max-height="300" max-width="35%" :src=imageTest cover></v-img>
 
-        <div class="d-flex flex-column">
+        <div class="d-flex flex-column flex-grow-1 flex-shrink-0">
           <div class="d-flex justify-content-between">
-          <div class="flex-column">
-            <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">
-              Status
+            <div class="flex-column">
+              <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">
+                Status
+              </div>
+              <div class="ma-2 pa-1 h5  text-caption text-uppercase font-weight-bold">
+                <v-badge :color="(status === 'ERROR') ? 'error' : 'success'" content="" dot inline></v-badge>
+                {{ status }}
+              </div>
             </div>
-            <div class="ma-2 pa-1 h5  text-caption text-uppercase font-weight-bold">
-              <v-badge
-                  :color="(status === 'ERROR') ? 'error' : 'success' "
-                  content=""
-                  dot
-                  inline
-              ></v-badge>
-              {{status}}
-            </div>
-          </div>
             <div class="flex-column">
               <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">Module</div>
               <v-sheet class="ma-2 pa-1 h5  text-caption font-weight-bold text-uppercase">{{ computingScript }}</v-sheet>
             </div>
-          <div class="flex-column">
-            <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">Duration</div>
-            <v-sheet class="ma-2 pa-1 h5  text-caption font-weight-bold text-uppercase">{{ duration }}</v-sheet>
-          </div>
+            <div class="flex-column">
+              <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">Duration</div>
+              <v-sheet class="ma-2 pa-1 h5  text-caption font-weight-bold text-uppercase">{{ duration }}</v-sheet>
+            </div>
 
           </div>
           <v-divider inset></v-divider>
@@ -46,6 +47,10 @@
             </div>
           </div>
         </div>
+        <v-btn color="danger" class="ma-4 align-self-center" @click="cancelSimulation" variant="outlined"
+          v-if="(status === 'Simulation en cours')">
+          Annuler la simualtion
+        </v-btn>
       </div>
 
     </v-card>
@@ -54,15 +59,15 @@
     <v-card class="mx-auto">
       <template v-slot:title>
         <div class="d-flex align-items-center">
-        <div class="ma-2 pa-1 h5  text-overline font-weight-bold">Logs</div>
-        <div class="text-center d-flex">
-          <v-btn class="ma-2 font-weight-bold" @click="all" size="small" variant="tonal" v-if="panel.length===0">
-            Afficher tous
-          </v-btn>
-          <v-btn class="ma-2 font-weight-bold" @click="none" size="small" variant="tonal" v-if="panel.length>0">
-            Cacher tous
-          </v-btn>
-        </div>
+          <div class="ma-2 pa-1 h5  text-overline font-weight-bold">Logs</div>
+          <div class="text-center d-flex">
+            <v-btn class="ma-2 font-weight-bold" @click="all" size="small" variant="tonal" v-if="panel.length === 0">
+              Afficher tous
+            </v-btn>
+            <v-btn class="ma-2 font-weight-bold" @click="none" size="small" variant="tonal" v-if="panel.length > 0">
+              Cacher tous
+            </v-btn>
+          </div>
         </div>
       </template>
       <v-card-text>
@@ -74,7 +79,9 @@
                 <div class="mr-2">
                   <v-icon icon="mdi-check-circle" color="success" v-if="log.status === 'SUCCESS'"></v-icon>
                   <v-icon icon="mdi-close" color="error" v-else-if="log.status === 'ERROR'"></v-icon>
-                  <v-progress-circular color="dark-blue" style="height: 18px" indeterminate width="3" v-else ></v-progress-circular>
+                  <v-progress-circular color="dark-blue" style="height: 18px" indeterminate width="3"
+                    v-else-if="log.status === 'En cours'"></v-progress-circular>
+                  <v-icon icon="mdi-launch" color="grey" v-else></v-icon>
                 </div>
                 <div>{{ log.script }}</div>
               </template>
@@ -94,8 +101,13 @@
 
 <script>
 import authHeader from "@/services/auth-header";
+import { useToast } from "vue-toastification";
 
 export default {
+  setup() {
+    const toast = useToast();
+    return { toast }
+  },
   data() {
     return {
       panel: [],
@@ -121,30 +133,42 @@ export default {
     none() {
       this.panel = []
     },
-    getLogs() {
+    getSimulation() {
       fetch("/api/simulation/" + this.id, {
         method: "GET",
         headers: authHeader(),
       })
-          .then(response => response.json())
-          .then(data => {
-            this.name = data['name']
-            this.description = data['description']
-            this.computingScript = data['computingScript']
-            this.roads = data['roads']
-            this.distance = data['distance']
-            this.getDuration(data)
-            this.allLog = []
-            this.logs = []
-            data['logResponses'].forEach(elt => {
-              this.logs.push({script: elt['scriptName'], status: elt['status'], content: elt['content']})
-              this.allLog.push(elt['scriptName'])
-              this.status = elt['status']
-            });
-            if (this.logs !== []) {
-              this.progession = this.logs.length / 3 * 100
-            }
+        .then(response => response.json())
+        .then(data => {        
+          this.name = data['name']
+          this.description = data['description']
+          this.computingScript = data['computingScript']
+          this.roads = data['roads']
+          this.distance = data['distance']
+          this.status = data['status']
+          this.getDuration(data)
+          this.allLog = []
+          this.logs = []
+          data['logResponses'].forEach(elt => {
+            this.logs.push({ script: elt['scriptName'], status: elt['status'], content: elt['content'] })
+            this.allLog.push(elt['scriptName'])
           });
+          if (this.logs !== []) {
+            this.progession = this.logs.length / 3 * 100
+          }
+        });
+    },
+    cancelSimulation() {
+      fetch(`/api/simulation/${this.id}/cancel`, {
+        method: "DELETE",
+        headers: authHeader(),
+      }).then(response => {
+        if (response.ok) {
+          this.toast.success(`Annulation de la simulation réussi`)
+        } else {
+          this.toast.error(`Erreur dans l'annulation de la simulation`)
+        }
+      })
     },
     getDuration(data) {
       if (data['beginDate'] === null) {
@@ -178,8 +202,7 @@ export default {
     }
   },
   mounted() {
-    this.getLogs()
-    this.intervalIds.push(setInterval(this.getLogs, 1000));
+    this.intervalIds.push(setInterval(this.getSimulation, 1000));
   },
   beforeUnmount() {
     // clear all intervals before unmounting the component

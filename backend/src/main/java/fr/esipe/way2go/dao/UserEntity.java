@@ -11,10 +11,10 @@ public class UserEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "username", unique = true)
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -26,7 +26,7 @@ public class UserEntity {
     @Column(name = "token", unique = true)
     private String token;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "user_id")
     private List<SimulationEntity> simulations;
 
@@ -159,17 +159,5 @@ public class UserEntity {
 
     public void setToken(String token) {
         this.token = token;
-    }
-
-    @Override
-    public String toString() {
-        return "UserEntity{" +
-                "userId=" + userId +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", role='" + role + '\'' +
-                ", simulations=" + simulations +
-                '}';
     }
 }

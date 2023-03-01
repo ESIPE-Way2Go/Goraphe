@@ -104,11 +104,11 @@
         <v-toolbar-title>Inviter un utilisateur</v-toolbar-title>
       </v-toolbar>
       <v-form v-model="isFormValid" fast-fail @submit.prevent="sendInvitation">
-
+      
         <v-card-text>
           <v-text-field v-model="form.email" :rules="emailRules" label="Email" required></v-text-field>
         </v-card-text>
-
+        
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="grey" @click="inviteDialog = false">Annuler</v-btn>

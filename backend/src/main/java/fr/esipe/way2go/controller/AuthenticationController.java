@@ -12,11 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
-
-// Faudrait peut être delete le cross origin. Normalement, il y en a pas besoin: à tester.
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
