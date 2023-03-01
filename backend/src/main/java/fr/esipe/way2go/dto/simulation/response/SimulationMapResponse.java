@@ -1,14 +1,14 @@
 package fr.esipe.way2go.dto.simulation.response;
 
 import fr.esipe.way2go.dao.SimulationEntity;
+import fr.esipe.way2go.utils.StatusSimulation;
 
 import java.util.List;
 
 public class SimulationMapResponse {
     private String title;
     private String description;
-    private String status;
-
+    private StatusSimulation status;
     private String script;
 
     private List<String> roads;
@@ -19,8 +19,6 @@ public class SimulationMapResponse {
         this.title = simulation.getName();
         this.description = simulation.getDescription();
         this.status = simulation.getStatus();
-        this.path = simulation.getShortestPath();
-        this.randomPoints = simulation.getRandomPoints();
         this.roads = simulation.getRoadType();
         this.script = simulation.getComputingScript();
     }
@@ -40,7 +38,7 @@ public class SimulationMapResponse {
         return description;
     }
 
-    public String getStatus() {
+    public StatusSimulation getStatus() {
         return status;
     }
 
@@ -64,7 +62,7 @@ public class SimulationMapResponse {
         this.description = description;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusSimulation status) {
         this.status = status;
     }
 

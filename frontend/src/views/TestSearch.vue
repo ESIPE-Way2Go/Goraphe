@@ -11,10 +11,10 @@
           <v-form @submit.prevent="makePostRequest" v-if="!close">
             <v-row align="start" class="mt-1">
               <v-autocomplete
-                  v-model="select"
+                  v-model.trim="select"
                   :loading="loading"
                   :items="items.map(i => i.label).filter((val,i)=>i<4)"
-                  v-model:search="search"
+                  v-model.trim:search="search"
                   class="mx-4"
                   density="default"
                   label="Rechercher une déstination"
@@ -26,20 +26,18 @@
 
             <v-row align="start" class="mt-1">
               <v-col cols="10">
-                <v-text-field variant="outlined" v-model="name" label="Nom de la simulation"></v-text-field>
-
+                <v-text-field variant="outlined" v-model.trim="name" label="Nom de la simulation"></v-text-field>
               </v-col>
               <v-col cols="2" align-self="start">
                 <v-btn prepend-icon="mdi-chevron-left" @click.stop="close= !close" flat size="large"></v-btn>
               </v-col>
             </v-row>
-
             <v-select
                 variant="outlined"
                 chips
                 label="Type de routes"
                 :items=roadTypes
-                v-model="selectedRoadTypes"
+                v-model.trim="selectedRoadTypes"
                 multiple
                 clearable
                 closable-chips
@@ -49,23 +47,21 @@
             </v-btn>
             <v-scroll-y-transition>
               <div class="d-flex flex-column justify-content-between" v-if="optionsOpen">
-
-                <v-text-field variant="outlined" v-model="start" label="Début" density="compact"
+                <v-text-field variant="outlined" v-model.trim="start" label="Début" density="compact"
                               @update:modelValue="updateStart"></v-text-field>
                 <v-btn density="compact" class="mb-3" variant="text" prepend-icon="mdi-swap-vertical"
                        @click="swapPoints"></v-btn>
-                <v-text-field variant="outlined" v-model="end" label="Fin" density="compact"
+                <v-text-field variant="outlined" v-model.trim="end" label="Fin" density="compact"
                               @update:modelValue="updateEnd"></v-text-field>
-                <v-text-field variant="outlined" v-model="center" label="Centre" density="compact"
+                <v-text-field variant="outlined" v-model.trim="center" label="Centre" density="compact"
                               @update:modelValue="circleUpdate"></v-text-field>
-                <v-text-field variant="outlined" v-model.number="randomPoints" label="Nombres de points Random"
+                <v-text-field variant="outlined" v-model.number.trim="randomPoints" label="Nombres de points Random"
                               type="number" density="compact"
                               :min="2"
                               max="100" step="1"></v-text-field>
-
-                <v-text-field variant="outlined" v-model="desc" label="Description" density="compact"></v-text-field>
+                <v-text-field variant="outlined" v-model.trim="desc" label="Description" density="compact"></v-text-field>
                 <div class="d-flex align-start">
-                  <v-text-field class="w-75" variant="outlined" v-model.number="dist" label="Distance (mètre)"
+                  <v-text-field class="w-75" variant="outlined" v-model.number.trim="dist" label="Distance (mètre)"
                                 density="compact"
                                 type="number" :min="minDist"
                                 max="100000" step="10" @change="circleChange"></v-text-field>
@@ -74,7 +70,6 @@
                 </div>
               </div>
             </v-scroll-y-transition>
-
             <v-btn type="submit" color="primary" v-if="selectedRoadTypes.length>0">Lancer la simulation</v-btn>
           </v-form>
         </v-card>
@@ -353,7 +348,7 @@ export default {
         let distance = this.dist;
         let roadTypes = this.$data.selectedRoadTypes;
         let script = this.$data.script;
-        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center, randomPoints});
+        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center,randomPoints});
         const response = await fetch('/api/simulation', {
           method: 'POST',
           headers: authHeader(),

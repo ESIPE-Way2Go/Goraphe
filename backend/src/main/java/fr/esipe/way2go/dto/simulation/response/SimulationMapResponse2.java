@@ -1,6 +1,7 @@
 package fr.esipe.way2go.dto.simulation.response;
 
 import fr.esipe.way2go.dao.SimulationEntity;
+import fr.esipe.way2go.utils.StatusSimulation;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Map;
 public class SimulationMapResponse2 {
     private String title;
     private String description;
-    private String status;
+    private StatusSimulation status;
     private String script;
     private List<String> roads;
     private Map<String, String> results;
@@ -39,7 +40,7 @@ public class SimulationMapResponse2 {
         return description;
     }
 
-    public String getStatus() {
+    public StatusSimulation getStatus() {
         return status;
     }
 
@@ -59,7 +60,7 @@ public class SimulationMapResponse2 {
         this.description = description;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusSimulation status) {
         this.status = status;
     }
 
