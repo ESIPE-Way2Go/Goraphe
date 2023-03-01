@@ -65,7 +65,7 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
     graph_geojson = edges_proj.to_json()
     print("GRAPH")
     print(graph_geojson)
-
+    logger.info("Geojson graph printed")
 
 
     #TODO vérifier si dans graph proj
@@ -89,8 +89,11 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
     final_evi_local_dict = dict([])
 
     #TODO Début iteration
+
     nb_iteration = 2
+    logger.info("Iterations loop beginning with "+str(nb_iteration))
     for index_iteration in range(nb_iteration):
+        logger.info("Executing random node in iteration loop in compute.py")
         rand_nodes = random_nodes.random_nodes(graph_proj, graph_not_proj, source_node, dest_node, user, sim,
                                                dist,nbPoints)
         final_rand_nodes.extend(rand_nodes)
@@ -126,6 +129,7 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
             length_SPtraveltime_paths[origin] = dict([])
             essential_mw_edges[origin] = dict([])
 
+            logger.info("Beginning iterative remove of edges in the selected route")
             for destination in rand_nodes:
                 # Calculate the shortest path
                 # TODO attention des fois aucun trajet trouvé entre source et target    raise nx.NetworkXNoPath(f"No path between {source} and {target}.")      networkx.exception.NetworkXNoPath: No path between 686687464 and 259190165.
@@ -182,10 +186,14 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
                 for item in indMW:
                     if item not in impactful_mw_edges:
                         impactful_mw_edges.append(item)
-            # outputs
+
+        logger.info("Finish iterative remove of edges in the selected route")
+        # outputs
         results = dict([])
         evi_local_dict = dict([])
         ref_alpha_traveltimes = 0
+
+        logger.info("Beginning processing of alpha, beta for LoS")
         for key in timetravel_shortest_paths:
             ref_alpha_traveltimes += sum(timetravel_shortest_paths[key].values())
         results["Base alpha traveltimes"] = ref_alpha_traveltimes
@@ -248,8 +256,10 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
                 final_results[edge_name]["evi_local"] = evi_local
                 final_results[edge_name]["evi_average_nip"] = evi_average_nip
                 final_evi_local_dict[(edge[0],edge[1],0)] = float(evi_local)
-        # transform results dictionary in dataframes to save as xlsx file
 
+        logger.info("Finish processing of alpha, beta for LoS")
+
+        # transform results dictionary in dataframes to save as xlsx file
         df_Results = pd.DataFrame.from_dict(results, orient='columns')
         df_Results.to_excel("scripts/" + user + "/" + sim + "_extremenodes_EVIs.xlsx")
         df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
@@ -264,6 +274,7 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
         #     f.write(selected_route_geojson)
         print("ITERATION" + str(index_iteration) + "_roadSelected")
         print(selected_route_geojson)
+    logger.info("Iterations loop finished")
     #TODO FIN ITERATION
     for edge_name,counter in final_results_counter.items() :
         final_results[edge_name]["Broken paths"] /= counter
