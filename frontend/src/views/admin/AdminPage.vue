@@ -31,10 +31,9 @@
             </thead>
             <tbody>
             <tr v-for="user in users" :key="user.id">
-              <!--TODO remove les trucs écrits en dur ici-->
-              <td class="text-center pa-1">{{ user.mail }}TOTO</td>
-              <td class="text-center pa-1">{{ user.name }}Romain</td>
-              <td class="text-center pa-1">{{ user.role }}ROLE_ADMIN</td>
+              <td class="text-center pa-1">{{ user.mail }}</td>
+              <td class="text-center pa-1">{{ user.name }}</td>
+              <td class="text-center pa-1">{{ user.role }}</td>
               <td class="text-center pa-1">
                 <v-btn v-if="user.role !== 'ROLE_ADMIN'" color="red"
                        icon="mdi-trash-can-outline" @click="deleteSelectUser(user)"></v-btn>
@@ -47,27 +46,26 @@
           <v-table>
             <thead>
             <tr>
-              <th class="text-left" scope="col">
+              <th class="text-center pa-1" scope="col">
                 Mail
               </th>
-              <th class="text-left" scope="col">
+              <th class="text-center pa-1" scope="col">
                 Date
               </th>
-              <th class="text-center" scope="col">
+              <th class="text-center pa-1" scope="col">
                 Options
               </th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="invitation in invitations" :key="invitation.id">
-              <!--TODO remove les trucs écrits en dur ici-->
-              <td>{{ invitation.email }}TOTO</td>
-              <td>{{ format(new Date(invitation.sendDate)) }}DATE</td>
-              <td class="text-center d-flex  justify-center pa-1">
-                <v-btn class="mr-6" color="grey" prepend-icon="mdi-redo"
+              <td class="text-center pa-1">{{ invitation.email }}</td>
+              <td class="text-center pa-1">{{ format(new Date(invitation.sendDate)) }}</td>
+              <td class="text-center d-flex justify-center pa-1">
+                <v-btn class="mr-6" color="primary" prepend-icon="mdi-redo"
                        @click="reSendInvitation(invitation)">Relancer une invitation
                 </v-btn>
-                <v-btn color="grey" prepend-icon="mdi-trash-can-outline"
+                <v-btn color="red" prepend-icon="mdi-trash-can-outline"
                        @click="deleteSelectInvitation(invitation)">Supprimer
                 </v-btn>
               </td>
@@ -123,12 +121,12 @@
   <v-dialog v-model="deleteInviteDialog" max-width="600">
     <v-card>
       <v-toolbar color="primary">
-        <v-toolbar-title>Suppression l'invitation pour <b>{{ invitation.email }}</b></v-toolbar-title>
+        <v-toolbar-title>Suppression de l'invitation pour <b>{{ invitation.email }}</b></v-toolbar-title>
       </v-toolbar>
 
       <v-card-text>
-        Attention ! Vous êtes sur le point de supprimer définitivement un utilisateur de notre application. Cette
-        action est irréversible et entraînera la suppression de toutes les données de cet utilisateur.
+        Attention ! Vous êtes sur le point de supprimer définitivement une invitation. Cette action est irréversible et
+        empêchera l'utilisation de cette invitation.
       </v-card-text>
 
       <v-card-actions>
@@ -154,11 +152,9 @@ export default {
   },
   data: () => ({
     tab: [],
-    //TODO remove les trucs en trop dans le tableau
-    users: [[], []],
+    users: [],
     user: '',
-    //TODO remove les trucs en trop dans le tableau
-    invitations: [[], []],
+    invitations: [],
     invitation: '',
     deleteDialog: false,
     inviteDialog: false,
@@ -272,11 +268,9 @@ export default {
           })
     },
     checkAdmin() {
-      //TODO put this back after the TESTS
       let checkAdmin = can("ROLE_ADMIN")
       if (checkAdmin === null || !checkAdmin)
-        print("toto")
-      //this.$router.push({name: 'home'});
+        this.$router.push({name: 'home'});
     },
     format(inputDate) {
       let date, month, year;
