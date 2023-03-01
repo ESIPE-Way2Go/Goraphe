@@ -1,9 +1,8 @@
 package fr.esipe.way2go.service.impl;
 
 import fr.esipe.way2go.controller.MapController;
-import fr.esipe.way2go.dao.SimulationEntity;
-import fr.esipe.way2go.dao.ResultEntity;
 import fr.esipe.way2go.dao.LogEntity;
+import fr.esipe.way2go.dao.SimulationEntity;
 import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.dto.simulation.request.SimulationRequest;
 import fr.esipe.way2go.service.LogService;
@@ -14,9 +13,8 @@ import fr.esipe.way2go.utils.StatusScript;
 import fr.esipe.way2go.utils.StatusSimulation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.io.BufferedReader;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -63,7 +61,6 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
         logs.add(logEntity1);
         logs.add(logEntity2);
         logs.add(logEntity3);
-
         var builder = new ProcessBuilder("python3", pathGeneric + "filter.py",
                 "--dist", Integer.toString(simulationRequest.getDistance()),
                 "--coords", coords.toString(),
@@ -89,16 +86,6 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             var status = exitCode == 0 ? StatusSimulation.SUCCESS : StatusSimulation.ERROR;
             errorLogs = new String(process.getErrorStream().readAllBytes());
             updateStatus(simulation, status, logs, errorLogs);
-            var stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            String key = "";
-            while ((line = stdInput.readLine()) != null) {
-                if (!line.startsWith("{")) {
-                    key = line;
-                } else {
-                    resultService.save(new ResultEntity(key, line, simulation));
-                }
-            }
 
             simulation.setStatus(status.getDescription());
             endSimulation(simulation, status);
@@ -143,7 +130,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
                 key.reset();
             }
         } catch (IOException | InterruptedException e) {
-           Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -172,5 +159,13 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             logService.save(log);
         });
         endSimulation(simulation, status);
+    }
+
+    private void getResult(Path path) {
+        var directory = path.toFile();
+        for (var file : directory.listFiles()) {
+            System.out.println(file.getName());
+        }
+
     }
 }

@@ -58,6 +58,9 @@ random = args.random
 
 # Creation of logger
 os.makedirs("scripts/" + user, exist_ok=True)
+os.makedirs("scripts/" + user + "/" + sim, exist_ok=True)
+os.makedirs("scripts/" + user + "/" + sim + "/json", exist_ok=True)
+
 LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "/filter.log"
 logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
 logger.info("Init of filter")
