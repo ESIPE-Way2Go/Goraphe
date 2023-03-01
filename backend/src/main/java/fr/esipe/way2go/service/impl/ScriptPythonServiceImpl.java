@@ -53,7 +53,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
         var sep = System.getProperty("file.separator");
         var pathGeneric = System.getProperty("user.dir") + sep + "scripts" + sep;
         var formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        var simulationName = simulation.getName() + "_" + formatter.format(new Date());
+        var simulationName = simulation.getName() + "_" + formatter.format(simulation.getBeginDate().getTime());
         var genericPathLog = pathGeneric + user.getUsername() + sep + simulationName;
         var logs = new ArrayList<LogEntity>();
         var logEntity1 = logService.save(new LogEntity(simulation, SCRIPT_1));
@@ -99,7 +99,11 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
                     resultService.save(new ResultEntity(key, line, simulation));
                 }
             }
-
+            if (!Files.exists(Path.of(genericPathLog + sep + SCRIPT_1 + ".log"))){
+                logEntity1.setContent(errorLogs);
+                logEntity1.setStatus(StatusScript.ERROR.getDescription());
+                logService.save(logEntity1);
+            }
             simulation.setStatus(status.getDescription());
             endSimulation(simulation, status);
         } catch (IOException | InterruptedException e) {

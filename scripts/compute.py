@@ -242,11 +242,11 @@ def compute(graph_proj,graph_not_proj,point1,point2,dist,user,sim,nbPoints):
         # transform results dictionary in dataframes to save as xlsx file
 
         df_Results = pd.DataFrame.from_dict(results, orient='columns')
-        df_Results.to_excel("scripts/" + user + "/" + sim + "_extremenodes_EVIs.xlsx")
+        df_Results.to_excel(os.getcwd() + "/scripts/" + user + "/" + sim + "/extremenodes_EVIs.xlsx")
         df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
-        df_Res_traveltimeSP.to_excel("scripts/" + user + "/" + sim + "_traveltimesSP.xlsx")
+        df_Res_traveltimeSP.to_excel(os.getcwd() + "/scripts/" + user + "/" + sim + "/traveltimesSP.xlsx")
         df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
-        df_essential_mw_edges.to_excel("scripts/" + user + "/" + sim + "_essential_mw_edges.xlsx")
+        df_essential_mw_edges.to_excel(os.getcwd() + "/scripts/" + user + "/" + sim + "/essential_mw_edges.xlsx")
 
         nx.set_edge_attributes(graph_proj, evi_local_dict, "evi_local")
 
