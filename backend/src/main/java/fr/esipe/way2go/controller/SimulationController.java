@@ -31,7 +31,7 @@ public class SimulationController {
     @Value("${nbThread}")
     private int nbThreads;
 
-    public static Map<Long, Thread> THREAD_SIMULATIONS = new HashMap<>();
+    public static final Map<Long, Thread> THREAD_SIMULATIONS = new HashMap<>();
 
     @Autowired
     public SimulationController(SimulationService simulationService, UserService userService, ScriptPythonService scriptPythonService, JwtUtils jwtUtils) {
@@ -55,7 +55,7 @@ public class SimulationController {
             throw new SimulationTooLaunch();
         if (simulationRequest.getName().contains(" "))
             throw new SimulationNameFormatWrong();
-        if (simulationRequest.getName().matches("^[0-9]*"))
+        if (simulationRequest.getName().matches("\\d"))
             throw new SimulationNameNotBeginByNumberException();
 
         var userName = jwtUtils.getUsersFromHeaders(headers);
@@ -71,7 +71,7 @@ public class SimulationController {
         var midPoint= new MapController.Point(simulationRequest.getCenter());
         var thread = new Thread(() -> {
             simulationSave.setBeginDate(Calendar.getInstance());
-            simulationSave.setStatus(StatusSimulation.LOAD.getDescription());
+            simulationSave.setStatus(StatusSimulation.LOAD);
             simulationService.save(simulationSave);
             scriptPythonService.executeScript(user, simulationSave, midPoint, simulationRequest);
         });

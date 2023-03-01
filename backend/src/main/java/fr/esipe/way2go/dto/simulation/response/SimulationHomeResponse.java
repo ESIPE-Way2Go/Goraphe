@@ -1,6 +1,7 @@
 package fr.esipe.way2go.dto.simulation.response;
 
 import fr.esipe.way2go.dao.SimulationEntity;
+import fr.esipe.way2go.utils.StatusSimulation;
 
 import java.util.Calendar;
 
@@ -9,8 +10,7 @@ public class SimulationHomeResponse {
     private String title;
     private Calendar beginDate;
     private Calendar endDate;
-
-    private String status;
+    private StatusSimulation status;
 
     public SimulationHomeResponse(SimulationEntity simulationEntity) {
         id = simulationEntity.getSimulationId();
@@ -52,11 +52,11 @@ public class SimulationHomeResponse {
         this.endDate = endDate;
     }
 
-    public String getStatus() {
+    public StatusSimulation getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusSimulation status) {
         this.status = status;
     }
 }

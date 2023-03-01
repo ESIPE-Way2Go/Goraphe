@@ -2,6 +2,8 @@ package fr.esipe.way2go.dto.simulation.response;
 
 import fr.esipe.way2go.dao.LogEntity;
 import fr.esipe.way2go.dao.SimulationEntity;
+import fr.esipe.way2go.utils.StatusSimulation;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -21,7 +23,7 @@ public class SimulationResponse {
     /**
      * Status of the simulation
      */
-    private String status;
+    private StatusSimulation status;
 
     /**
      * Name of the computing_script algorithm
@@ -74,8 +76,9 @@ public class SimulationResponse {
     public String getDescription() {
         return description;
     }
-    public String getStatus() {
-        return status;
+
+    public void setStatus(StatusSimulation status) {
+        this.status = status;
     }
 
     public String getComputingScript() {
@@ -102,13 +105,15 @@ public class SimulationResponse {
         return logResponses;
     }
 
+    public StatusSimulation getStatus() {
+        return status;
+    }
+
     public void setSimulationName(String simulationName) {
         this.name = simulationName;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+
 
     public void setComputingScript(String computingScript) {
         this.computingScript = computingScript;
