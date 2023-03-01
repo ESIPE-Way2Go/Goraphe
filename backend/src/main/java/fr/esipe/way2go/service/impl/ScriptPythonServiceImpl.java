@@ -74,8 +74,6 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
                 "--point2", new MapController.Point(simulationRequest.getEnd()).toString(),
                 "--random", Integer.toString(simulationRequest.getRandomPoints())
         );
-
-        System.out.println(builder.toString());
         String errorLogs = null;
         try {
             var process = builder.start();
