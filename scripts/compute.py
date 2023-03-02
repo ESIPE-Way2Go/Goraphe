@@ -98,7 +98,7 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
     logger.info("Iterations loop beginning with " + str(nb_iteration))
     for index_iteration in range(nb_iteration):
         logger.info("Executing random node in iteration loop in compute.py")
-        rand_nodes = random_nodes.random_nodes(graph_proj, graph_not_proj, source_node, dest_node, user, sim,
+        rand_nodes = random_nodes.random_nodes(graph_proj, source_node, dest_node, user, sim,
                                                dist, nbPoints)
         final_rand_nodes.extend(rand_nodes)
         rand_nodes_geojson = get_nodes_geojson(graph_proj, rand_nodes)
