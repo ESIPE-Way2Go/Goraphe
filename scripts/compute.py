@@ -260,7 +260,6 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
 
         logger.info("Finish processing of alpha, beta for LoS")
 
-
         # transform results dictionary in dataframes to save as xlsx file
         df_Results = pd.DataFrame.from_dict(results, orient='columns')
         df_Results.to_excel(excel_directory + "/extremenodes_EVIs.xlsx")
