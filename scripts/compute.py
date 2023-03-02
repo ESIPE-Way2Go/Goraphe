@@ -151,6 +151,7 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
                     timetravel_shortest_path += graph_proj.get_edge_data(u, v)[0]['traveltimes']
                     roads_traveltimesSP[(u, v)] = graph_proj.get_edge_data(u, v)
 
+
                 timetravel_shortest_paths[origin][destination] = timetravel_shortest_path
                 if destination not in final_timetravel_shortest_paths[origin] :
                     final_timetravel_shortest_paths[origin][destination] = timetravel_shortest_path
