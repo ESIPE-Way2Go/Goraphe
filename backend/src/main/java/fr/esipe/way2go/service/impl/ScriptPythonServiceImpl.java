@@ -59,7 +59,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
         logs.add(logEntity1);
         logs.add(logEntity2);
         logs.add(logEntity3);
-        var builder = new ProcessBuilder("python", pathGeneric + "filter.py",
+        var builder = new ProcessBuilder("python3", pathGeneric + "filter.py",
                 "--dist", Integer.toString(simulationRequest.getDistance()),
                 "--coords", coords.toString(),
                 "--user", user.getUsername(),
