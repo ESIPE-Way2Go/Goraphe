@@ -66,8 +66,6 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
     edges_proj = ox.graph_to_gdfs(graph_proj, nodes=False, edges=True)
     graph_geojson = edges_proj.to_json()
     logger.info("GEOJSON CREATED")
-    # print("GRAPH")
-    # print(graph_geojson)
     with open(directory + "/GRAPHE.geojson", 'w') as f:
         f.write(graph_geojson)
     logger.info("Geojson graph printed")
@@ -80,18 +78,18 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
     transformer = pyproj.Transformer.from_crs(wgs84_crs, projected_crs)
 
     x, y = transformer.transform(point1[1], point1[0])
-    print("X : " + str(x) + " Y : " + str(y))
     source_node = ox.nearest_nodes(graph_proj, x, y)
 
     x, y = transformer.transform(point2[1], point2[0])
-    print("X : " + str(x) + " Y : " + str(y))
     dest_node = ox.nearest_nodes(graph_proj, x, y)
 
     final_rand_nodes = []
     final_results = dict([])
     final_results_counter = dict([])
     final_evi_local_dict = dict([])
-
+    final_timetravel_shortest_paths = dict([])
+    final_timetravel_shortest_paths_counter = dict([])
+    final_essential_mw_edges = dict([])
     # TODO Début iteration
 
     nb_iteration = 2
@@ -103,9 +101,8 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
         final_rand_nodes.extend(rand_nodes)
         rand_nodes_geojson = get_nodes_geojson(graph_proj, rand_nodes)
         with open(directory + "/ITERATION" + str(index_iteration) + "_randomNodes.geojson", 'w') as f:
-             f.write(rand_nodes_geojson)
-       # print("ITERATION" + str(index_iteration) + "_randomNodes")
-        #    print(rand_nodes_geojson)
+            f.write(rand_nodes_geojson)
+
         # base shortest paths
         routes_traveltimes = dict([])
         timetravel_shortest_paths = dict([])
@@ -130,9 +127,13 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
 
             routes_traveltimes[origin] = dict([])
             timetravel_shortest_paths[origin] = dict([])
+            if origin not in final_timetravel_shortest_paths :
+                final_timetravel_shortest_paths[origin] = dict([])
+                final_timetravel_shortest_paths_counter[origin] = dict([])
             length_SPtraveltime_paths[origin] = dict([])
             essential_mw_edges[origin] = dict([])
-
+            if origin not in final_essential_mw_edges :
+                final_essential_mw_edges[origin] = dict([])
             logger.info("Beginning iterative remove of edges in the selected route")
             for destination in rand_nodes:
                 # Calculate the shortest path
@@ -151,6 +152,12 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
                     roads_traveltimesSP[(u, v)] = graph_proj.get_edge_data(u, v)
 
                 timetravel_shortest_paths[origin][destination] = timetravel_shortest_path
+                if destination not in final_timetravel_shortest_paths[origin] :
+                    final_timetravel_shortest_paths[origin][destination] = timetravel_shortest_path
+                    final_timetravel_shortest_paths_counter[origin][destination] = 1
+                else :
+                    final_timetravel_shortest_paths[origin][destination] += timetravel_shortest_path
+                    final_timetravel_shortest_paths_counter[origin][destination] += 1
 
                 for item in indMW:
                     G6 = graph_proj.copy()
@@ -184,9 +191,14 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
                         # add edge to dict, entry origin->destination
                         if origin not in essential_mw_edges:
                             essential_mw_edges[origin] = dict([])
+                        if origin not in final_essential_mw_edges:
+                            final_essential_mw_edges[origin] = dict([])
                         if destination not in essential_mw_edges[origin]:
                             essential_mw_edges[origin][destination] = []
+                        if destination not in final_essential_mw_edges[origin]:
+                            final_essential_mw_edges[origin][destination] = []
                         essential_mw_edges[origin][destination].append(item)
+                        final_essential_mw_edges[origin][destination].append(item)
 
                 for item in indMW:
                     if item not in impactful_mw_edges:
@@ -260,20 +272,38 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
 
         logger.info("Finish processing of alpha, beta for LoS")
 
-        # transform results dictionary in dataframes to save as xlsx file
-        df_Results = pd.DataFrame.from_dict(results, orient='columns')
-        df_Results.to_excel(excel_directory + "/extremenodes_EVIs.xlsx")
-        df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
-        df_Res_traveltimeSP.to_excel(excel_directory +"/traveltimesSP.xlsx")
-        df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
-        df_essential_mw_edges.to_excel(excel_directory +"/essential_mw_edges.xlsx")
+        excel_writer_mode = 'a'
+        if(index_iteration==0):
+            excel_writer_mode = 'w'
+        # Create or load the Excel file and transform results dictionary in dataframes to save as xlsx file
+        with pd.ExcelWriter(excel_directory + "/extremenodes_EVIs.xlsx", mode=excel_writer_mode) as writer:
+            # Create a new sheet in the file with the results
+            df_Results = pd.DataFrame.from_dict(results, orient='columns')
+            df_Results.to_excel(writer, sheet_name="Iteration_"+str(index_iteration))
+
+        with pd.ExcelWriter(excel_directory +"/traveltimesSP.xlsx", mode=excel_writer_mode) as writer:
+            # Create a new sheet in the file with the travel times
+            df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
+            df_Res_traveltimeSP.to_excel(writer, sheet_name="Iteration_"+str(index_iteration))
+
+        with pd.ExcelWriter(excel_directory +"/essential_mw_edges.xlsx", mode=excel_writer_mode) as writer:
+            # Create a new sheet in the file with the essential MW edges
+            df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
+            df_essential_mw_edges.to_excel(writer, sheet_name="Iteration_"+str(index_iteration))
+
+
+        # df_Results = pd.DataFrame.from_dict(results, orient='columns')
+        # df_Results.to_excel(excel_directory + "/extremenodes_EVIs.xlsx")
+        # df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
+        # df_Res_traveltimeSP.to_excel(excel_directory +"/traveltimesSP.xlsx")
+        # df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
+        # df_essential_mw_edges.to_excel(excel_directory +"/essential_mw_edges.xlsx")
 
         nx.set_edge_attributes(graph_proj, evi_local_dict, "evi_local")
         selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes', logger)
         with open(directory + "/ITERATION" + str(index_iteration) + "_roadSelected.geojson", 'w') as f:
             f.write(selected_route_geojson)
-    # print("ITERATION" + str(index_iteration) + "_roadSelected")
-    # print(selected_route_geojson)
+
     logger.info("Iterations loop finished")
     # TODO FIN ITERATION
     for edge_name, counter in final_results_counter.items():
@@ -286,18 +316,34 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
         splited = edge_name.split("_", 2)
         final_evi_local_dict[(float(splited[0]), float(splited[1]), 0)] /= counter
 
+    for origin in final_timetravel_shortest_paths_counter:
+        for destination in final_timetravel_shortest_paths_counter[origin]:
+            final_timetravel_shortest_paths[origin][destination] /= final_timetravel_shortest_paths_counter[origin][destination]
+
+    # Create or load the Excel file and transform results dictionary in dataframes to save as xlsx file
+    with pd.ExcelWriter(excel_directory + "/extremenodes_EVIs.xlsx", mode=excel_writer_mode) as writer:
+        # Create a new sheet in the file with the results
+        df_Results = pd.DataFrame.from_dict(final_results, orient='columns')
+        df_Results.to_excel(writer, sheet_name="Final")
+    #TODO à modifier les valeurs exportées final pour timetravel_shortest_paths et essential_MW_edges
+    with pd.ExcelWriter(excel_directory +"/traveltimesSP.xlsx", mode=excel_writer_mode) as writer:
+        # Create a new sheet in the file with the travel times
+        df_Res_traveltimeSP = pd.DataFrame.from_dict(final_timetravel_shortest_paths, orient='index')
+        df_Res_traveltimeSP.to_excel(writer, sheet_name="Final")
+
+    with pd.ExcelWriter(excel_directory +"/essential_mw_edges.xlsx", mode=excel_writer_mode) as writer:
+        # Create a new sheet in the file with the essential MW edges
+        df_essential_mw_edges = pd.DataFrame.from_dict(final_essential_mw_edges, orient='columns')
+        df_essential_mw_edges.to_excel(writer, sheet_name="Final")
+
     rand_nodes_geojson = get_nodes_geojson(graph_proj, final_rand_nodes)
-    # print("FINAL_randomNodes")
-    #   print(rand_nodes_geojson)
     with open(directory + "/FINAL_randomNodes.geojson", 'w') as f:
-        f.write(selected_route_geojson)
+        f.write(rand_nodes_geojson)
     nx.set_edge_attributes(graph_proj, final_evi_local_dict, "evi_local")
 
     selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes', logger)
     with open(directory + "/FINAL_roadSelected.geojson", 'w') as f:
         f.write(selected_route_geojson)
-    # print("FINAL_roadSelected")
-    # print(selected_route_geojson)
 
     # calculate computational time
     time_elapsed = (time.perf_counter() - time_start)
