@@ -88,7 +88,6 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             updateStatus(simulation, status, logs);
         } catch (IOException | InterruptedException e) {
             updateStatus(simulation,StatusSimulation.CANCEL,logs);
-            endSimulation(simulation, StatusSimulation.CANCEL);
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
