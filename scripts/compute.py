@@ -303,4 +303,4 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
     # calculate computational time
     time_elapsed = (time.perf_counter() - time_start)
     logger.info("Computing time : " + str(time_elapsed))
-    logger.info("End of compute")
+    logger.info("End")

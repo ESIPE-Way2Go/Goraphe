@@ -124,7 +124,7 @@ def random_nodes(G_proj, G_not_proj, source_node, destination_node, user, sim, d
     ############### USED TO TEST AND DEBUG BY PRINTING THE RANDOM NODES RESULT ###############
 
     logger.info("All random nodes generated : " + str(random_nodes))
-    logger.info("End of random_nodes")
+    logger.info("End")
   #  print(random_nodes)
     return random_nodes
 

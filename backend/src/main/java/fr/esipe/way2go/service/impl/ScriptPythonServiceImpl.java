@@ -84,10 +84,10 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             if(status==StatusSimulation.ERROR)
                 logService.save(new LogEntity(simulation,new String(process.getErrorStream().readAllBytes()),StatusScript.ERROR,"Error Python"));
             getResult(Path.of(genericPathLog + "/json"), simulation);
-
             simulation.setStatus(status);
-            endSimulation(simulation, status);
+            updateStatus(simulation, status, logs);
         } catch (IOException | InterruptedException e) {
+            updateStatus(simulation,StatusSimulation.CANCEL,logs);
             endSimulation(simulation, StatusSimulation.CANCEL);
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
@@ -104,24 +104,13 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
                 for (var event : key.pollEvents()) {
                     var filename = event.context().toString();
                     if (filename.endsWith(".log")) {
-                        if (event.kind().equals(StandardWatchEventKinds.ENTRY_CREATE)) {
-                            LogEntity log;
-                            var nameOfFile = event.context().toString().replace(".log", "");
-                            if (nameOfFile.equals(SCRIPT_2)) {
-                                log = logs.get(SCRIPT_1);
-                                log.setStatus(StatusScript.SUCCESS);
-                                logService.save(log);
-                            } else if (nameOfFile.equals(SCRIPT_3)) {
-                                log = logs.get(SCRIPT_2);
-                                log.setStatus(StatusScript.SUCCESS);
-                                logService.save(log);
-                            }
-                        }
                         var filenameModify = (Path) event.context();
                         var content = readFile(path + "/" + filenameModify);
                         var logEntity = logs.get(filenameModify.toString().replace(".log", ""));
                         logEntity.setContent(content);
                         logEntity.setStatus(StatusScript.LOAD);
+                        if(content.endsWith("End\n"))
+                            logEntity.setStatus(StatusScript.SUCCESS);
                         logService.save(logEntity);
                     }
                 }
@@ -146,5 +135,24 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
         for (var file : list) {
             resultService.save(new ResultEntity(file.getName().replace(".geojson", ""), readFile(file.getAbsolutePath()), simulation));
         }
+    }
+    private void updateStatus(SimulationEntity simulation, StatusSimulation status, List<LogEntity> logs) {
+        logs.forEach(log -> {
+            if (log.getStatus().equals(StatusScript.LOAD)) {
+                switch (status) {
+                    case SUCCESS -> log.setStatus(StatusScript.SUCCESS);
+                    case ERROR -> {
+                        log.setStatus(StatusScript.ERROR);
+                        log.setContent(log.getContent());
+                    }
+                    case CANCEL -> {
+                        log.setStatus(StatusScript.ERROR);
+                        log.setContent(log.getContent() + " " + status);
+                    }
+                }
+            }
+            logService.save(log);
+        });
+        endSimulation(simulation, status);
     }
 }
