@@ -291,14 +291,6 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
             df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
             df_essential_mw_edges.to_excel(writer, sheet_name="Iteration_"+str(index_iteration))
 
-
-        # df_Results = pd.DataFrame.from_dict(results, orient='columns')
-        # df_Results.to_excel(excel_directory + "/extremenodes_EVIs.xlsx")
-        # df_Res_traveltimeSP = pd.DataFrame.from_dict(timetravel_shortest_paths, orient='index')
-        # df_Res_traveltimeSP.to_excel(excel_directory +"/traveltimesSP.xlsx")
-        # df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
-        # df_essential_mw_edges.to_excel(excel_directory +"/essential_mw_edges.xlsx")
-
         nx.set_edge_attributes(graph_proj, evi_local_dict, "evi_local")
         selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes', logger)
         with open(directory + "/ITERATION" + str(index_iteration) + "_roadSelected.geojson", 'w') as f:
