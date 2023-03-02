@@ -22,7 +22,8 @@ def setup_logger(name, log_file, level=logging.DEBUG):
 
 def random_node_is_too_close(random_node, path_nodes, G_proj, min_distance):
     for node in path_nodes:
-        distance_calculated = ox.distance.euclidean_dist_vec(G_proj.nodes[node]['x'], G_proj.nodes[node]['y'],
+        distance_calculated = ox.distance.euclidean_dist_vec(G_proj.nodes[node]['x'],
+                                                             G_proj.nodes[node]['y'],
                                                              G_proj.nodes[random_node]['x'],
                                                              G_proj.nodes[random_node]['y'])
         if distance_calculated < min_distance:
@@ -120,19 +121,19 @@ def random_nodes(G_proj, G_not_proj, source_node, destination_node, user, sim, d
 
     ############### USED TO TEST AND DEBUG BY PRINTING THE RANDOM NODES RESULT ###############
     # create a list of colors to highlight the source and destinations nodes
-    #node_colors = ['red' if node in [source_node, destination_node] else 'gray' for node in G_proj.nodes()]
+    # node_colors = ['red' if node in [source_node, destination_node] else 'gray' for node in G_proj.nodes()]
     # create a list of node sizes to set the size of nodes in random_nodes to 10 and
     # the size of nodes not in random_nodes to 0
-    #node_sizes = [10 if node in [source_node, destination_node] else 0 for node in G_proj.nodes()]
+    # node_sizes = [10 if node in [source_node, destination_node] else 0 for node in G_proj.nodes()]
     # plot the graph with highlighted source and destination nodes
-    #ox.plot_graph(G_proj, node_color=node_colors, node_size=node_sizes, show=True)
+    # ox.plot_graph(G_proj, node_color=node_colors, node_size=node_sizes, show=True)
     # create a list of colors to highlight the random nodes
-    #node_colors = ['blue' if node in random_nodes else 'gray' for node in G_proj.nodes()]
+    # node_colors = ['blue' if node in random_nodes else 'gray' for node in G_proj.nodes()]
     # create a list of node sizes to set the size of nodes in random_nodes to 10 and
     # the size of nodes not in random_nodes to 0
-    #node_sizes = [10 if node in random_nodes else 0 for node in G_proj.nodes()]
+    # node_sizes = [10 if node in random_nodes else 0 for node in G_proj.nodes()]
     # plot the graph with highlighted random nodes
-    #ox.plot_graph(G_proj, node_color=node_colors, node_size=node_sizes, show=True)
+    # ox.plot_graph(G_proj, node_color=node_colors, node_size=node_sizes, show=True)
     ############### USED TO TEST AND DEBUG BY PRINTING THE RANDOM NODES RESULT ###############
 
     logger.info("All random nodes generated : " + str(random_nodes))
