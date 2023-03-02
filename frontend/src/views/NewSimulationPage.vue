@@ -14,7 +14,7 @@
                   v-model.trim="select"
                   :loading="loading"
                   :items="items.map(i => i.label).filter((val,i)=>i<4)"
-                  v-model.trim:search="search"
+                  v-model:search="search"
                   class="mx-4"
                   density="default"
                   label="Rechercher une destination"

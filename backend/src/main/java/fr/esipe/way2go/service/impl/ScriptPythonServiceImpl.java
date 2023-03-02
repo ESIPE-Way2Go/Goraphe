@@ -1,6 +1,5 @@
 package fr.esipe.way2go.service.impl;
 
-import fr.esipe.way2go.controller.MapController;
 import fr.esipe.way2go.dao.LogEntity;
 import fr.esipe.way2go.dao.ResultEntity;
 import fr.esipe.way2go.dao.SimulationEntity;
@@ -31,7 +30,6 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
     private static final String SCRIPT_1 = "filter";
     private static final String SCRIPT_2 = "random";
     private static final String SCRIPT_3 = "compute";
-
     @Autowired
     public ScriptPythonServiceImpl(LogService logService, SimulationService simulationService, ResultService resultService) {
         this.logService = logService;
@@ -47,7 +45,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
      * @param coords            : Coordinates of the center point of the graph.
      * @param simulationRequest : contains parameters of the simulation such as the distance and the description, and the road types selected.
      */
-    public void executeScript(UserEntity user, SimulationEntity simulation, MapController.Point coords, SimulationRequest simulationRequest) {
+    public void executeScript(UserEntity user, SimulationEntity simulation, Point coords, SimulationRequest simulationRequest) {
         var sep = System.getProperty("file.separator");
         var pathGeneric = System.getProperty("user.dir") + sep + "scripts" + sep;
         var formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -67,11 +65,10 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
                 "--user", user.getUsername(),
                 "--sim", simulationName,
                 "--roads", String.join(",", simulationRequest.getRoadTypes()),
-                "--point1", new MapController.Point(simulationRequest.getStart()).toString(),
-                "--point2", new MapController.Point(simulationRequest.getEnd()).toString(),
+                "--point1", new Point(simulationRequest.getStart()).toString(),
+                "--point2", new Point(simulationRequest.getEnd()).toString(),
                 "--random", Integer.toString(simulationRequest.getRandomPoints())
         );
-        String errorLogs = null;
         try {
             var process = builder.start();
             var logMap = new HashMap<String, LogEntity>();
@@ -84,19 +81,16 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             int exitCode = process.waitFor();
             thread.interrupt();
             var status = exitCode == 0 ? StatusSimulation.SUCCESS : StatusSimulation.ERROR;
-            errorLogs = new String(process.getErrorStream().readAllBytes());
-            updateStatus(simulation, status, logs, errorLogs);
+            if(status==StatusSimulation.ERROR)
+                logService.save(new LogEntity(simulation,new String(process.getErrorStream().readAllBytes()),StatusScript.ERROR,"Error Python"));
             getResult(Path.of(genericPathLog + "/json"), simulation);
-            if (!Files.exists(Path.of(genericPathLog + sep + SCRIPT_1 + ".log"))){
-                logEntity1.setContent(errorLogs);
-                logEntity1.setStatus(StatusScript.ERROR);
-                logService.save(logEntity1);
-            }
+
             simulation.setStatus(status);
             endSimulation(simulation, status);
         } catch (IOException | InterruptedException e) {
-            updateStatus(simulation, StatusSimulation.CANCEL, logs, errorLogs);
+            endSimulation(simulation, StatusSimulation.CANCEL);
             Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
         }
     }
 
@@ -143,26 +137,6 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
         simulation.setEndDate(Calendar.getInstance());
         simulation.setStatus(status);
         simulationService.save(simulation);
-    }
-
-    private void updateStatus(SimulationEntity simulation, StatusSimulation status, List<LogEntity> logs, String errorLogs) {
-        logs.forEach(log -> {
-            if (log.getStatus().equals(StatusScript.LOAD)) {
-                switch (status) {
-                    case SUCCESS -> log.setStatus(StatusScript.SUCCESS);
-                    case ERROR -> {
-                        log.setStatus(StatusScript.ERROR);
-                        log.setContent(log.getContent() + errorLogs);
-                    }
-                    case CANCEL -> {
-                        log.setStatus(StatusScript.ERROR);
-                        log.setContent(log.getContent() + " " + status);
-                    }
-                }
-            }
-            logService.save(log);
-        });
-        endSimulation(simulation, status);
     }
 
     private void getResult(Path path, SimulationEntity simulation) {

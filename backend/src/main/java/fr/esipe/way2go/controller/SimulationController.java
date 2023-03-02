@@ -81,7 +81,7 @@ public class SimulationController {
         }
         var simulation = new SimulationEntity(simulationRequest.getName(), user, simulationRequest.getDesc(), simulationRequest.getDistance(),  simulationRequest.getScript(), simulationRequest.getRoadTypes());
         var simulationSave = simulationService.save(simulation);
-        var midPoint= new MapController.Point(simulationRequest.getCenter());
+        var midPoint= new ScriptPythonService.Point(simulationRequest.getCenter());
         var thread = new Thread(() -> {
             simulationSave.setBeginDate(Calendar.getInstance());
             simulationSave.setStatus(StatusSimulation.LOAD);
@@ -196,8 +196,9 @@ public class SimulationController {
         var zipFileName = simulationName+".zip";
 
         var baos = new ByteArrayOutputStream();
-        try (var zos = new ZipOutputStream(baos)) {
-            Files.list(Paths.get(excelPath)).filter(path -> path.getFileName().toString().endsWith(".xlsx"))
+        try (var zos = new ZipOutputStream(baos);
+        var files = Files.list(Paths.get(excelPath))) {
+            files.filter(path -> path.getFileName().toString().endsWith(".xlsx"))
                     .forEach(path -> {
                         try {
                             var zipEntry = new ZipEntry(path.getFileName().toString());
