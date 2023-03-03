@@ -10,6 +10,7 @@ import time
 import argparse
 from shapely import LineString
 import compute
+import computeFusion
 import random_nodes
 
 
@@ -113,7 +114,9 @@ speed_map = {
     'primary_link': 40,
     'secondary_link': 40,
     'tertiary_link': 40,
-    'road': 50
+    'road': 50,
+    'service' : 50,
+    'residential' : 50
 }
 # new attribute list
 traveltimes = dict([])
@@ -141,5 +144,6 @@ logger.info("Filtering time : " + str(time_elapsed))
 logger.info("End of filter")
 
 logger.info("Number of edges in graph : " + str(len(edges_proj)))
-compute.compute(g, g_not_proj,point1,point2,dist,user,sim,random)
+# compute.compute(g, g_not_proj,point1,point2,dist,user,sim,random)
+computeFusion.compute(g, g_not_proj,point1,point2,dist,user,sim,random)
 logger.info("Total time : " + str((time.perf_counter() - time_start)))

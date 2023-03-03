@@ -204,6 +204,7 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
                 for item in indMW:
                     if item not in impactful_mw_edges:
                         impactful_mw_edges.append(item)
+                        impactful_mw_edges.append(item)
 
         logger.info("Finish iterative remove of edges in the selected route")
         # outputs
