@@ -6,7 +6,7 @@
   <h3 align="center">Goraphe</h3>
 
   <p align="center">
-      This project is a web application to analyze the impact of events (accidents, works, speed limit reduction) on roads. 
+    This project is a web application web which execute a <b>python script</b> in order to analyze the impact of events (accidents, works, speed limit reduction) on roads with the params selected by the user. 
   </p>
 </div>
 
@@ -47,6 +47,7 @@ many formulas on which we rely in our project.
 
 This project was built with the tehchnologies next
 - [Docker](https://www.docker.com/)
+- [Python](https://www.python.org/)
 - [Vue](https://vuejs.org/)
 - [Java](https://www.java.com/en/)
 - [PostgreSQL](https://www.postgresql.org/)
@@ -85,8 +86,7 @@ git clone https://github.com/ESIPE-Way2Go/Goraphe.git
 3. There is a user created with the script in **bdd** repository. This user is **admin** and password is **0000**. To change password, you must encrypt your new password [bcrypt](https://www.bcrypt.fr/) and update the start.sql.script.
 4. Change the request with new ones below
 ```sql
-INSERT INTO public."user"(username, password, email, role)
-VALUES ('admin', '{bcrypt}your password', 'email', 'ROLE_ADMIN');
+INSERT INTO public."user"(username, password, email, role) VALUES ('admin', '{bcrypt}your password', 'email', 'ROLE_ADMIN');
 ```
 :warning: don't change the **ROLE_ADMIN** for **admin role**
 5. Create a file environnement called **.env** in the root repository of project like as following
@@ -115,8 +115,6 @@ VUE_APP_SEARCH_KEY=key app search key
 docker-compose up
 ```
 8. If you turn the application in local, this one should now be running at http://localhost.
-
-
 
 ## USAGE
 
