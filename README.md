@@ -33,8 +33,6 @@
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 ![Screenshot from 2023-03-03 15-35-27](https://user-images.githubusercontent.com/58255353/222748570-a90337ce-0c46-4b6a-8119-e3369e416718.png)
@@ -45,9 +43,6 @@ speed limit) occurring on the roads, which is the subject of research
 of our client. The research papers that were produced by the client provide
 many formulas on which we rely in our project.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 ### Built With
 
 This project was built with the tehchnologies next
@@ -56,8 +51,6 @@ This project was built with the tehchnologies next
 - [Java](https://www.java.com/en/)
 - [PostgreSQL](https://www.postgresql.org/)
 - [Maven](https://maven.apache.org/)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Getting-started
 
@@ -111,5 +104,3 @@ docker-compose up
 <!-- LICENSE -->
 ## License
 Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
