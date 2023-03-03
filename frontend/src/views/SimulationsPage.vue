@@ -72,7 +72,7 @@
       </v-col>
     </v-row>
   </v-container>
-  <v-container v-else>
+  <v-container v-if="simulations.length === 0 && simulationsInLoad.length ===0">
     <v-card
         color="#385F73"
         rounded

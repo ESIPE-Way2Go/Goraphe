@@ -3,22 +3,25 @@ package fr.esipe.way2go.dto.simulation.response;
 import fr.esipe.way2go.dao.SimulationEntity;
 import fr.esipe.way2go.utils.StatusSimulation;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SimulationMapResponse {
     private String title;
     private String description;
     private StatusSimulation status;
     private String script;
-
     private List<String> roads;
-    private String path;
-    private String randomPoints;
+    private Map<String,String> results;
+
 
     public SimulationMapResponse(SimulationEntity simulation) {
         this.title = simulation.getName();
         this.description = simulation.getDescription();
         this.status = simulation.getStatus();
+        results = new HashMap<>();
+        simulation.getResultEntities().forEach(resultEntity -> results.put(resultEntity.getKey(),resultEntity.getContent()));
         this.roads = simulation.getRoadType();
         this.script = simulation.getComputingScript();
     }
@@ -46,12 +49,8 @@ public class SimulationMapResponse {
         return roads;
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public String getRandomPoints() {
-        return randomPoints;
+    public Map<String, String> getResults() {
+        return results;
     }
 
     public void setTitle(String title) {
@@ -70,11 +69,7 @@ public class SimulationMapResponse {
         this.roads = roads;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public void setRandomPoints(String randomPoints) {
-        this.randomPoints = randomPoints;
+    public void setResults(Map<String, String> results) {
+        this.results = results;
     }
 }

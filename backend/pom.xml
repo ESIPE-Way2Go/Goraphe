@@ -139,6 +139,7 @@
                                         <include>static/</include>
                                         <include>index.html</include>
                                         <include>favicon.ico</include>
+                                        <include>favico.ico</include>
                                     </includes>
                                 </resource>
                             </resources>
