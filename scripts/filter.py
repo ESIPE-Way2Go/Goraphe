@@ -138,8 +138,7 @@ nx.set_edge_attributes(g, traveltimes, "traveltimes")
 
 time_elapsed = (time.perf_counter() - time_start)
 logger.info("Filtering time : " + str(time_elapsed))
-logger.info("End of filter")
-
 logger.info("Number of edges in graph : " + str(len(edges_proj)))
+logger.info("End")
 compute.compute(g, g_not_proj,point1,point2,dist,user,sim,random)
 logger.info("Total time : " + str((time.perf_counter() - time_start)))
