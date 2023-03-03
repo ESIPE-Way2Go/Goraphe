@@ -134,6 +134,7 @@ docker-compose up
 
 ### Administration
 1. Go to the administration 
+![Screenshot from 2023-03-03 16-48-09](https://user-images.githubusercontent.com/58255353/222764654-6530a545-0df9-4045-96f7-c9302983e30a.png)
 2. To create account
 3. You send an invitation 
 4. These person receive an email to create is account
