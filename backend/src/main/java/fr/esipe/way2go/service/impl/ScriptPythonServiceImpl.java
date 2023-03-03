@@ -107,6 +107,7 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             WatchKey key;
             while ((key = watchService.take()) != null) {
                 for (var event : key.pollEvents()) {
+                    System.out.println("EVENT " + event.kind() + " file : " + event.context());
                     var filename = event.context().toString();
                     if (filename.endsWith(".log")) {
                         var filenameModify = (Path) event.context();
