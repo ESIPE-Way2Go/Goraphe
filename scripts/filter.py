@@ -10,6 +10,7 @@ import time
 import argparse
 from shapely import LineString
 import compute
+import computeFusion
 import random_nodes
 
 

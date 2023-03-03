@@ -178,9 +178,9 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
                         if not origin in routes_er[edge_name]:
                             routes_er[edge_name][origin] = dict([])
                         routes_er[edge_name][origin][destination] = route_traveltimes
+                        timetravel_shortest_path = 0
+                        roads_traveltimesSP = dict()
                         for u, v in zip(route_traveltimes[:-1], route_traveltimes[1:]):
-                            timetravel_shortest_path = 0
-                            roads_traveltimesSP = dict()
                             timetravel_shortest_path += graph_proj.get_edge_data(u, v)[0]['traveltimes']
                             roads_traveltimesSP[(u, v)] = graph_proj.get_edge_data(u, v)
 
