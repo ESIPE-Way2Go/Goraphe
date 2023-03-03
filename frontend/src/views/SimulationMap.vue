@@ -12,8 +12,10 @@
              attribution="OpenStreetMap contributors"
           ></l-tile-layer>
           <l-control-zoom position="bottomright" zoom-in-text="+" zoom-out-text="-" />
-            <l-geo-json  :geojson="simulation.path"  :options-style="geoStyler" :visible=listLayout[0].isShow :options="optionsTest"   ></l-geo-json>
-            <l-geo-json :geojson="simulation.randomPoints" :options-style="styleFunction" :visible=listLayout[1].isShow :options="optionsTest"  ></l-geo-json>
+          <l-geo-json   :geojson="simulation.graph" :options-style="styleGraph" ></l-geo-json>
+            <l-geo-json ref="graph" :geojson="simulation.path"  :options-style="geoStyler" :visible=listLayout[0].isShow :options="optionsPath"   ></l-geo-json>
+            <l-geo-json :geojson="simulation.randomPoints" :options-style="styleMarker" :visible=listLayout[1].isShow :options="optionsMarker"  ></l-geo-json>
+
         </l-map>
       </div>
 
@@ -55,7 +57,7 @@
                 variant="outlined"
                 rounded
                 :subtitle="simulation.computingScript"
-                class="ma-1 border-primary"
+                class="ma-1"
             >
             </v-list-item>
 
@@ -88,12 +90,20 @@
             </v-col>
           </v-row>
 
-          <v-list lines="two">
+          <v-select
+              v-model="selectedSimulation"
+              label="Simulation"
+              :items="listsOfJson.map(json => json.type + json.number).filter((element, index,self) => {
+              return self.indexOf(element) === index;})"
+              variant="underlined"
+              :update:modelValue="changeSimulationJson(selectedSimulation)"
+          ></v-select>
 
+          <v-list lines="two">
             <v-list-item
                 v-for="layout in listLayout" :key="layout"
                 :title="layout.name"
-                variant="outlined"
+
                 rounded
                 class="ma-1"
             >
@@ -102,7 +112,6 @@
                 </v-list-item-action>
             </v-list-item>
           </v-list>
-
           <v-list border variant="flat" rounded>
             <v-list-item-title class="ma-2 text-capitalize text-h6 text-center">
               Légende
@@ -127,7 +136,6 @@
           </v-list>
         </v-card>
       </v-slide-y-transition>
-
     </v-row>
   </v-container>
 
@@ -139,15 +147,15 @@ import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer,LGeoJson, LControlZoom} from "@vue-leaflet/vue-leaflet";
 import authHeader from "@/services/auth-header";
 import {useDisplay, useTheme} from "vuetify";
-import {useToast} from "vue-toastification";
-import {latLngBounds} from "leaflet/src/geo";
+
+
+import { latLngBounds } from "leaflet/dist/leaflet-src.esm";
 
 export default {
   setup() {
-    const theme = useTheme();
-    const toast = useToast();
-    const {sm, md, lgAndUp} = useDisplay();
 
+    const theme = useTheme();
+    const {sm, md, lgAndUp} = useDisplay();
 
     return {
       listLegends: [
@@ -160,10 +168,9 @@ export default {
 
       theme,
       toggleTheme: () => theme.global.name.value = theme.global.current.value.dark ? 'myCustomLightTheme' : 'dark',
-      toast,
       sm, md, lgAndUp,
 
-      styleFunction() {
+      styleMarker() {
         return () => {
           return {
             weight: 10,
@@ -177,7 +184,7 @@ export default {
 
   },
   computed: {
-    optionsTest() {
+    optionsMarker() {
       return {
         pointToLayer: (feature, latlng) => {
           return L.circleMarker(latlng, {
@@ -187,24 +194,14 @@ export default {
             radius: 5
           })
         },
+      }
+    },
+    optionsPath() {
+      return {
         onEachFeature: (feature, layer) => {
           layer.bindTooltip(
               "<div>LoS:" +
               feature.properties.evi_local +
-              "</div><div>nom: " +
-              feature.properties.name +
-              "</div>",
-              {permanent: false, sticky: true}
-          );
-        }
-      }
-    },
-    optionsTest2() {
-      return {
-        onEachFeature: (feature, layer) => {
-          layer.bindTooltip(
-              "<div>route:" +
-              feature.properties.highway +
               "</div><div>nom: " +
               feature.properties.name +
               "</div>",
@@ -226,17 +223,26 @@ export default {
 
   data() {
     return {
-      center: [48.8405364, 2.5843466],
-      map: null,
+      //center of the maps at the start
+      center: [48.205364, 2.5843466],
       zoom: 14,
-      waypoints: [],
       closeleft: false,
       closeright: false,
-      simulation: {name: "", description: "", computingScript: "", roads: [], dist: 0, path: [], randomPoints: []},
+      //simulation selected that is show on the map
+      simulation: {name: "", description: "", computingScript: "", roads: [], dist: 0, path: [], randomPoints: [],graph: []},
+      //id of the simulation
       id: this.$route.params.id,
+
+      //style for the Path
       geoStyler: (feature)=>({
         weight: 5,
         color: this.listLegends.map(c => {return {color: c.color,end: c.end}}).sort((a,b) =>{return (a.end - b.end)}).find(c => c.end > feature.properties.evi_local).color ,
+        opacity: 0.8,
+      }),
+      //style for the Graph
+      styleGraph: ()=>({
+        weight: 8,
+        color: '#000000',
         opacity: 0.8,
       }),
 
@@ -248,12 +254,11 @@ export default {
         [48.8405364, 3.5843466],
         [48.8405364, 4.5843466]
       ]),
-      listLayout: [{json: this.geojson, name: "graphe", isShow: true, style: this.styleFunction}, {
-        json: this.geojson,
-        name: "chemin",
-        isShow: true,
-        style: this.geoStyler
-      }],
+      listLayout: [
+          { name: "Chemin", isShow: true, },
+        {name: "Points aléatoires", isShow: true}],
+      listsOfJson: [],
+      selectedSimulation : "FINAL"
     }
   },
   mounted() {
@@ -262,6 +267,18 @@ export default {
   methods: {
     uncheckRoadTypes() {
       this.selectedRoadTypes = [];
+    },
+
+    changeSimulationJson(v){
+      console.log(v)
+      let tempo = this.listsOfJson.filter(json => json.find===v);
+      tempo.forEach(json => {
+        if(json.isPath) {
+          this.simulation.path = json.json
+        }else{
+          this.simulation.randomPoints = json.json
+        }
+      })
     },
 
     async getSimulation() {
@@ -275,10 +292,36 @@ export default {
             this.simulation.description = data['description']
             this.simulation.computingScript = data['script']
             this.simulation.roads = data['roads']
-            this.simulation.path = JSON.parse(data['path'])
-            this.simulation.randomPoints = JSON.parse(data["randomPoints"])
-            console.log(this.simulation.path)
-            console.log(this.geojson4)
+
+            let map = Object.entries(data['results']).sort( (r1,r2) => r1.key <r2.key);
+            console.log(map)
+            let results = [];
+            map.forEach( entry => {
+              const [key, val] = entry;
+              let tempo = key.split('_');
+              if(tempo.length<2 && tempo[0]==='GRAPHE'){
+                console.log(JSON.parse(val))
+                this.simulation.graph = JSON.parse(val);
+              }
+              if(tempo[0].includes("ITERATION")){
+                let number = tempo[0].substring("ITERATION".length)
+                console.log(tempo[0], number,tempo[1])
+                results.push({type:'ITERATION',number:number,isPath:tempo[1].includes('road'),json:JSON.parse(val),find:tempo[0]})
+              }
+              if(tempo[0].includes("FINAL")){
+                results.push({type:tempo[0],number:'',isPath:tempo[1].includes('road'),json:JSON.parse(val),find:tempo[0]})
+                if(tempo[1].includes('road')){
+                  this.simulation.path= JSON.parse(val);
+                }else{
+                  this.simulation.randomPoints= JSON.parse(val);
+                }
+              }
+            })
+            let geojsongroup = L.geoJSON(this.simulation.graph);
+            this.listsOfJson = results;
+            this.$refs.map.leafletObject.fitBounds(geojsongroup.getBounds());
+            this.$refs.map.leafletObject.setMaxBounds(geojsongroup.getBounds());
+            this.$refs.map.leafletObject.setMinZoom(6);
           });
     },
   },

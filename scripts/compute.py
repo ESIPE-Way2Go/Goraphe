@@ -64,7 +64,9 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
     time_start = time.perf_counter()
 
     edges_proj = ox.graph_to_gdfs(graph_proj, nodes=False, edges=True)
-    graph_geojson = edges_proj.to_json()
+    edges_not_proj = ox.graph_to_gdfs(graph_not_proj, nodes=False, edges=True)
+
+    graph_geojson = edges_not_proj.to_json()
     logger.info("GEOJSON CREATED")
     with open(directory + "/GRAPHE.geojson", 'w') as f:
         f.write(graph_geojson)

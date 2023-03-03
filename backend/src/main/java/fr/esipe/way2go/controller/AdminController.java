@@ -10,7 +10,9 @@ import fr.esipe.way2go.dto.user.request.UpdatePasswordRequest;
 import fr.esipe.way2go.dto.user.request.UserRequest;
 import fr.esipe.way2go.dto.user.response.UserInfoResponse;
 import fr.esipe.way2go.dto.user.response.UserResponse;
-import fr.esipe.way2go.exception.user.*;
+import fr.esipe.way2go.exception.user.UserEmailFound;
+import fr.esipe.way2go.exception.user.WrongEmailFormatException;
+import fr.esipe.way2go.exception.user.WrongPasswordFormatException;
 import fr.esipe.way2go.exception.invite.InviteNotFoundException;
 import fr.esipe.way2go.service.EmailService;
 import fr.esipe.way2go.service.InviteService;
@@ -20,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
@@ -285,5 +286,6 @@ public class AdminController {
         emailSenderService.sendInvitation(invite.getTargetEmail(), invite);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }
 
