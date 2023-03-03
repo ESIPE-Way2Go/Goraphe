@@ -79,7 +79,8 @@ This project was built with the tehchnologies next
 git clone https://github.com/ESIPE-Way2Go/Goraphe.git
 ```
 2. Go to root of the project
-3. Create a file environnement called **.env** in the root repository of project like as following
+4. Create a file environnement called **.env** in the root repository of project like as following
+5. There is a user created with the script in **bdd** repository. This user is **admin** and password is **0000**. You must change the password. 
 ```
 SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/goraphe
 SPRING_DATASOURCE_USERNAME=postgres
@@ -100,6 +101,29 @@ SPRING_MAIL_PASSWORD=password of your google account (step STMP 10)
 docker-compose up
 ```
 4. If you turn the application in local, this one should now be running at http://localhost.
+
+## USAGE
+
+### Simulation
+1. Go to the url : http://localhost
+2. Identifiy you with this admin account.
+3. You can launch in new simulation with the button **Nouvelle simulation**
+4. Selected two points on the map
+![Screenshot from 2023-03-03 16-28-54](https://user-images.githubusercontent.com/58255353/222760190-bf126bef-eb5f-4cd0-baac-686be7195b47.png)
+5. Fill the form
+6. Launch simulation
+7. You arrive on the new page where you see the progress of your launched simulation
+8. Upon the simulation is finished, you can see the result on the map 
+![Screenshot from 2023-03-03 16-31-44](https://user-images.githubusercontent.com/58255353/222760817-92eef043-cb5a-47a2-bb98-be82e2220e67.png)
+
+### Administration
+1. Go to the administration 
+2. To create account
+3. You send an invitation 
+4. These person receive an email to create is account
+5. Go on the link 
+6. Fill the form
+7. Account created
 
 <!-- LICENSE -->
 ## License
