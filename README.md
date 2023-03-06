@@ -66,12 +66,18 @@ This project was built with the tehchnologies next
 4. Go to the security tab
 5. Adds dual authentication in your google account
 6. Create a password for application in clicking this tab **Password application** like below
+
 ![Screenshot from 2023-03-03 16-01-50](https://user-images.githubusercontent.com/58255353/222754239-b2fdb9cf-22df-42fc-8348-1bbdf064b8b0.png)
+
 7. Following the step 
 8. Select the other application, put a name of your application
+
 ![Screenshot from 2023-03-03 16-05-23](https://user-images.githubusercontent.com/58255353/222754842-c280d4bb-df38-4386-9000-d12e6aa2fa18.png)
+
 9. Save the password for the application 
+
 ![Screenshot from 2023-03-03 16-05-37](https://user-images.githubusercontent.com/58255353/222754939-3ca1da48-ea4b-4094-8f1f-63b34d824642.png)
+
 10. You can send an email with the goraphe application
 
 #### Get api key
@@ -82,6 +88,11 @@ This project was built with the tehchnologies next
 ```bash
 git clone https://github.com/ESIPE-Way2Go/Goraphe.git
 ```
+Or download the zip of the project with the user interface.
+The project MUST be placed in the WSL2 in order for it to work properly.
+
+![image](https://user-images.githubusercontent.com/77906813/223176368-ca90f455-2870-4401-b730-7304ffbdad99.png)
+
 2. Go to root of the project
 3. There is a user created with the script in **bdd** repository. This user is **admin** and password is **0000**. To change password, you must encrypt your new password [bcrypt](https://www.bcrypt.fr/) and update the start.sql.script.
 4. Change the request with new ones below
@@ -110,7 +121,7 @@ SPRING_MAIL_PASSWORD=password of your google account (step STMP 10)
 VUE_APP_MAPBOX_KEY=key mapbox
 VUE_APP_SEARCH_KEY=key app search key
 ```
-7. Execute the following command in terminal 
+7. Execute the following command in terminal (WSL)
 ```
 docker-compose up
 ```

@@ -61,13 +61,15 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
         logs.add(logEntity3);
         var builder = new ProcessBuilder("python3", pathGeneric + "filter.py",
                 "--dist", Integer.toString(simulationRequest.getDistance()),
-                "--coords", coords.toString(),
+                "--coords="+ coords.toString(),
                 "--user", user.getUsername(),
                 "--sim", simulationName,
                 "--roads", String.join(",", simulationRequest.getRoadTypes()),
-                "--point1", new Point(simulationRequest.getStart()).toString(),
-                "--point2", new Point(simulationRequest.getEnd()).toString(),
-                "--random", Integer.toString(simulationRequest.getRandomPoints())
+                "--point1="+ new Point(simulationRequest.getStart()).toString(),
+                "--point2="+ new Point(simulationRequest.getEnd()).toString(),
+                "--random", Integer.toString(simulationRequest.getRandomPoints()),
+                "--start_id",Integer.toString(simulationRequest.getStartOsmid()),
+                "--end_id",Integer.toString(simulationRequest.getEndOsmid())
         );
         try {
             var process = builder.start();
@@ -107,7 +109,6 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
             WatchKey key;
             while ((key = watchService.take()) != null) {
                 for (var event : key.pollEvents()) {
-                    System.out.println("EVENT " + event.kind() + " file : " + event.context());
                     var filename = event.context().toString();
                     if (filename.endsWith(".log")) {
                         var filenameModify = (Path) event.context();

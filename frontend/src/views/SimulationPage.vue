@@ -17,7 +17,7 @@
                 Status
               </div>
               <div class="ma-2 pa-1 h5  text-caption text-uppercase font-weight-bold">
-                <v-badge :color="(status === 'ERROR') ? 'error' : 'success'" content="" dot inline></v-badge>
+                <v-badge :color="(status === 'ERROR' || status === 'CANCEL') ? 'error' : (status ==='SUCCESS')? 'success' : 'warning'" content="" dot inline></v-badge>
                 {{ status }}
               </div>
             </div>
@@ -49,12 +49,13 @@
               </div>
             </div>
             <div class="d-flex flex-column">
-              <v-btn color="danger" class="ma-1 align-self-center" @click="cancelSimulation" variant="outlined"
+              <v-btn color="danger" class="ma-2 align-self-center" @click="cancelSimulation" variant="outlined"
                      v-if="(status === 'LOAD')">
                 Annuler la simulation
               </v-btn>
-              <v-btn color="primary" class="ma-1 align-self-center" @click="downloadFile" variant="outlined">
-                Téléchargement Excel
+              <v-btn color="primary" class="ma-2 align-self-center" @click="gotoSimulationMap" variant="outlined"
+                     v-if="(status === 'SUCCESS')">
+                Résultat
               </v-btn>
             </div>
           </div>
@@ -130,46 +131,16 @@ export default {
       progession: 0,
       id: this.$route.params.id,
       intervalIds: [], // array to hold interval IDs
-      imageTest: require('@/assets/test.png'),
+      imageTest: require('@/assets/paris.png'),
     }
   },
 
   methods: {
-    // Button to download the generated excel files
-    downloadFile() {
-      const url = '/api/simulation/' + this.id + '/download';
-      fetch(url, {method: 'GET', headers: authHeader()})
-          .then(response => {
-            // Check that the response status is in the 200-299 range,
-            // which indicates a successful response.
-            if (response.ok) {
-              // Get the filename from the Content-Disposition header
-              const contentDisposition = response.headers.get('Content-Disposition');
-              const filenameMatch = contentDisposition.match(/filename="(.+)"/);
-              const filename = filenameMatch ? filenameMatch[1] : 'unknown';
-              // Create a new Blob object from the response body
-              return response.blob().then(blob => ({blob, filename}));
-            } else {
-              throw new Error(`Request failed with status ${response.status}`);
-            }
-          })
-          .then(({blob, filename}) => {
-            // Create a new URL object for the blob
-            const url = URL.createObjectURL(blob);
-            // Create a new anchor element to trigger the download
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            // Trigger the download by clicking the anchor element
-            link.click();
-            // Clean up the URL object and anchor element
-            URL.revokeObjectURL(url);
-            link.remove();
-          })
-          .catch(error => {
-            console.error(error);
-          });
+
+    gotoSimulationMap(){
+      this.$router.push({name: 'simulationMap', params: {id: this.id}});
     },
+
     all() {
       this.panel = this.allLog
     },
