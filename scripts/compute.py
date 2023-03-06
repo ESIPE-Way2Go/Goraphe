@@ -52,7 +52,7 @@ def setup_logger(name, log_file, level=logging.DEBUG):
     return logger
 
 
-def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoints):
+def compute(graph_proj, point1, point2, dist, user, sim, nbPoints):
     # Directory
     directory = "scripts/" + user + "/" + sim + "/json"
     excel_directory = "scripts/" + user + "/" + sim
@@ -97,7 +97,6 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
     final_evi_local_dict = dict([])
     final_evi_average_nip_dict = dict([])
 
-    # TODO Début iteration
     nb_iteration = 2
     logger.info("Iterations loop beginning with " + str(nb_iteration))
     for index_iteration in range(nb_iteration):
@@ -143,7 +142,7 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
             logger.info("Beginning iterative remove of edges in the selected route")
             for destination in rand_nodes:
                 # Calculate the shortest path
-                # TODO attention des fois aucun trajet trouvé entre source et target    raise nx.NetworkXNoPath(f"No path between {source} and {target}.")      networkx.exception.NetworkXNoPath: No path between 686687464 and 259190165.
+                # Attention : des fois aucun trajet trouvé entre source et target    raise nx.NetworkXNoPath(f"No path between {source} and {target}.")      networkx.exception.NetworkXNoPath: No path between 686687464 and 259190165.
                 try:
                     route_traveltimes = nx.shortest_path(graph_proj, source=origin, target=destination,
                                                          weight='traveltimes')
@@ -338,7 +337,6 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
             f.write(selected_route_geojson)
 
     logger.info("Iterations loop finished")
-    # TODO FIN ITERATION
     for edge_name, counter in final_results_counter.items():
         final_results[edge_name]["Broken paths"] /= counter
         final_results[edge_name]["Impacted paths"] /= counter
@@ -365,7 +363,6 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
         # Create a new sheet in the file with the results
         df_Results = pd.DataFrame.from_dict(final_results, orient='columns')
         df_Results.to_excel(writer, sheet_name="Final")
-    #TODO à modifier les valeurs exportées final pour timetravel_shortest_paths et essential_MW_edges
     with pd.ExcelWriter(excel_directory +"/traveltimesSP.xlsx", mode=excel_writer_mode) as writer:
         # Create a new sheet in the file with the travel times
         df_Res_traveltimeSP = pd.DataFrame.from_dict(final_timetravel_shortest_paths, orient='index')
