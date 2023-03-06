@@ -68,8 +68,8 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
                 "--point1="+ new Point(simulationRequest.getStart()).toString(),
                 "--point2="+ new Point(simulationRequest.getEnd()).toString(),
                 "--random", Integer.toString(simulationRequest.getRandomPoints()),
-                "--start_id",Integer.toString(simulationRequest.getStart_id()),
-                "--end_id",Integer.toString(simulationRequest.getEnd_id())
+                "--start_id",Integer.toString(simulationRequest.getStartOsmid()),
+                "--end_id",Integer.toString(simulationRequest.getEndOsmid())
         );
         try {
             var process = builder.start();

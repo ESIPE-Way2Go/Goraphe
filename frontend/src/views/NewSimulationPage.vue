@@ -355,8 +355,6 @@ export default {
         this.toast.error("Number of random points must be between 2 and 100");
         return;
       }
-      //console.log("length = " + this.length * 0.6)
-      //console.log("dist = " + this.dist)
       try {
         let randomPoints = this.$data.randomPoints;
         let center = this.center;
@@ -368,15 +366,15 @@ export default {
         let roadTypes = this.$data.selectedRoadTypes;
         let script = this.$data.script;
 
-        let start_id = await this.findOsmid(start);
-        let end_id = await this.findOsmid(end);
+        let startOsmid = await this.findOsmid(start);
+        let endOsmid = await this.findOsmid(end);
 
         //console.log(start_id)
         //console.log(end_id)
-        if(start_id===undefined){
+        if(startOsmid===undefined){
           return;
         }
-        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center,randomPoints,start_id,end_id});
+        let body = JSON.stringify({start, end, distance, name, desc, roadTypes, script, center,randomPoints,startOsmid,endOsmid});
 
         const response = await fetch('/api/simulation', {
           method: 'POST',
@@ -389,7 +387,7 @@ export default {
         }
 
         const data = await response.json();
-        //console.log(data['simulationId']);
+
         this.$router.push({name: 'simulation', params: {id: data['simulationId']}});
 
       } catch (error) {

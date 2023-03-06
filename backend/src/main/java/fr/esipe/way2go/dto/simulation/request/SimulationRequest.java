@@ -15,8 +15,8 @@ public class SimulationRequest {
     double[] center;
     int randomPoints;
 
-    int start_id;
-    int end_id;
+    int startOsmid;
+    int endOsmid;
 
     public int getRandomPoints() {
         return randomPoints;
@@ -90,21 +90,20 @@ public class SimulationRequest {
         this.center = center;
     }
 
-
-    public int getStart_id() {
-        return start_id;
+    public int getStartOsmid() {
+        return startOsmid;
     }
 
-    public void setStart_id(int start_id) {
-        this.start_id = start_id;
+    public void setStartOsmid(int startOsmid) {
+        this.startOsmid = startOsmid;
     }
 
-    public int getEnd_id() {
-        return end_id;
+    public int getEndOsmid() {
+        return endOsmid;
     }
 
-    public void setEnd_id(int end_id) {
-        this.end_id = end_id;
+    public void setEndOsmid(int endOsmid) {
+        this.endOsmid = endOsmid;
     }
 
     @Override
