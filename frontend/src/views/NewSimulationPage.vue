@@ -192,7 +192,7 @@ export default {
         L.latLng(48.8393560, 2.5859384),
         L.latLng(48.8400943, 2.5861805)
       ],
-      router: L.Routing.mapbox(process.env.VUE_APP_MAPBOX_KEY)
+      router: L.Routing.mapbox('pk.eyJ1IjoibWV4aW1hIiwiYSI6ImNsZWd2djNkdDBwc3gzcXR0ZXB3Nmt6dDQifQ.GeKKqQmsdu8WhrePgFj2ww')
     }).addTo(map);
 
     this.control = control;
@@ -260,7 +260,7 @@ export default {
     async querySelections(v) {
       const provider = new OpenCageProvider({
         params: {
-          key: process.env.VUE_APP_SEARCH_KEY,
+          key: 'ab736f9a32a2477aaf2036de1dc4340d',
         },
       });
       this.loading = true
