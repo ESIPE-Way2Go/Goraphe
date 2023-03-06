@@ -52,7 +52,7 @@ def setup_logger(name, log_file, level=logging.DEBUG):
     return logger
 
 
-def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoints):
+def compute(graph_proj, point1, point2, dist, user, sim, nbPoints):
     # Directory
     directory = "scripts/" + user + "/" + sim + "/json"
     excel_directory = "scripts/" + user + "/" + sim
@@ -64,17 +64,13 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
     time_start = time.perf_counter()
 
     edges_proj = ox.graph_to_gdfs(graph_proj, nodes=False, edges=True)
-    edges_not_proj = ox.graph_to_gdfs(graph_not_proj, nodes=False, edges=True)
-
-    graph_geojson = edges_not_proj.to_json()
+    graph_geojson = edges_proj.to_json()
     logger.info("GEOJSON CREATED")
     with open(directory + "/GRAPHE.geojson", 'w') as f:
         f.write(graph_geojson)
     logger.info("Geojson graph printed")
 
     # TODO vérifier si dans graph proj
-    # source_node = ox.distance.nearest_nodes(graph_not_proj, point1[0], point1[1])
-    # dest_node = ox.distance.nearest_nodes(graph_not_proj, point2[0], point2[1])
     wgs84_crs = pyproj.CRS("EPSG:4326")
     projected_crs = pyproj.CRS(str(graph_proj.graph["crs"]))
     transformer = pyproj.Transformer.from_crs(wgs84_crs, projected_crs)
@@ -87,12 +83,20 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
 
     final_rand_nodes = []
     final_results = dict([])
+    final_results["Base alpha traveltimes"] = 0
     final_results_counter = dict([])
     final_evi_local_dict = dict([])
     final_timetravel_shortest_paths = dict([])
     final_timetravel_shortest_paths_counter = dict([])
     final_essential_mw_edges = dict([])
-    # TODO Début iteration
+
+    #dicts to add attributes to the graph that will be used to write geojson
+    final_broken_paths_dict = dict([])
+    final_impacted_paths_dict = dict([])
+    final_beta_traveltimes_dict = dict([])
+    final_traveltimes_ratio_dict = dict([])
+    final_evi_local_dict = dict([])
+    final_evi_average_nip_dict = dict([])
 
     nb_iteration = 2
     logger.info("Iterations loop beginning with " + str(nb_iteration))
@@ -139,7 +143,7 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
             logger.info("Beginning iterative remove of edges in the selected route")
             for destination in rand_nodes:
                 # Calculate the shortest path
-                # TODO attention des fois aucun trajet trouvé entre source et target    raise nx.NetworkXNoPath(f"No path between {source} and {target}.")      networkx.exception.NetworkXNoPath: No path between 686687464 and 259190165.
+                # Attention : des fois aucun trajet trouvé entre source et target    raise nx.NetworkXNoPath(f"No path between {source} and {target}.")      networkx.exception.NetworkXNoPath: No path between 686687464 and 259190165.
                 try:
                     route_traveltimes = nx.shortest_path(graph_proj, source=origin, target=destination,
                                                          weight='traveltimes')
@@ -153,6 +157,7 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
                     timetravel_shortest_path += graph_proj.get_edge_data(u, v)[0]['traveltimes']
                     roads_traveltimesSP[(u, v)] = graph_proj.get_edge_data(u, v)
 
+                logger.info("TIMETRAVEL SHORTEST PATH = "+str(timetravel_shortest_path))
                 timetravel_shortest_paths[origin][destination] = timetravel_shortest_path
                 if destination not in final_timetravel_shortest_paths[origin] :
                     final_timetravel_shortest_paths[origin][destination] = timetravel_shortest_path
@@ -177,9 +182,10 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
                         if not origin in routes_er[edge_name]:
                             routes_er[edge_name][origin] = dict([])
                         routes_er[edge_name][origin][destination] = route_traveltimes
+
+                        timetravel_shortest_path = 0
+                        roads_traveltimesSP = dict()
                         for u, v in zip(route_traveltimes[:-1], route_traveltimes[1:]):
-                            timetravel_shortest_path = 0
-                            roads_traveltimesSP = dict()
                             timetravel_shortest_path += graph_proj.get_edge_data(u, v)[0]['traveltimes']
                             roads_traveltimesSP[(u, v)] = graph_proj.get_edge_data(u, v)
 
@@ -209,13 +215,23 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
         logger.info("Finish iterative remove of edges in the selected route")
         # outputs
         results = dict([])
+
+        # dicts to add attributes to the graph that will be used to write geojson
+        broken_paths_dict = dict([])
+        impacted_paths_dict = dict([])
+        beta_traveltimes_dict = dict([])
+        traveltimes_ratio_dict = dict([])
         evi_local_dict = dict([])
+        evi_average_nip_dict = dict([])
+
         ref_alpha_traveltimes = 0
 
         logger.info("Beginning processing of alpha, beta for LoS")
         for key in timetravel_shortest_paths:
             ref_alpha_traveltimes += sum(timetravel_shortest_paths[key].values())
         results["Base alpha traveltimes"] = ref_alpha_traveltimes
+        final_results["Base alpha traveltimes"] += ref_alpha_traveltimes
+
         for edge in impactful_mw_edges:
             # used to calculate ratio over non broken paths in case of an essential edge
             alpha_traveltimes = ref_alpha_traveltimes
@@ -252,6 +268,13 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
             results[edge_name]["evi_local"] = evi_local
             results[edge_name]["evi_average_nip"] = evi_average_nip
 
+            broken_paths_dict[(edge[0], edge[1], 0)] = float(nbp)
+            impacted_paths_dict[(edge[0], edge[1], 0)] = float(nip)
+            beta_traveltimes_dict[(edge[0], edge[1], 0)] = float(beta_traveltimes)
+            traveltimes_ratio_dict[(edge[0], edge[1], 0)] = float(ref_ratio_traveltimes)
+            evi_local_dict[(edge[0], edge[1], 0)] = float(evi_local)
+            evi_average_nip_dict[(edge[0], edge[1], 0)] = float(evi_average_nip)
+
             if (edge_name in final_results):
                 final_results_counter[edge_name] += 1
                 final_results[edge_name]["Broken paths"] += nbp
@@ -260,7 +283,13 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
                 final_results[edge_name]["traveltimes ratio (ref)"] += ref_ratio_traveltimes
                 final_results[edge_name]["evi_local"] += evi_local
                 final_results[edge_name]["evi_average_nip"] += evi_average_nip
+
+                final_broken_paths_dict[(edge[0], edge[1], 0)] += float(nbp)
+                final_impacted_paths_dict[(edge[0], edge[1], 0)] += float(nip)
+                final_beta_traveltimes_dict[(edge[0], edge[1], 0)] += float(beta_traveltimes)
+                final_traveltimes_ratio_dict[(edge[0], edge[1], 0)] += float(ref_ratio_traveltimes)
                 final_evi_local_dict[(edge[0], edge[1], 0)] += float(evi_local)
+                final_evi_average_nip_dict[(edge[0], edge[1], 0)] += float(evi_average_nip)
             else:
                 final_results_counter[edge_name] = 1
                 final_results[edge_name] = dict([])
@@ -270,7 +299,13 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
                 final_results[edge_name]["traveltimes ratio (ref)"] = ref_ratio_traveltimes
                 final_results[edge_name]["evi_local"] = evi_local
                 final_results[edge_name]["evi_average_nip"] = evi_average_nip
+
+                final_broken_paths_dict[(edge[0], edge[1], 0)] = float(nbp)
+                final_impacted_paths_dict[(edge[0], edge[1], 0)] = float(nip)
+                final_beta_traveltimes_dict[(edge[0], edge[1], 0)] = float(beta_traveltimes)
+                final_traveltimes_ratio_dict[(edge[0], edge[1], 0)] = float(ref_ratio_traveltimes)
                 final_evi_local_dict[(edge[0], edge[1], 0)] = float(evi_local)
+                final_evi_average_nip_dict[(edge[0], edge[1], 0)] = float(evi_average_nip)
 
         logger.info("Finish processing of alpha, beta for LoS")
 
@@ -293,13 +328,18 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
             df_essential_mw_edges = pd.DataFrame.from_dict(essential_mw_edges, orient='columns')
             df_essential_mw_edges.to_excel(writer, sheet_name="Iteration_"+str(index_iteration))
 
+        nx.set_edge_attributes(graph_proj, broken_paths_dict, "broken_paths")
+        nx.set_edge_attributes(graph_proj, impacted_paths_dict, "impacted_paths")
+        nx.set_edge_attributes(graph_proj, beta_traveltimes_dict, "beta_traveltimes")
+        nx.set_edge_attributes(graph_proj, traveltimes_ratio_dict, "timetravel_ratio")
         nx.set_edge_attributes(graph_proj, evi_local_dict, "evi_local")
+        nx.set_edge_attributes(graph_proj, evi_average_nip_dict, "evi_average_nip")
+
         selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes', logger)
         with open(directory + "/ITERATION" + str(index_iteration) + "_roadSelected.geojson", 'w') as f:
             f.write(selected_route_geojson)
 
     logger.info("Iterations loop finished")
-    # TODO FIN ITERATION
     for edge_name, counter in final_results_counter.items():
         final_results[edge_name]["Broken paths"] /= counter
         final_results[edge_name]["Impacted paths"] /= counter
@@ -307,9 +347,16 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
         final_results[edge_name]["traveltimes ratio (ref)"] /= counter
         final_results[edge_name]["evi_local"] = evi_local
         final_results[edge_name]["evi_average_nip"] /= counter
-        splited = edge_name.split("_", 2)
-        final_evi_local_dict[(float(splited[0]), float(splited[1]), 0)] /= counter
 
+        splited = edge_name.split("_", 2)
+
+        final_broken_paths_dict[(float(splited[0]), float(splited[1]), 0)] /= counter
+        final_impacted_paths_dict[(float(splited[0]), float(splited[1]), 0)] /= counter
+        final_beta_traveltimes_dict[(float(splited[0]), float(splited[1]), 0)] /= counter
+        final_traveltimes_ratio_dict[(float(splited[0]), float(splited[1]), 0)] /= counter
+        final_evi_local_dict[(float(splited[0]), float(splited[1]), 0)] /= counter
+        final_evi_average_nip_dict[(float(splited[0]), float(splited[1]), 0)] /= counter
+    final_results["Base alpha traveltimes"] /= nb_iteration
     for origin in final_timetravel_shortest_paths_counter:
         for destination in final_timetravel_shortest_paths_counter[origin]:
             final_timetravel_shortest_paths[origin][destination] /= final_timetravel_shortest_paths_counter[origin][destination]
@@ -319,7 +366,6 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
         # Create a new sheet in the file with the results
         df_Results = pd.DataFrame.from_dict(final_results, orient='columns')
         df_Results.to_excel(writer, sheet_name="Final")
-    #TODO à modifier les valeurs exportées final pour timetravel_shortest_paths et essential_MW_edges
     with pd.ExcelWriter(excel_directory +"/traveltimesSP.xlsx", mode=excel_writer_mode) as writer:
         # Create a new sheet in the file with the travel times
         df_Res_traveltimeSP = pd.DataFrame.from_dict(final_timetravel_shortest_paths, orient='index')
@@ -333,7 +379,14 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
     rand_nodes_geojson = get_nodes_geojson(graph_proj, final_rand_nodes)
     with open(directory + "/FINAL_randomNodes.geojson", 'w') as f:
         f.write(rand_nodes_geojson)
+
+    nx.set_edge_attributes(graph_proj, final_broken_paths_dict, "broken_paths")
+    nx.set_edge_attributes(graph_proj, final_impacted_paths_dict, "impacted_paths")
+    nx.set_edge_attributes(graph_proj, final_beta_traveltimes_dict, "beta_traveltimes")
+    nx.set_edge_attributes(graph_proj, final_traveltimes_ratio_dict, "timetravel_ratio")
     nx.set_edge_attributes(graph_proj, final_evi_local_dict, "evi_local")
+    nx.set_edge_attributes(graph_proj, final_evi_average_nip_dict, "evi_average_nip")
+
 
     selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes', logger)
     with open(directory + "/FINAL_roadSelected.geojson", 'w') as f:

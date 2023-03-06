@@ -53,7 +53,7 @@
                      v-if="(status === 'LOAD')">
                 Annuler la simulation
               </v-btn>
-              <v-btn color="primary" class="ma-1 align-self-center" @click="downloadFile" variant="outlined">
+              <v-btn color="primary" class="ma-1 align-self-center" @click="downloadFile" variant="outlined" v-if="(status === 'SUCCESS')">
                 Téléchargement Excel
               </v-btn>
             </div>

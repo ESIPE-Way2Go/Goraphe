@@ -25,6 +25,7 @@ def setup_logger(name, log_file, level=logging.DEBUG):
 
     return logger
 
+
 #################SELECTION OF THE ROADNETWORK#######################################################
 parser = argparse.ArgumentParser()
 # user name
@@ -113,7 +114,9 @@ speed_map = {
     'primary_link': 40,
     'secondary_link': 40,
     'tertiary_link': 40,
-    'road': 50
+    'road': 50,
+    'service': 50,
+    'residential': 50
 }
 # new attribute list
 traveltimes = dict([])
@@ -126,19 +129,24 @@ for k in edges_proj.index:
     edges_proj = edges_proj.fillna(value=np.nan)
     if math.isnan(float(edges_proj.at[k, 'maxspeed'])):
         maxspeed = float(speed_map.get(edges_proj.at[k, 'highway'], 0))
+        maxspeed /= 3.6
         edges_proj.at[k, 'maxspeed'] = maxspeed
     else:
-        maxspeed = float(edges_proj.at[k, 'maxspeed'])
+        maxspeed = float(edges_proj.at[k, 'maxspeed'])/3.6
     fixedmaxspeed[(u, v, key)] = maxspeed
-    traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / fixedmaxspeed[(u, v, key)]) / 3.6) if \
+    traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / fixedmaxspeed[(u, v, key)])) if \
         fixedmaxspeed[(u, v, key)] != 0 else sys.maxsize
+
+for key,speed in fixedmaxspeed.items() :
+    print("Speed : "+str(speed)+" ||| Timetravel : "+str(traveltimes[key])+" ||| highway : "+str(edges_proj.at[(key[0],key[1],key[2]),'highway'])+" ||| key : "+str(key))
 
 nx.set_edge_attributes(g, fixedmaxspeed, "fixedmaxspeed")
 nx.set_edge_attributes(g, traveltimes, "traveltimes")
 
 time_elapsed = (time.perf_counter() - time_start)
 logger.info("Filtering time : " + str(time_elapsed))
+logger.info("End of filter")
+
 logger.info("Number of edges in graph : " + str(len(edges_proj)))
-logger.info("End")
-compute.compute(g, g_not_proj,point1,point2,dist,user,sim,random)
+compute.compute(g, point1, point2, dist, user, sim, random)
 logger.info("Total time : " + str((time.perf_counter() - time_start)))
