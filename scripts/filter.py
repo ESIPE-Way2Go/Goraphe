@@ -113,7 +113,7 @@ if (len(test) < 1):
     logger.error('Not source_node find close of the osmid selected')
     exit(1)
 else:
-    logger.info("The nearest node of the source node on the road has like osmid is ", test[0][0])
+    logger.info("The nearest node of the source node on the road has like osmid is " + str(test[0][0]))
     source_node = test[0][0]
 
 logger.info("get destination node")
@@ -122,7 +122,7 @@ if (len(test) < 1):
     logger.error('Not source_node find close of the osmid selected')
     exit(1)
 else:
-    logger.info("The nearest node of the destination node on the road has like osmid is ", test[0][0])
+    logger.info("The nearest node of the destination node on the road has like osmid is " + str(test[0][0]))
     dest_node=test[0][0]
 
 nodes_proj, edges_proj = ox.graph_to_gdfs(g, nodes=True, edges=True)
@@ -166,5 +166,5 @@ time_elapsed = (time.perf_counter() - time_start)
 logger.info("Filtering time : " + str(time_elapsed))
 logger.info("Number of edges in graph : " + str(len(edges_proj)))
 logger.info("End")
-compute.compute(g, g_not_proj,point1,point2,dist,user,sim,random,source_node,dest_node)
+compute.compute(g,point1,point2,dist,user,sim,random,source_node,dest_node)
 logger.info("Total time : " + str((time.perf_counter() - time_start)))

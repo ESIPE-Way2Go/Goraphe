@@ -48,7 +48,7 @@ def random_nodes(G_proj, source_node, destination_node, user, sim, dist, nb_rand
     # we will use those two path_nodes lists to have a better random selection of all the nodes that are on the shortest
     # path between the source and destination nodes
     path_nodes = nx.shortest_path(G_proj, source=source_node, target=destination_node)
-    path_nodes = random.shuffle(path_nodes)
+    random.shuffle(path_nodes)
 
     logger.info("Number of random nodes asked : " + str(nb_random_nodes))
     # if the number of random nodes is not enough, reduce the number of random nodes that will be taken to the maximum
