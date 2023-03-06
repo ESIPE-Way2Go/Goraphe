@@ -1,37 +1,41 @@
 <template>
   <div class="mx-auto w-75 mt-5">
     <v-card class="mb-10">
+      <v-card-title style="font-size: 30px">
+        Simulation : {{ name }}
+      </v-card-title>
+      <v-card-subtitle v-if="description !== null">
+        {{ description }}
+      </v-card-subtitle>
       <div class="d-flex">
-            <v-img class="ma-2 rounded-1" max-height="300" max-width="35%" :src=imageTest cover></v-img>
+        <v-img class="ma-2 rounded-1" max-height="300" max-width="35%" :src=imageTest cover></v-img>
 
-        <div class="d-flex flex-column">
+        <div class="d-flex flex-column flex-grow-1 flex-shrink-0">
           <div class="d-flex justify-content-between">
-          <div class="flex-column">
-            <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">
-              Status
+            <div class="flex-column">
+              <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">
+                Status
+              </div>
+              <div class="ma-2 pa-1 h5  text-caption text-uppercase font-weight-bold">
+                <v-badge :color="(status === 'ERROR') ? 'error' : 'success'" content="" dot inline></v-badge>
+                {{ status }}
+              </div>
             </div>
-            <div class="ma-2 pa-1 h5  text-caption text-uppercase font-weight-bold">
-              <v-badge
-                  :color="(status === 'ERROR') ? 'error' : (status === 'SUCCESS')? 'success' : 'warning'"
-                  content=""
-                  dot
-                  inline
-              ></v-badge>
-              {{ status }}
-            </div>
-          </div>
             <div class="flex-column">
               <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">Module</div>
-              <v-sheet class="ma-2 pa-1 h5  text-caption font-weight-bold text-uppercase">{{ computingScript }}</v-sheet>
+              <v-sheet class="ma-2 pa-1 h5  text-caption font-weight-bold text-uppercase">{{
+                  computingScript
+                }}
+              </v-sheet>
             </div>
-          <div class="flex-column">
-            <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">Duration</div>
-            <v-sheet class="ma-2 pa-1 h5  text-caption font-weight-bold text-uppercase">{{ duration }}</v-sheet>
-          </div>
+            <div class="flex-column">
+              <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">Duration</div>
+              <v-sheet class="ma-2 pa-1 h5  text-caption font-weight-bold text-uppercase">{{ duration }}</v-sheet>
+            </div>
 
           </div>
           <v-divider inset></v-divider>
-          <div class="d-flex">
+          <div class="d-flex justify-space-between">
             <div class="flex-column">
               <div class="ma-2 pa-1 h5 text-accent text-uppercase text-overline font-weight-bold ">Routes choisies</div>
               <div>
@@ -44,6 +48,15 @@
                 </div>
               </div>
             </div>
+            <div class="d-flex flex-column">
+              <v-btn color="danger" class="ma-1 align-self-center" @click="cancelSimulation" variant="outlined"
+                     v-if="(status === 'LOAD')">
+                Annuler la simulation
+              </v-btn>
+              <v-btn color="primary" class="ma-1 align-self-center" @click="downloadFile" variant="outlined">
+                Téléchargement Excel
+              </v-btn>
+            </div>
           </div>
         </div>
       </div>
@@ -54,15 +67,15 @@
     <v-card class="mx-auto">
       <template v-slot:title>
         <div class="d-flex align-items-center">
-        <div class="ma-2 pa-1 h5  text-overline font-weight-bold">Logs</div>
-        <div class="text-center d-flex">
-          <v-btn class="ma-2 font-weight-bold" @click="all" size="small" variant="tonal" v-if="panel.length===0">
-            Afficher tous
-          </v-btn>
-          <v-btn class="ma-2 font-weight-bold" @click="none" size="small" variant="tonal" v-if="panel.length>0">
-            Cacher tous
-          </v-btn>
-        </div>
+          <div class="ma-2 pa-1 h5  text-overline font-weight-bold">Logs</div>
+          <div class="text-center d-flex">
+            <v-btn class="ma-2 font-weight-bold" @click="all" size="small" variant="tonal" v-if="panel.length === 0">
+              Afficher tous
+            </v-btn>
+            <v-btn class="ma-2 font-weight-bold" @click="none" size="small" variant="tonal" v-if="panel.length > 0">
+              Cacher tous
+            </v-btn>
+          </div>
         </div>
       </template>
       <v-card-text>
@@ -74,7 +87,9 @@
                 <div class="mr-2">
                   <v-icon icon="mdi-check-circle" color="success" v-if="log.status === 'SUCCESS'"></v-icon>
                   <v-icon icon="mdi-close" color="error" v-else-if="log.status === 'ERROR'"></v-icon>
-                  <v-progress-circular color="dark-blue" style="height: 18px" indeterminate width="3" v-else-if="log.status !== 'PAS LANCE'" ></v-progress-circular>
+                  <v-progress-circular color="dark-blue" style="height: 18px" indeterminate width="3"
+                                       v-else-if="log.status === 'LOAD'"></v-progress-circular>
+                  <v-icon icon="mdi-launch" color="grey" v-else></v-icon>
                 </div>
                 <div>{{ log.script }}</div>
               </template>
@@ -94,8 +109,13 @@
 
 <script>
 import authHeader from "@/services/auth-header";
+import {useToast} from "vue-toastification";
 
 export default {
+  setup() {
+    const toast = useToast();
+    return {toast}
+  },
   data() {
     return {
       panel: [],
@@ -115,13 +135,48 @@ export default {
   },
 
   methods: {
+    // Button to download the generated excel files
+    downloadFile() {
+      const url = '/api/simulation/' + this.id + '/download';
+      fetch(url, {method: 'GET', headers: authHeader()})
+          .then(response => {
+            // Check that the response status is in the 200-299 range,
+            // which indicates a successful response.
+            if (response.ok) {
+              // Get the filename from the Content-Disposition header
+              const contentDisposition = response.headers.get('Content-Disposition');
+              const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+              const filename = filenameMatch ? filenameMatch[1] : 'unknown';
+              // Create a new Blob object from the response body
+              return response.blob().then(blob => ({blob, filename}));
+            } else {
+              throw new Error(`Request failed with status ${response.status}`);
+            }
+          })
+          .then(({blob, filename}) => {
+            // Create a new URL object for the blob
+            const url = URL.createObjectURL(blob);
+            // Create a new anchor element to trigger the download
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            // Trigger the download by clicking the anchor element
+            link.click();
+            // Clean up the URL object and anchor element
+            URL.revokeObjectURL(url);
+            link.remove();
+          })
+          .catch(error => {
+            console.error(error);
+          });
+    },
     all() {
       this.panel = this.allLog
     },
     none() {
       this.panel = []
     },
-    getLogs() {
+    getSimulation() {
       fetch("/api/simulation/" + this.id, {
         method: "GET",
         headers: authHeader(),
@@ -145,6 +200,18 @@ export default {
               this.progession = this.logs.length / 3 * 100
             }
           });
+    },
+    cancelSimulation() {
+      fetch(`/api/simulation/${this.id}/cancel`, {
+        method: "DELETE",
+        headers: authHeader(),
+      }).then(response => {
+        if (response.ok) {
+          this.toast.success(`Annulation de la simulation réussi`)
+        } else {
+          this.toast.error(`Erreur dans l'annulation de la simulation`)
+        }
+      })
     },
     getDuration(data) {
       if (data['beginDate'] === null) {
@@ -178,8 +245,7 @@ export default {
     }
   },
   mounted() {
-    this.getLogs()
-    this.intervalIds.push(setInterval(this.getLogs, 1000));
+    this.intervalIds.push(setInterval(this.getSimulation, 1000));
   },
   beforeUnmount() {
     // clear all intervals before unmounting the component

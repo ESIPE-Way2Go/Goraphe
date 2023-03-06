@@ -1,7 +1,10 @@
 package fr.esipe.way2go.dao;
 
 import fr.esipe.way2go.dao.converter.CalendarConverter;
+import fr.esipe.way2go.dao.converter.StatusSimulationConverter;
 import fr.esipe.way2go.dao.converter.StringListConverter;
+import fr.esipe.way2go.utils.StatusSimulation;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -29,7 +32,6 @@ public class SimulationEntity {
     @Column(name = "generation_distance", nullable = false)
     private int generationDistance;
 
-
     @Column(name = "road_type", nullable = false)
     @Convert(converter = StringListConverter.class)
     private List<String> roadType;
@@ -45,20 +47,14 @@ public class SimulationEntity {
     @Column(name = "share_link", nullable = false, unique = true)
     private UUID shareLink;
 
-    @Column(name = "statistics", nullable = false)
-    private String statistics;
     @Column(name = "status", nullable = false)
-    private String status;
-
-    @Column(name = "shortestPath", length = 10000000)
-    private String shortestPath;
-
-    @Column(name = "random_points", length = 10000000)
-    private String randomPoints;
-
+    @Convert(converter = StatusSimulationConverter.class)
+    private StatusSimulation status;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "simulation")
     private List<LogEntity> logs;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "simulation")
+    private List<ResultEntity> resultEntities;
 
     public SimulationEntity() {
     }
@@ -71,8 +67,7 @@ public class SimulationEntity {
         this.generationDistance = distance;
         this.roadType = roadTypes;
         this.shareLink = UUID.randomUUID();
-        this.statistics = "statistics";
-        this.status = "NOT LAUNCH";
+        this.status = StatusSimulation.WAIT;
     }
 
     public UUID getShareLink() {
@@ -200,24 +195,6 @@ public class SimulationEntity {
     }
 
     /**
-     * Returns this simulation's random points.
-     *
-     * @return randomPoints This simulation's random points. (String)
-     */
-    public String getRandomPoints() {
-        return randomPoints;
-    }
-
-    /**
-     * Sets new random points for this simulation.
-     *
-     * @param randomPoints This simulation's new random points. (String)
-     */
-    public void setRandomPoints(String randomPoints) {
-        this.randomPoints = randomPoints;
-    }
-
-    /**
      * Returns this simulation's road type.
      *
      * @return roadType This simulation's road type. (String)
@@ -233,32 +210,6 @@ public class SimulationEntity {
      */
     public void setRoadType(List<String> roadType) {
         this.roadType = roadType;
-    }
-
-    public String getShortestPath() {
-        return shortestPath;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    /**
-     * Returns this simulation's statistics.
-     *
-     * @return statistics This simulation's statistics. (String)
-     */
-    public String getStatistics() {
-        return statistics;
-    }
-
-    /**
-     * Sets new statistics for this simulation.
-     *
-     * @param statistics This simulation's new statistics. (String)
-     */
-    public void setStatistics(String statistics) {
-        this.statistics = statistics;
     }
 
     /**
@@ -287,12 +238,20 @@ public class SimulationEntity {
         this.endDate = endDate;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public List<ResultEntity> getResultEntities() {
+        return resultEntities;
     }
 
-    public void setShortestPath(String shortestPath) {
-        this.shortestPath = shortestPath;
+    public void setResultEntities(List<ResultEntity> resultEntities) {
+        this.resultEntities = resultEntities;
+    }
+
+    public StatusSimulation getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusSimulation status) {
+        this.status = status;
     }
 
     @Override
@@ -308,10 +267,7 @@ public class SimulationEntity {
                 ", beginDate=" + beginDate +
                 ", endDate=" + endDate +
                 ", shareLink=" + shareLink +
-                ", statistics='" + statistics + '\'' +
                 ", status='" + status + '\'' +
-                ", shortestPath='" + shortestPath + '\'' +
-                ", randomPoints='" + randomPoints + '\'' +
                 ", logs=" + logs +
                 '}';
     }

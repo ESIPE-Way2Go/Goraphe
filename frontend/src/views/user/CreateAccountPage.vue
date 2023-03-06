@@ -8,8 +8,8 @@
       </v-card-title>
       <v-card-text>
         <v-form v-model="isFormValid" fast-fail @submit.prevent="createAccount">
-          <v-text-field v-model="mail" class="ma-2" label="Mail" readonly variant="outlined"></v-text-field>
-          <v-text-field v-model="form.username" :rules="usernameRules" class="ma-2" label="Pseudonyme"
+          <v-text-field v-model.trim="mail" class="ma-2" label="Mail" readonly variant="outlined"></v-text-field>
+          <v-text-field v-model.trim="form.username" :rules="usernameRules" class="ma-2" label="Pseudonyme"
                         variant="outlined"></v-text-field>
           <v-text-field v-model="form.password" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :rules="passwordRules"
                         :type="show1 ? 'text' : 'password'" class="ma-2"
@@ -45,8 +45,9 @@ export default {
       show2: false,
       usernameRules: [
         value => {
-          if (value !== '') return true
-          return 'Ce champ ne doit pas être vide'
+          if (value === '')
+            return 'Ce champ ne doit pas être vide';
+          return /[a-zA-Z0-9_-]+/.test(value)?true:"Name cannot contain any special characters";
         },
       ],
       passwordRules: [
@@ -111,7 +112,7 @@ export default {
 
 <style>
 .bg-image {
-  background-image: url('@/assets/roads_backgroung_img.svg');
+  background-image: url('@/assets/roads_backgroung_img.jpg');
   background-size: cover;
   background-position: center center;
 }

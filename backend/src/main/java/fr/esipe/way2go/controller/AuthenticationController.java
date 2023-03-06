@@ -12,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -29,6 +28,11 @@ public class AuthenticationController {
         this.jwtUtils = jwtUtils;
     }
 
+    /**
+     * Tries to connect the user with the info from the connection form
+     * @param loginRequest parameters given from the connection form y the user
+     * @return HTTP Response OK and the user details if the connection was successful
+     */
     @PostMapping("/signin")
     public ResponseEntity<JwtResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
 

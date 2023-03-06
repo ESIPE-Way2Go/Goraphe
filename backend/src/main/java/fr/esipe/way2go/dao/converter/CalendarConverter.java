@@ -1,9 +1,11 @@
 package fr.esipe.way2go.dao.converter;
 
 import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 import java.util.Calendar;
 import java.sql.Date;
 
+@Converter
 public class CalendarConverter implements AttributeConverter<Calendar, Date> {
     @Override
     public Date convertToDatabaseColumn(Calendar calendar) {

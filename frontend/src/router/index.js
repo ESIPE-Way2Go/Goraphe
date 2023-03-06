@@ -19,7 +19,7 @@ const routes = [
     {
         path: '/map',
         name: "map",
-        component: () => import('@/views/TestSearch.vue'),
+        component: () => import('@/views/NewSimulationPage.vue'),
         meta: { requiresAuth: true, layout: 'map' }
     },
     {

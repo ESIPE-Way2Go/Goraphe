@@ -1,33 +1,40 @@
 package fr.esipe.way2go.service.impl;
 
-import fr.esipe.way2go.controller.MapController;
 import fr.esipe.way2go.dao.LogEntity;
+import fr.esipe.way2go.dao.ResultEntity;
 import fr.esipe.way2go.dao.SimulationEntity;
 import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.dto.simulation.request.SimulationRequest;
 import fr.esipe.way2go.service.LogService;
+import fr.esipe.way2go.service.ResultService;
 import fr.esipe.way2go.service.ScriptPythonService;
 import fr.esipe.way2go.service.SimulationService;
+import fr.esipe.way2go.utils.StatusScript;
+import fr.esipe.way2go.utils.StatusSimulation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.util.Calendar;
+import java.nio.file.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static fr.esipe.way2go.controller.SimulationController.THREAD_SIMULATIONS;
 
 @Service
 public class ScriptPythonServiceImpl implements ScriptPythonService {
 
     private final LogService logService;
     private final SimulationService simulationService;
+    private final ResultService resultService;
 
-
+    private static final String SCRIPT_1 = "filter";
+    private static final String SCRIPT_2 = "random";
+    private static final String SCRIPT_3 = "compute";
     @Autowired
-    public ScriptPythonServiceImpl(LogService logService, SimulationService simulationService) {
+    public ScriptPythonServiceImpl(LogService logService, SimulationService simulationService, ResultService resultService) {
         this.logService = logService;
         this.simulationService = simulationService;
+        this.resultService = resultService;
     }
 
     /**
@@ -38,66 +45,141 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
      * @param coords            : Coordinates of the center point of the graph.
      * @param simulationRequest : contains parameters of the simulation such as the distance and the description, and the road types selected.
      */
-    public void executeScript(UserEntity user, SimulationEntity simulation, MapController.Point coords, SimulationRequest simulationRequest) {
+    public void executeScript(UserEntity user, SimulationEntity simulation, Point coords, SimulationRequest simulationRequest) {
         var sep = System.getProperty("file.separator");
         var pathGeneric = System.getProperty("user.dir") + sep + "scripts" + sep;
-        var genericPathLog = pathGeneric + user.getUsername() + sep + simulation.getName();
-        var pathLog1 = genericPathLog + "_1.log";
-        var pathLog2 = genericPathLog + "_2.log";
-        var pathLog3 = genericPathLog + "_3.log";
-        var logEntity1 = logService.save(new LogEntity(simulation, "filter"));
-        var logEntity2 = logService.save(new LogEntity(simulation, "random_nodes"));
-        var logEntity3 = logService.save(new LogEntity(simulation, "compute"));
+        var formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        var simulationName = simulation.getName() + "_" + formatter.format(simulation.getBeginDate().getTime());
+        var genericPathLog = pathGeneric + user.getUsername() + sep + simulationName;
+        var logs = new ArrayList<LogEntity>();
+        var logEntity1 = logService.save(new LogEntity(simulation, SCRIPT_1));
+        var logEntity2 = logService.save(new LogEntity(simulation, SCRIPT_2));
+        var logEntity3 = logService.save(new LogEntity(simulation, SCRIPT_3));
 
+        logs.add(logEntity1);
+        logs.add(logEntity2);
+        logs.add(logEntity3);
         var builder = new ProcessBuilder("python3", pathGeneric + "filter.py",
                 "--dist", Integer.toString(simulationRequest.getDistance()),
                 "--coords", coords.toString(),
                 "--user", user.getUsername(),
-                "--sim", simulation.getName(),
+                "--sim", simulationName,
                 "--roads", String.join(",", simulationRequest.getRoadTypes()),
-                "--point1", new MapController.Point(simulationRequest.getStart()).toString(),
-                "--point2", new MapController.Point(simulationRequest.getEnd()).toString()
+                "--point1", new Point(simulationRequest.getStart()).toString(),
+                "--point2", new Point(simulationRequest.getEnd()).toString(),
+                "--random", Integer.toString(simulationRequest.getRandomPoints())
         );
-
         try {
             var process = builder.start();
+            var logMap = new HashMap<String, LogEntity>();
+            logMap.put(SCRIPT_1, logEntity1);
+            logMap.put(SCRIPT_2, logEntity2);
+            logMap.put(SCRIPT_3, logEntity3);
+
+            var thread = new Thread(() -> readLogFile(Paths.get(genericPathLog), logMap));
+            thread.start();
             int exitCode = process.waitFor();
-            var status = exitCode == 0 ? "SUCCESS" : "ERROR";
-            var errorLogs = new String(process.getErrorStream().readAllBytes());
-
-            logEntity1.setContent(readFile(Path.of(pathLog1).toString()));
-            logEntity2.setContent(readFile(Path.of(pathLog2).toString()));
-            logEntity3.setContent(readFile(Path.of(pathLog3).toString()));
-
-            if (logEntity2.getContent().equals("")) {
-                logEntity1.setStatus(status);
-                logEntity1.setContent(logEntity1.getContent() + errorLogs);
-            }
-            else if (logEntity3.getContent().equals("")) {
-                logEntity1.setStatus("SUCCESS");
-                logEntity2.setStatus(status);
-                logEntity2.setContent(logEntity2.getContent() + errorLogs);
-            } else {
-                logEntity1.setStatus("SUCCESS");
-                logEntity2.setStatus("SUCCESS");
-                logEntity3.setStatus(status);
-                logEntity3.setContent(logEntity3.getContent() + errorLogs);
-            }
-
-            logService.save(logEntity1);
-            logService.save(logEntity2);
-            logService.save(logEntity3);
-
-            var stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            var randomPoints = stdInput.readLine();
-            var shortestPath = stdInput.readLine();
-            simulation.setEndDate(Calendar.getInstance());
-            simulation.setRandomPoints(randomPoints);
-            simulation.setShortestPath(shortestPath);
+            thread.interrupt();
+            var status = exitCode == 0 ? StatusSimulation.SUCCESS : StatusSimulation.ERROR;
+            if(status==StatusSimulation.ERROR)
+                logService.save(new LogEntity(simulation,new String(process.getErrorStream().readAllBytes()),StatusScript.ERROR,"Error Python"));
+            getResult(Path.of(genericPathLog + "/json"), simulation);
             simulation.setStatus(status);
-            simulationService.save(simulation);
+            updateStatus(simulation, status, logs);
+        } catch (IOException | InterruptedException e) {
+            updateStatus(simulation,StatusSimulation.CANCEL,logs);
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * This function reads the logs generated by a simulation and puts them in the database
+     * in order to display them on the simulation logs page
+     * @param path
+     * @param logs
+     */
+    private void readLogFile(Path path, Map<String, LogEntity> logs) {
+        try {
+            Files.createDirectory(path);
+            var watchService = path.getFileSystem().newWatchService();
+            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
+            WatchKey key;
+            while ((key = watchService.take()) != null) {
+                for (var event : key.pollEvents()) {
+                    System.out.println("EVENT " + event.kind() + " file : " + event.context());
+                    var filename = event.context().toString();
+                    if (filename.endsWith(".log")) {
+                        var filenameModify = (Path) event.context();
+                        var content = readFile(path + "/" + filenameModify);
+                        var logEntity = logs.get(filenameModify.toString().replace(".log", ""));
+                        logEntity.setContent(content);
+                        logEntity.setStatus(StatusScript.LOAD);
+                        if(content.endsWith("End\n"))
+                            logEntity.setStatus(StatusScript.SUCCESS);
+                        logService.save(logEntity);
+                    }
+                }
+                key.reset();
+            }
         } catch (IOException | InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    /**
+     * Writes the status and end date of a simulation which has ended in the database
+     * @param simulation
+     * @param status
+     */
+    private void endSimulation(SimulationEntity simulation, StatusSimulation status) {
+        THREAD_SIMULATIONS.remove(simulation.getSimulationId());
+        simulation.setEndDate(Calendar.getInstance());
+        simulation.setStatus(status);
+        simulationService.save(simulation);
+    }
+
+    /**
+     * Gets the geojsons produced by a simulation and writes them in the database
+     * @param path
+     * @param simulation
+     */
+    private void getResult(Path path, SimulationEntity simulation) {
+        var directory = path.toFile();
+        var list = directory.listFiles(file -> file.getName().endsWith(".geojson"));
+        if (list == null) return;
+        for (var file : list) {
+            resultService.save(new ResultEntity(file.getName().replace(".geojson", ""), readFile(file.getAbsolutePath()), simulation));
+        }
+
+    }
+
+    /**
+     * Updates the status of the scripts within a simulation, and the status of the simulation itself
+     * Then ends the simulation.
+     * This is meant to be used when a simulation has reached its end, to give the front the right values to display
+     * @param simulation
+     * @param status
+     * @param logs
+     */
+    private void updateStatus(SimulationEntity simulation, StatusSimulation status, List<LogEntity> logs) {
+        logs.forEach(log -> {
+            if (log.getStatus().equals(StatusScript.LOAD)) {
+                switch (status) {
+                    case SUCCESS -> log.setStatus(StatusScript.SUCCESS);
+                    case ERROR -> {
+                        log.setStatus(StatusScript.ERROR);
+                        log.setContent(log.getContent());
+                    }
+                    case CANCEL -> {
+                        log.setStatus(StatusScript.ERROR);
+                        log.setContent(log.getContent() + " " + status);
+                    }
+                    default -> System.out.println("For whatever reason, this simulation doesn't have a status, or is different that SUCCESS,ERROR or CANCEL...");
+                }
+            }
+            logService.save(log);
+        });
+        endSimulation(simulation, status);
     }
 }

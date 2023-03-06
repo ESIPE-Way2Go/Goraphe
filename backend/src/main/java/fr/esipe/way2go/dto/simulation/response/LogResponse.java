@@ -1,20 +1,22 @@
 package fr.esipe.way2go.dto.simulation.response;
 
+import fr.esipe.way2go.utils.StatusScript;
+
 public class LogResponse {
-    private String status;
+    private StatusScript status;
     private String scriptName;
     private String[] content;
 
     public LogResponse() {
     }
 
-    public LogResponse(String status, String scriptName, String[] content) {
+    public LogResponse(StatusScript status, String scriptName, String[] content) {
         this.status = status;
         this.scriptName = scriptName;
         this.content = content;
     }
 
-    public String getStatus() {
+    public StatusScript getStatus() {
         return status;
     }
 
@@ -26,7 +28,7 @@ public class LogResponse {
         return content;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusScript status) {
         this.status = status;
     }
 

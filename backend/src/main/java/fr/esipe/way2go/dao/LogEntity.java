@@ -1,5 +1,8 @@
 package fr.esipe.way2go.dao;
 
+import fr.esipe.way2go.dao.converter.StatusScriptConverter;
+import fr.esipe.way2go.utils.StatusScript;
+
 import javax.persistence.*;
 
 @Entity
@@ -15,12 +18,13 @@ public class LogEntity {
     private SimulationEntity simulation;
 
     @Column(name = "status", nullable = false)
-    private String status;
+    @Convert(converter = StatusScriptConverter.class)
+    private StatusScript status;
 
     @Column(name = "script", nullable = false)
     private String script;
 
-    @Column(name = "content", length = 10000)
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
 
@@ -29,11 +33,11 @@ public class LogEntity {
 
     public LogEntity(SimulationEntity simulation, String script) {
         this.simulation = simulation;
-        this.status = "PAS LANCE";
+        this.status = StatusScript.NOT_LAUNCHED;
         this.script = script;
     }
 
-    public LogEntity(SimulationEntity simulation, String content, String status, String script) {
+    public LogEntity(SimulationEntity simulation, String content, StatusScript status, String script) {
         this.simulation = simulation;
         this.content = content;
         this.status = status;
@@ -81,7 +85,7 @@ public class LogEntity {
      *
      * @return status This log's status. (String)
      */
-    public String getStatus() {
+    public StatusScript getStatus() {
         return status;
     }
 
@@ -90,7 +94,7 @@ public class LogEntity {
      *
      * @param status This log's new status. (String)
      */
-    public void setStatus(String status) {
+    public void setStatus(StatusScript status) {
         this.status = status;
     }
 
