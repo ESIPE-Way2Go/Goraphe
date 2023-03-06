@@ -47,7 +47,7 @@ export default {
         value => {
           if (value === '')
             return 'Ce champ ne doit pas être vide';
-          return /^[a-zA-Z0-9_-]+$/.test(value)?"Name cannot contain any special characters":true;
+          return /[a-zA-Z0-9_-]+/.test(value)?true:"Name cannot contain any special characters";
         },
       ],
       passwordRules: [

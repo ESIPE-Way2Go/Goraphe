@@ -21,6 +21,7 @@ FROM openjdk:17.0.2-jdk-slim
 RUN apt-get update
 RUN apt-get install -y python3
 RUN apt-get install -y python3-pip
+RUN apt-get install -y inotify-tools
 
 MAINTAINER Way2Go Way2Go
 

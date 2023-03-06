@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto w-75 mt-5">
     <v-card class="mb-10">
-      <v-card-title>
+      <v-card-title style="font-size: 30px">
         Simulation : {{ name }}
       </v-card-title>
       <v-card-subtitle v-if="description !== null">
@@ -23,7 +23,10 @@
             </div>
             <div class="flex-column">
               <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">Module</div>
-              <v-sheet class="ma-2 pa-1 h5  text-caption font-weight-bold text-uppercase">{{ computingScript }}</v-sheet>
+              <v-sheet class="ma-2 pa-1 h5  text-caption font-weight-bold text-uppercase">{{
+                  computingScript
+                }}
+              </v-sheet>
             </div>
             <div class="flex-column">
               <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">Duration</div>
@@ -32,7 +35,7 @@
 
           </div>
           <v-divider inset></v-divider>
-          <div class="d-flex">
+          <div class="d-flex justify-space-between">
             <div class="flex-column">
               <div class="ma-2 pa-1 h5 text-accent text-uppercase text-overline font-weight-bold ">Routes choisies</div>
               <div>
@@ -45,13 +48,17 @@
                 </div>
               </div>
             </div>
+            <div class="d-flex flex-column">
+              <v-btn color="danger" class="ma-1 align-self-center" @click="cancelSimulation" variant="outlined"
+                     v-if="(status === 'LOAD')">
+                Annuler la simulation
+              </v-btn>
+              <v-btn color="primary" class="ma-1 align-self-center" @click="downloadFile" variant="outlined" v-if="(status === 'SUCCESS')">
+                Téléchargement Excel
+              </v-btn>
+            </div>
           </div>
         </div>
-        <v-btn color="danger" class="ma-4 align-self-center" @click="cancelSimulation" variant="outlined"
-          v-if="(status === 'Simulation en cours')">
-          Annuler la simulation
-        </v-btn>
-        <v-btn color="primary" @click="downloadFile">Download File</v-btn>
       </div>
 
     </v-card>
@@ -81,7 +88,7 @@
                   <v-icon icon="mdi-check-circle" color="success" v-if="log.status === 'SUCCESS'"></v-icon>
                   <v-icon icon="mdi-close" color="error" v-else-if="log.status === 'ERROR'"></v-icon>
                   <v-progress-circular color="dark-blue" style="height: 18px" indeterminate width="3"
-                    v-else-if="log.status === 'En cours'"></v-progress-circular>
+                                       v-else-if="log.status === 'LOAD'"></v-progress-circular>
                   <v-icon icon="mdi-launch" color="grey" v-else></v-icon>
                 </div>
                 <div>{{ log.script }}</div>
@@ -102,12 +109,12 @@
 
 <script>
 import authHeader from "@/services/auth-header";
-import { useToast } from "vue-toastification";
+import {useToast} from "vue-toastification";
 
 export default {
   setup() {
     const toast = useToast();
-    return { toast }
+    return {toast}
   },
   data() {
     return {
@@ -129,8 +136,8 @@ export default {
 
   methods: {
     downloadFile() {
-      const url = '/api/simulation/'+this.id+'/download';
-      fetch(url, { method: 'GET' , headers : authHeader()})
+      const url = '/api/simulation/' + this.id + '/download';
+      fetch(url, {method: 'GET', headers: authHeader()})
           .then(response => {
             // Check that the response status is in the 200-299 range,
             // which indicates a successful response.
@@ -140,12 +147,12 @@ export default {
               const filenameMatch = contentDisposition.match(/filename="(.+)"/);
               const filename = filenameMatch ? filenameMatch[1] : 'unknown';
               // Create a new Blob object from the response body
-              return response.blob().then(blob => ({ blob, filename }));
+              return response.blob().then(blob => ({blob, filename}));
             } else {
               throw new Error(`Request failed with status ${response.status}`);
             }
           })
-          .then(({ blob, filename }) => {
+          .then(({blob, filename}) => {
             // Create a new URL object for the blob
             const url = URL.createObjectURL(blob);
             // Create a new anchor element to trigger the download
@@ -173,25 +180,25 @@ export default {
         method: "GET",
         headers: authHeader(),
       })
-        .then(response => response.json())
-        .then(data => {
-          this.name = data['name']
-          this.description = data['description']
-          this.computingScript = data['computingScript']
-          this.roads = data['roads']
-          this.distance = data['distance']
-          this.status = data['status']
-          this.getDuration(data)
-          this.allLog = []
-          this.logs = []
-          data['logResponses'].forEach(elt => {
-            this.logs.push({ script: elt['scriptName'], status: elt['status'], content: elt['content'] })
-            this.allLog.push(elt['scriptName'])
+          .then(response => response.json())
+          .then(data => {
+            this.name = data['name']
+            this.description = data['description']
+            this.computingScript = data['computingScript']
+            this.roads = data['roads']
+            this.distance = data['distance']
+            this.status = data['status']
+            this.getDuration(data)
+            this.allLog = []
+            this.logs = []
+            data['logResponses'].forEach(elt => {
+              this.logs.push({script: elt['scriptName'], status: elt['status'], content: elt['content']})
+              this.allLog.push(elt['scriptName'])
+            });
+            if (this.logs !== []) {
+              this.progession = this.logs.length / 3 * 100
+            }
           });
-          if (this.logs !== []) {
-            this.progession = this.logs.length / 3 * 100
-          }
-        });
     },
     cancelSimulation() {
       fetch(`/api/simulation/${this.id}/cancel`, {

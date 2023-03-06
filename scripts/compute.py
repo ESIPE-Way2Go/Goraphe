@@ -1,7 +1,6 @@
 import logging
 import os
 import osmnx as ox
-import osmnet as oxnet
 import networkx as nx
 import pandas as pd
 import time
@@ -52,15 +51,6 @@ def setup_logger(name, log_file, level=logging.DEBUG):
 
     return logger
 
-# def get_nodes_from_way(osmid):
-#     #overpass_url = "http://overpass-api.de/api/interpreter"
-#     query = "[out:json];(" + "".join(["way("+osmid+");"]) + ");out body geom;"
-#     response = oxnet.overpass_request(data=query)
-#     element = response['elements']
-#
-#     u = element['nodes'][0]
-#     v = element['nodes'][-1]
-#     return u,v
 
 def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoints):
     # Directory
@@ -78,6 +68,7 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
     logger.info("GEOJSON CREATED")
     with open(directory + "/GRAPHE.geojson", 'w') as f:
         f.write(graph_geojson)
+    logger.info("Geojson graph printed")
 
     # TODO vérifier si dans graph proj
     wgs84_crs = pyproj.CRS("EPSG:4326")
@@ -86,18 +77,14 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
 
     x, y = transformer.transform(point1[1], point1[0])
     source_node = ox.nearest_nodes(graph_proj, x, y)
-    #source_node = ox.nearest_edges(graph_proj,x,y)[0]
-    print("SOURCE : "+str(source_node))
 
     x, y = transformer.transform(point2[1], point2[0])
     dest_node = ox.nearest_nodes(graph_proj, x, y)
-    #dest_node = ox.nearest_edges(graph_proj,x,y)[1]
-    print("DEST : " + str(dest_node))
-
 
     final_rand_nodes = []
     final_results = dict([])
     final_results_counter = dict([])
+    final_evi_local_dict = dict([])
     final_timetravel_shortest_paths = dict([])
     final_timetravel_shortest_paths_counter = dict([])
     final_essential_mw_edges = dict([])
@@ -129,7 +116,6 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
         # shortest paths with edges removed
         routes_er = dict([])
         timetravel_shortest_paths_er = dict([])
-
         # motorway edges impossible to remove
         essential_mw_edges = dict([])
         # motorway edges affecting the shortest paths
@@ -155,16 +141,15 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
             if origin not in final_essential_mw_edges :
                 final_essential_mw_edges[origin] = dict([])
             logger.info("Beginning iterative remove of edges in the selected route")
-
             for destination in rand_nodes:
                 # Calculate the shortest path
                 # TODO attention des fois aucun trajet trouvé entre source et target    raise nx.NetworkXNoPath(f"No path between {source} and {target}.")      networkx.exception.NetworkXNoPath: No path between 686687464 and 259190165.
-                # try:
-                route_traveltimes = nx.shortest_path(graph_proj, source=origin, target=destination,
-                                                     weight='traveltimes')
-                routes_traveltimes[origin][destination] = route_traveltimes
-                # except nx.NetworkXNoPath:
-                #     logger.info("no route beetween :" + str(origin) + " and " + str(destination))
+                try:
+                    route_traveltimes = nx.shortest_path(graph_proj, source=origin, target=destination,
+                                                         weight='traveltimes')
+                    routes_traveltimes[origin][destination] = route_traveltimes
+                except nx.NetworkXNoPath:
+                    logger.info("no route beetween :" + str(origin) + " and " + str(destination))
 
                 timetravel_shortest_path = 0
                 roads_traveltimesSP = dict()
@@ -172,7 +157,7 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
                     timetravel_shortest_path += graph_proj.get_edge_data(u, v)[0]['traveltimes']
                     roads_traveltimesSP[(u, v)] = graph_proj.get_edge_data(u, v)
 
-
+                logger.info("TIMETRAVEL SHORTEST PATH = "+str(timetravel_shortest_path))
                 timetravel_shortest_paths[origin][destination] = timetravel_shortest_path
                 if destination not in final_timetravel_shortest_paths[origin] :
                     final_timetravel_shortest_paths[origin][destination] = timetravel_shortest_path
@@ -228,7 +213,6 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
                         impactful_mw_edges.append(item)
 
         logger.info("Finish iterative remove of edges in the selected route")
-
         # outputs
         results = dict([])
 
@@ -272,6 +256,7 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
             ref_ratio_traveltimes = ((beta_traveltimes - ref_alpha_traveltimes) / ref_alpha_traveltimes) * 100
             evi_local = ((beta_traveltimes - alpha_traveltimes) / alpha_traveltimes) * 100
             evi_average_nip = ((beta_traveltimes - alpha_traveltimes) / nip)
+            evi_local_dict[(edge[0], edge[1], 0)] = float(evi_local)
 
             results[edge_name] = dict([])
             results[edge_name]["Broken paths"] = nbp
@@ -359,7 +344,7 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
         final_results[edge_name]["Impacted paths"] /= counter
         final_results[edge_name]["Beta traveltimes"] /= counter
         final_results[edge_name]["traveltimes ratio (ref)"] /= counter
-        final_results[edge_name]["evi_local"] /= counter
+        final_results[edge_name]["evi_local"] = evi_local
         final_results[edge_name]["evi_average_nip"] /= counter
 
         splited = edge_name.split("_", 2)
@@ -410,4 +395,4 @@ def compute(graph_proj, graph_not_proj, point1, point2, dist, user, sim, nbPoint
     # calculate computational time
     time_elapsed = (time.perf_counter() - time_start)
     logger.info("Computing time : " + str(time_elapsed))
-    logger.info("End of compute")
+    logger.info("End")

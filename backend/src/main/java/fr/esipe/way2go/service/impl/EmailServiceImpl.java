@@ -18,6 +18,11 @@ public class EmailServiceImpl implements EmailService {
     @Value("${sever.url.dev}")
     private String uri;
 
+    /**
+     * Sends an email to the given email address with a link which is an invitation to create an account
+     * @param email : given email in the form to invite a user
+     * @param inviteEntity
+     */
     @Override
     public void sendInvitation(String email, InviteEntity inviteEntity) {
         var subject = "Invitation à créer un compte sur Goraphe";
@@ -39,6 +44,10 @@ public class EmailServiceImpl implements EmailService {
         mailSender.send(createEmail(email, subject, content));
     }
 
+    /**
+     * Sends an email to an existing user which forgot his password, with a link to change his password
+     * @param userEntity
+     */
     @Override
     public void sendLinkForForgetPassword(UserEntity userEntity) {
         var subject = "Récupération de votre mot de passe";
@@ -63,6 +72,13 @@ public class EmailServiceImpl implements EmailService {
         mailSender.send(createEmail(userEntity.getEmail(), subject, body));
     }
 
+    /**
+     * function to create a mail
+     * @param receiver
+     * @param subject
+     * @param body
+     * @return
+     */
     private SimpleMailMessage createEmail(String receiver, String subject, String body) {
         var message = new SimpleMailMessage();
         message.setFrom(sender);
