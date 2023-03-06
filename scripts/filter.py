@@ -25,7 +25,6 @@ def setup_logger(name, log_file, level=logging.DEBUG):
 
     return logger
 
-
 #################SELECTION OF THE ROADNETWORK#######################################################
 parser = argparse.ArgumentParser()
 # user name
@@ -44,6 +43,11 @@ parser.add_argument("--roads", type=lambda x: x.split(','), required=True)
 parser.add_argument("--dist", type=int, required=True)
 # Number of random points generated for each iteration
 parser.add_argument("--random", type=int, required=True)
+# start osm_id
+parser.add_argument("--start_id", type=int, required=True)
+# end osm_id
+parser.add_argument("--end_id", type=int, required=True)
+
 # Parse the command-line arguments
 args = parser.parse_args()
 
@@ -56,6 +60,8 @@ dist = args.dist
 user = args.user
 sim = args.sim
 random = args.random
+source_node=args.start_id
+dest_node=args.end_id
 
 # Creation of logger
 os.makedirs("scripts/" + user, exist_ok=True)
@@ -89,16 +95,35 @@ logger.info(road_types)
 logger.info(f"Nodes of graph :{g.number_of_nodes()}")
 logger.info(f"Edges of graph :{g.number_of_edges()}")
 # remove nodes with degree=0 (no edges) from the network
-solitary = [n for n, d in g.degree() if d == 0]
-g.remove_nodes_from(solitary)
+#solitary = [n for n, d in g.degree() if d == 0]
+#g.remove_nodes_from(solitary)
 logger.info(f"Nodes of graph after removing solitary :{g.number_of_nodes()}")
 logger.info(f"Edges of graph after removing solitary :{g.number_of_edges()}")
+
 # Generate connected components and select the largest:
-largest_scc = max(nx.strongly_connected_components(g), key=len)
-g = g.subgraph(largest_scc)
+#largest_scc = max(nx.strongly_connected_components(g), key=len)
+#g = g.subgraph(largest_scc)
 
 logger.info(f"Nodes of graph after scc :{g.number_of_nodes()}")
 logger.info(f"Edges of graph after scc :{g.number_of_edges()}")
+
+logger.info("get source node")
+test = [(u,v,k,d) for u,v,k,d in g.edges(keys=True, data=True) if  d['osmid'] == int(source_node)]
+if (len(test) < 1):
+    logger.error('Not source_node find close of the osmid selected')
+    exit(1)
+else:
+    logger.info("The nearest node of the source node on the road has like osmid is ", test[0][0])
+    source_node = test[0][0]
+
+logger.info("get destination node")
+test = [(u,v,k,d) for u,v,k,d in g.edges(keys=True, data=True) if  d['osmid']==int(dest_node)]
+if (len(test) < 1):
+    logger.error('Not source_node find close of the osmid selected')
+    exit(1)
+else:
+    logger.info("The nearest node of the destination node on the road has like osmid is ", test[0][0])
+    dest_node=test[0][0]
 
 nodes_proj, edges_proj = ox.graph_to_gdfs(g, nodes=True, edges=True)
 
@@ -114,9 +139,7 @@ speed_map = {
     'primary_link': 40,
     'secondary_link': 40,
     'tertiary_link': 40,
-    'road': 50,
-    'service': 50,
-    'residential': 50
+    'road': 50
 }
 # new attribute list
 traveltimes = dict([])
@@ -129,24 +152,19 @@ for k in edges_proj.index:
     edges_proj = edges_proj.fillna(value=np.nan)
     if math.isnan(float(edges_proj.at[k, 'maxspeed'])):
         maxspeed = float(speed_map.get(edges_proj.at[k, 'highway'], 0))
-        maxspeed /= 3.6
         edges_proj.at[k, 'maxspeed'] = maxspeed
     else:
-        maxspeed = float(edges_proj.at[k, 'maxspeed'])/3.6
+        maxspeed = float(edges_proj.at[k, 'maxspeed'])
     fixedmaxspeed[(u, v, key)] = maxspeed
-    traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / fixedmaxspeed[(u, v, key)])) if \
+    traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / fixedmaxspeed[(u, v, key)]) / 3.6) if \
         fixedmaxspeed[(u, v, key)] != 0 else sys.maxsize
-
-for key,speed in fixedmaxspeed.items() :
-    print("Speed : "+str(speed)+" ||| Timetravel : "+str(traveltimes[key])+" ||| highway : "+str(edges_proj.at[(key[0],key[1],key[2]),'highway'])+" ||| key : "+str(key))
 
 nx.set_edge_attributes(g, fixedmaxspeed, "fixedmaxspeed")
 nx.set_edge_attributes(g, traveltimes, "traveltimes")
 
 time_elapsed = (time.perf_counter() - time_start)
 logger.info("Filtering time : " + str(time_elapsed))
-logger.info("End of filter")
-
 logger.info("Number of edges in graph : " + str(len(edges_proj)))
-compute.compute(g, point1, point2, dist, user, sim, random)
+logger.info("End")
+compute.compute(g, g_not_proj,point1,point2,dist,user,sim,random,source_node,dest_node)
 logger.info("Total time : " + str((time.perf_counter() - time_start)))
