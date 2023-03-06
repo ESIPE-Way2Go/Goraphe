@@ -47,29 +47,26 @@ def random_nodes(G_proj, source_node, destination_node, user, sim, dist, nb_rand
 
     # we will use those two path_nodes lists to have a better random selection of all the nodes that are on the shortest
     # path between the source and destination nodes
-    path_nodes_src_to_dst = nx.shortest_path(G_proj, source=source_node, target=destination_node)
-    path_nodes_dst_to_src = nx.shortest_path(G_proj, source=destination_node, target=source_node)
+    path_nodes = nx.shortest_path(G_proj, source=source_node, target=destination_node)
+    path_nodes = random.shuffle(path_nodes)
 
     logger.info("Number of random nodes asked : " + str(nb_random_nodes))
     # if the number of random nodes is not enough, reduce the number of random nodes that will be taken to the maximum
     # possible
-    if nb_random_nodes > len(path_nodes_src_to_dst):
+    if nb_random_nodes > len(path_nodes):
         logger.info("Can't generate " + str(nb_random_nodes) + " random nodes (too much for our shortest path), only a "
                                                                "maximum of " + str(
-            len(path_nodes_src_to_dst)) + " will be generated")
-        nb_random_nodes = len(path_nodes_src_to_dst)
+            len(path_nodes)) + " will be generated")
+        nb_random_nodes = len(path_nodes)
 
-    shortest_path_nodes_src_to_dst = random.sample(path_nodes_src_to_dst,
-                                                   nb_random_nodes // 2 + nb_random_nodes % 2 - 1)
-    shortest_path_nodes_dst_to_src = random.sample(path_nodes_dst_to_src, nb_random_nodes // 2 - 1)
-    shortest_path_nodes = shortest_path_nodes_src_to_dst + shortest_path_nodes_dst_to_src
+    shortest_path_nodes = random.sample(path_nodes, nb_random_nodes)
     logger.info("Shortest path nodes that will be used to generate our random nodes : " + str(shortest_path_nodes))
 
     # define "n_random_nodes" at random positions in the graph (n_random_nodes at a distance between "min_distance" and
     # "max_distance")
     logger.info("----------Start of the loop used to generate our random nodes----------")
 
-    # generate (or not if too close) the remaining random nodes on the graph
+    # generate (or not if too close) the random nodes on the graph
     for shortest_path_node in shortest_path_nodes:
         logger.info("Trying to generate good random nodes from the shortest path node : " + str(shortest_path_node))
         # take the actual shortest path node's coordinates from which the actual random node will be taken
@@ -85,7 +82,7 @@ def random_nodes(G_proj, source_node, destination_node, user, sim, dist, nb_rand
         # used to set a max number of "while" iterations
         j = 0
         max_loop_iterations = 25
-        while random_node_is_too_close(random_node, path_nodes_src_to_dst, G_proj, min_distance):
+        while random_node_is_too_close(random_node, path_nodes, G_proj, min_distance):
             logger.info("\tRandom node generated but not valid in the graph : " + str(random_node))
             if j == max_loop_iterations:
                 break
@@ -104,11 +101,11 @@ def random_nodes(G_proj, source_node, destination_node, user, sim, dist, nb_rand
             random_nodes.append(random_node)
     logger.info("----------End of the loop used to generate our random nodes----------")
 
-    if len(random_nodes)<nb_random_nodes :
-        nb_to_generate = nb_random_nodes-len(random_nodes)
+    if len(random_nodes) < nb_random_nodes:
+        nb_to_generate = nb_random_nodes - len(random_nodes)
 
         # generate nb_to_generate random nodes on the graph
-        for nb in range(nb_to_generate): #TODO remplacer shortest_path_node
+        for nb in range(nb_to_generate):
             nod = random.choice(shortest_path_nodes)
             logger.info("Generate good random nodes from the shortest path node : " + str(nod))
             x, y = G_proj.nodes[nod]['x'], G_proj.nodes[nod]['y']
@@ -141,5 +138,5 @@ def random_nodes(G_proj, source_node, destination_node, user, sim, dist, nb_rand
     ############### USED TO TEST AND DEBUG BY PRINTING THE RANDOM NODES RESULT ###############
 
     logger.info("All random nodes generated : " + str(random_nodes))
-    logger.info("End")
+    logger.info("End of random_nodes")
     return random_nodes
