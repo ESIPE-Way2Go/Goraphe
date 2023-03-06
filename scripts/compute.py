@@ -34,6 +34,11 @@ def shortest_path_geojson(G, point1, point2, weight, logger):
     features['maxspeed'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('fixedmaxspeed', ''), axis=1)
     features['timetravel'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('traveltimes', ''), axis=1)
     features['evi_local'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('evi_local', ''), axis=1)
+    features['evi_average_nip'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('evi_average_nip', ''), axis=1)
+    features['impacted_paths'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('impacted_paths', ''), axis=1)
+    features['broken_paths'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('broken_paths', ''), axis=1)
+    features['beta_traveltimes'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('beta_traveltimes', ''), axis=1)
+    features['timetravel_ratio'] = features.apply(lambda x: G.edges[(x[0], x[1], x[2])].get('timetravel_ratio', ''), axis=1)
 
     return features.to_json()
 
@@ -63,8 +68,11 @@ def compute(graph_proj, point1, point2, dist, user, sim, nbPoints,source_node,de
     logger.info("Init of compute")
     time_start = time.perf_counter()
 
-    edges_proj = ox.graph_to_gdfs(graph_proj, nodes=False, edges=True)
-    graph_geojson = edges_proj.to_json()
+    g_reproj = ox.projection.project_graph(graph_proj,to_crs="EPSG:4326")
+    edges_reproj = ox.graph_to_gdfs(g_reproj, nodes=False, edges=True)
+    graph_geojson = edges_reproj.to_json()
+#    edges_proj = ox.graph_to_gdfs(graph_proj, nodes=False, edges=True)
+#    graph_geojson = edges_proj.to_json()
     logger.info("GEOJSON CREATED")
     with open(directory + "/GRAPHE.geojson", 'w') as f:
         f.write(graph_geojson)

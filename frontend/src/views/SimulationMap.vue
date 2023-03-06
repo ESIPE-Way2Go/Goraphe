@@ -218,7 +218,7 @@ export default {
         onEachFeature: (feature, layer) => {
           layer.bindTooltip(
               "<div>LoS:" +
-              feature.properties.evi_local +
+              feature.properties.evi_average_nip +
               "</div><div>nom: " +
               feature.properties.name +
               "</div><div>ID:" +
@@ -336,6 +336,7 @@ export default {
                 if(tempo[1].includes('road')){
                   console.log(JSON.parse(val))
                   this.simulation.path= JSON.parse(val);
+                  console.log(this.simulation.path)
                 }else{
                   this.simulation.randomPoints= JSON.parse(val);
                 }
