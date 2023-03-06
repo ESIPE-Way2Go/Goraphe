@@ -83,6 +83,7 @@ def compute(graph_proj, point1, point2, dist, user, sim, nbPoints):
 
     final_rand_nodes = []
     final_results = dict([])
+    final_results["Base alpha traveltimes"] = 0
     final_results_counter = dict([])
     final_evi_local_dict = dict([])
     final_timetravel_shortest_paths = dict([])
@@ -229,6 +230,8 @@ def compute(graph_proj, point1, point2, dist, user, sim, nbPoints):
         for key in timetravel_shortest_paths:
             ref_alpha_traveltimes += sum(timetravel_shortest_paths[key].values())
         results["Base alpha traveltimes"] = ref_alpha_traveltimes
+        final_results["Base alpha traveltimes"] += ref_alpha_traveltimes
+
         for edge in impactful_mw_edges:
             # used to calculate ratio over non broken paths in case of an essential edge
             alpha_traveltimes = ref_alpha_traveltimes
@@ -353,7 +356,7 @@ def compute(graph_proj, point1, point2, dist, user, sim, nbPoints):
         final_traveltimes_ratio_dict[(float(splited[0]), float(splited[1]), 0)] /= counter
         final_evi_local_dict[(float(splited[0]), float(splited[1]), 0)] /= counter
         final_evi_average_nip_dict[(float(splited[0]), float(splited[1]), 0)] /= counter
-
+    final_results["Base alpha traveltimes"] /= nb_iteration
     for origin in final_timetravel_shortest_paths_counter:
         for destination in final_timetravel_shortest_paths_counter[origin]:
             final_timetravel_shortest_paths[origin][destination] /= final_timetravel_shortest_paths_counter[origin][destination]
