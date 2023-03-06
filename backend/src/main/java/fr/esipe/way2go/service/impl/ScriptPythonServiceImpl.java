@@ -61,12 +61,12 @@ public class ScriptPythonServiceImpl implements ScriptPythonService {
         logs.add(logEntity3);
         var builder = new ProcessBuilder("python3", pathGeneric + "filter.py",
                 "--dist", Integer.toString(simulationRequest.getDistance()),
-                "--coords", coords.toString(),
+                "--coords="+ coords.toString(),
                 "--user", user.getUsername(),
                 "--sim", simulationName,
                 "--roads", String.join(",", simulationRequest.getRoadTypes()),
-                "--point1", new Point(simulationRequest.getStart()).toString(),
-                "--point2", new Point(simulationRequest.getEnd()).toString(),
+                "--point1="+ new Point(simulationRequest.getStart()).toString(),
+                "--point2="+ new Point(simulationRequest.getEnd()).toString(),
                 "--random", Integer.toString(simulationRequest.getRandomPoints()),
                 "--start_id",Integer.toString(simulationRequest.getStart_id()),
                 "--end_id",Integer.toString(simulationRequest.getEnd_id())
