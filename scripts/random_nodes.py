@@ -69,21 +69,6 @@ def random_nodes(G_proj, source_node, destination_node, user, sim, dist, nb_rand
     # "max_distance")
     logger.info("----------Start of the loop used to generate our random nodes----------")
 
-    # generate at least 2 random nodes on the graph
-    for node in [source_node, destination_node]:
-        logger.info("Generate good random nodes from the shortest path node : " + str(node))
-        x, y = G_proj.nodes[node]['x'], G_proj.nodes[node]['y']
-
-        # define 2 distances (x and y) to set our random node
-        rx = random.uniform(-max_distance, max_distance)
-        ry = random.uniform(-max_distance, max_distance)
-
-        # find the random node
-        random_node = ox.distance.nearest_nodes(G_proj, x + rx, y + ry)
-
-        logger.info("\tRandom node generated and used : " + str(random_node))
-        random_nodes.append(random_node)
-
     # generate (or not if too close) the remaining random nodes on the graph
     for shortest_path_node in shortest_path_nodes:
         logger.info("Trying to generate good random nodes from the shortest path node : " + str(shortest_path_node))
@@ -118,6 +103,25 @@ def random_nodes(G_proj, source_node, destination_node, user, sim, dist, nb_rand
             logger.info("\tRandom node generated and used because valid in the graph : " + str(random_node))
             random_nodes.append(random_node)
     logger.info("----------End of the loop used to generate our random nodes----------")
+
+    if len(random_nodes)<nb_random_nodes :
+        nb_to_generate = nb_random_nodes-len(random_nodes)
+
+        # generate nb_to_generate random nodes on the graph
+        for nb in range(nb_to_generate): #TODO remplacer shortest_path_node
+            nod = random.choice(shortest_path_nodes)
+            logger.info("Generate good random nodes from the shortest path node : " + str(nod))
+            x, y = G_proj.nodes[nod]['x'], G_proj.nodes[nod]['y']
+
+            # define 2 distances (x and y) to set our random node
+            rx = random.uniform(-max_distance, max_distance)
+            ry = random.uniform(-max_distance, max_distance)
+
+            # find the random node
+            random_node = ox.distance.nearest_nodes(G_proj, x + rx, y + ry)
+
+            logger.info("\tRandom node generated and used : " + str(random_node))
+            random_nodes.append(random_node)
 
     ############### USED TO TEST AND DEBUG BY PRINTING THE RANDOM NODES RESULT ###############
     # create a list of colors to highlight the source and destinations nodes
