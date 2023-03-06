@@ -280,7 +280,7 @@ export default {
     },
 
     swapPoints() {
-      console.log(this.control._plan._waypoints)
+      //console.log(this.control._plan._waypoints)
       this.control.setWaypoints([
         L.latLng(this.control._plan._waypoints[1].latLng.lat, this.control._plan._waypoints[1].latLng.lng),
         L.latLng(this.control._plan._waypoints[0].latLng.lat, this.control._plan._waypoints[0].latLng.lng)
@@ -298,7 +298,7 @@ export default {
         L.latLng(value[0].y, value[0].x),
         L.latLng(value[0].y, value[0].x)
       ])
-      console.log(this.control.waypoints)
+      //console.log(this.control.waypoints)
     },
     updateStart() {
       const startLatLng = this.start.split(',').reverse().map(parseFloat);
@@ -355,8 +355,8 @@ export default {
         this.toast.error("Number of random points must be between 2 and 100");
         return;
       }
-      console.log("length = " + this.length * 0.6)
-      console.log("dist = " + this.dist)
+      //console.log("length = " + this.length * 0.6)
+      //console.log("dist = " + this.dist)
       try {
         let randomPoints = this.$data.randomPoints;
         let center = this.center;
@@ -371,8 +371,8 @@ export default {
         let start_id = await this.findOsmid(start);
         let end_id = await this.findOsmid(end);
 
-        console.log(start_id)
-        console.log(end_id)
+        //console.log(start_id)
+        //console.log(end_id)
         if(start_id===undefined){
           return;
         }
@@ -389,7 +389,7 @@ export default {
         }
 
         const data = await response.json();
-        console.log(data['simulationId']);
+        //console.log(data['simulationId']);
         this.$router.push({name: 'simulation', params: {id: data['simulationId']}});
 
       } catch (error) {

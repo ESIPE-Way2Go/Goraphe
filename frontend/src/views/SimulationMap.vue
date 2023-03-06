@@ -334,9 +334,9 @@ export default {
               if(tempo[0].includes("FINAL")){
                 results.push({type:tempo[0],number:'',isPath:tempo[1].includes('road'),json:JSON.parse(val),find:tempo[0]})
                 if(tempo[1].includes('road')){
-                  console.log(JSON.parse(val))
+                  //console.log(JSON.parse(val))
                   this.simulation.path= JSON.parse(val);
-                  console.log(this.simulation.path)
+                  //console.log(this.simulation.path)
                 }else{
                   this.simulation.randomPoints= JSON.parse(val);
                 }
