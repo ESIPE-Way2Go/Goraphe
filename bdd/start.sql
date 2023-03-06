@@ -3,7 +3,7 @@ DROP DATABASE IF EXISTS goraphe;
   -- Name: goraphe; Type: DATABASE; Schema: -; Owner: postgres
   --
 
-  CREATE DATABASE goraphe WITH TEMPLATE = template0 ENCODING = 'UTF8';
+  CREATE DATABASE goraphe WITH TEMPLATE=template0 ENCODING = 'UTF8';
 
 
   ALTER DATABASE goraphe OWNER TO postgres;

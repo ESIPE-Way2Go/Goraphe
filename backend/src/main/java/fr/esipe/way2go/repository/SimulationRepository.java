@@ -14,5 +14,4 @@ public interface SimulationRepository extends JpaRepository<SimulationEntity, Lo
 
     @Query("SELECT s FROM SimulationEntity s WHERE user = :user")
     List<SimulationEntity> getSimulationFromUser(@Param("user") UserEntity user);
-
 }

@@ -116,6 +116,9 @@ docker-compose up
 ```
 8. If you turn the application in local, this one should now be running at http://localhost.
 
+### Remarque
+As our project execute a python script, you can change the script python **without restart the container**. There is a share folder with the container dockers nominate **scripts**. You have to create a **scripts** repository on your machine at the root of the project.
+
 ## USAGE
 
 ### Simulation

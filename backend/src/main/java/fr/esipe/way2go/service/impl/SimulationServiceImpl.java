@@ -4,7 +4,6 @@ import fr.esipe.way2go.dao.SimulationEntity;
 import fr.esipe.way2go.dao.UserEntity;
 import fr.esipe.way2go.repository.SimulationRepository;
 import fr.esipe.way2go.service.SimulationService;
-import io.swagger.annotations.Example;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
