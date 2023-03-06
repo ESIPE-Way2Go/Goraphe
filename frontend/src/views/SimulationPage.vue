@@ -135,6 +135,7 @@ export default {
   },
 
   methods: {
+    // Button to download the generated excel files
     downloadFile() {
       const url = '/api/simulation/' + this.id + '/download';
       fetch(url, {method: 'GET', headers: authHeader()})

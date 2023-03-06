@@ -89,11 +89,13 @@ import {OpenCageProvider} from "leaflet-geosearch";
 
 export default {
   computed: {
+    // Computes the minimum distance for the 2 selected points to be itñhe generated graph
     minDist() {
       return Math.max(this.length * 0.6, 100);
     },
   },
   watch: {
+    // Updates the minimum distance and the circle
     minDist(newVal) {
       if (this.dist < newVal) {
         this.dist = newVal;
@@ -101,6 +103,7 @@ export default {
         this.circle_center = L.circle(this.center, {radius: this.dist}).addTo(this.map);
       }
     },
+    // Search bar
     search(val) {
       val && val !== this.select && this.querySelections(val)
     },
@@ -154,16 +157,17 @@ export default {
     };
   },
   mounted() {
+    // Creates the map
     let map = L.map('map', {
       maxBounds: [[-90, -180], [90, 180]],
       maxZoom: 18,
       minZoom: 3,
       zoomControl: false
+      // Sets the base view for the map (coordinates and zoom level)
     }).setView([48.8393560, 2.5859384], 16);
     L.control.zoom({
       position: 'bottomright'
     }).addTo(map);
-
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
@@ -188,6 +192,7 @@ export default {
         });
       },
       waypointMode: 'snap',
+      // base position for the markers
       waypoints: [
         L.latLng(48.8393560, 2.5859384),
         L.latLng(48.8400943, 2.5861805)
@@ -199,6 +204,7 @@ export default {
     //need instance of circle with value
     this.circle_center = L.circle(this.center, {radius: 200}).addTo(map);
 
+    // Updates the relevant data when needed
     this.control.on('routesfound', (e) => {
       this.start = [e.waypoints[0].latLng.lng, e.waypoints[0].latLng.lat];
       this.end = [e.waypoints[e.waypoints.length - 1].latLng.lng, e.waypoints[e.waypoints.length - 1].latLng.lat];
@@ -210,7 +216,7 @@ export default {
       this.circle_center = L.circle(this.center, {radius: this.dist}).addTo(map);
     });
 
-    //create btn with DOM (please kill me)
+    //create btn with DOM
     function createButton(label, container) {
       let btn = L.DomUtil.create('button', 'v-btn pa-2 ma-2 bg-accent', container);
       btn.setAttribute('type', 'button');

@@ -57,7 +57,7 @@ export default {
     }
   },
   methods: {
-
+    // Connects the user if the username and password are correct, then redirects him to the homepage. Otherwise, shows an error
     handleLogin() {
       this.$store.dispatch("auth/login", this.form).then((response) => {
             if (response.email) {
