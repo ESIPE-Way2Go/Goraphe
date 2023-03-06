@@ -49,12 +49,12 @@
             {{ simulation.date }}
             <div class="h5 text-caption text-uppercase font-weight-bold">
               <v-badge
-                  :color="(simulation.status === 'ERROR') ? 'error' : 'success'"
+                  :color="(simulation.status === 'ERROR' || simulation.status === 'CANCEL') ? 'error' : (simulation.status ==='SUCCESS')? 'success' : 'warning'"
                   content=""
                   dot
                   inline
               ></v-badge>
-              {{ (simulation.status === 'ERROR') ? 'error' : 'success' }}
+              {{ (simulation.status === 'ERROR') ? 'error' : (simulation.status ==='SUCCESS')? 'success' : 'cancel' }}
             </div>
           </v-card-subtitle>
           <v-card-actions class="justify-space-between">

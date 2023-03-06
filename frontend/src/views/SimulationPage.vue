@@ -17,7 +17,7 @@
                 Status
               </div>
               <div class="ma-2 pa-1 h5  text-caption text-uppercase font-weight-bold">
-                <v-badge :color="(status === 'ERROR') ? 'error' : 'success'" content="" dot inline></v-badge>
+                <v-badge :color="(status === 'ERROR' || status === 'CANCEL') ? 'error' : (status ==='SUCCESS')? 'success' : 'warning'" content="" dot inline></v-badge>
                 {{ status }}
               </div>
             </div>
