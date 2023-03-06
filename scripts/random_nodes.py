@@ -1,12 +1,9 @@
 import logging
 import os
-
 import osmnx as ox
 import networkx as nx
 import random
 
-
-# Need to be duplicated from filter3 because of error "circular import"
 def setup_logger(name, log_file, level=logging.DEBUG):
     """To setup as many loggers as you want"""
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -19,7 +16,7 @@ def setup_logger(name, log_file, level=logging.DEBUG):
 
     return logger
 
-
+#Used to check if a random node is too close to the selected road
 def random_node_is_too_close(random_node, path_nodes, G_proj, min_distance):
     for node in path_nodes:
         distance_calculated = ox.distance.euclidean_dist_vec(G_proj.nodes[node]['x'],
@@ -119,23 +116,6 @@ def random_nodes(G_proj, source_node, destination_node, user, sim, dist, nb_rand
 
             logger.info("\tRandom node generated and used : " + str(random_node))
             random_nodes.append(random_node)
-
-    ############### USED TO TEST AND DEBUG BY PRINTING THE RANDOM NODES RESULT ###############
-    # create a list of colors to highlight the source and destinations nodes
-    #node_colors = ['red' if node in [source_node, destination_node] else 'gray' for node in G_proj.nodes()]
-    # create a list of node sizes to set the size of nodes in random_nodes to 10 and
-    # the size of nodes not in random_nodes to 0
-    #node_sizes = [10 if node in [source_node, destination_node] else 0 for node in G_proj.nodes()]
-    # plot the graph with highlighted source and destination nodes
-    #ox.plot_graph(G_proj, node_color=node_colors, node_size=node_sizes, show=True)
-    # create a list of colors to highlight the random nodes
-    #node_colors = ['blue' if node in random_nodes else 'gray' for node in G_proj.nodes()]
-    # create a list of node sizes to set the size of nodes in random_nodes to 10 and
-    # the size of nodes not in random_nodes to 0
-    #node_sizes = [10 if node in random_nodes else 0 for node in G_proj.nodes()]
-    # plot the graph with highlighted random nodes
-    #ox.plot_graph(G_proj, node_color=node_colors, node_size=node_sizes, show=True)
-    ############### USED TO TEST AND DEBUG BY PRINTING THE RANDOM NODES RESULT ###############
 
     logger.info("All random nodes generated : " + str(random_nodes))
     logger.info("End of random_nodes")

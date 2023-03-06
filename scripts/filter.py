@@ -4,14 +4,10 @@ import sys
 import numpy as np
 import osmnx as ox
 import networkx as nx
-import geopandas as gpd
 import math
 import time
 import argparse
-from shapely import LineString
 import compute
-import random_nodes
-
 
 def setup_logger(name, log_file, level=logging.DEBUG):
     """To setup as many loggers as you want"""
@@ -26,6 +22,8 @@ def setup_logger(name, log_file, level=logging.DEBUG):
     return logger
 
 #################SELECTION OF THE ROADNETWORK#######################################################
+time_start = time.perf_counter()
+
 parser = argparse.ArgumentParser()
 # user name
 parser.add_argument("--user", type=str, required=True)
@@ -67,13 +65,16 @@ dest_node=args.end_id
 os.makedirs("scripts/" + user, exist_ok=True)
 os.makedirs("scripts/" + user + "/" + sim, exist_ok=True)
 os.makedirs("scripts/" + user + "/" + sim + "/json", exist_ok=True)
-
 LOG_FILENAME = os.getcwd() + "/scripts/" + user + "/" + sim + "/filter.log"
 logger = setup_logger(LOG_FILENAME, LOG_FILENAME)
+
 logger.info("Init of filter")
+
+#check if the number of random nodes is enough or to much to run a simulation
 if random < 2 or random > 100:
     logger.error("Number of random points cannot be less than 2 or more than 100")
     exit(0)
+
 # motorway,trunk,primary,secondary,tertiary,residential,service
 cf = '["highway"~"' + '|'.join(roads) + '"]'
 
@@ -82,51 +83,37 @@ logger.info(f"Roads accepted : {roads}")
 logger.info(f"Generation distance : {dist}")
 logger.info(f"Starting point : {point1}")
 logger.info(f"Destination point : {point2}")
-time_start = time.perf_counter()
 
+#Create the graph using center coordinates and a radius distance
 g_not_proj = ox.graph_from_point(location, dist, simplify=False, network_type='drive', custom_filter=cf)
 g = ox.project_graph(g_not_proj)
 
-road_types = set(map(str, nx.get_edge_attributes(g, 'highway').values()))
-logger.info(road_types)
-
-# Plot the graph
-# ox.plot_graph(g)
 logger.info(f"Nodes of graph :{g.number_of_nodes()}")
 logger.info(f"Edges of graph :{g.number_of_edges()}")
-# remove nodes with degree=0 (no edges) from the network
-#solitary = [n for n, d in g.degree() if d == 0]
-#g.remove_nodes_from(solitary)
-logger.info(f"Nodes of graph after removing solitary :{g.number_of_nodes()}")
-logger.info(f"Edges of graph after removing solitary :{g.number_of_edges()}")
-
-# Generate connected components and select the largest:
-#largest_scc = max(nx.strongly_connected_components(g), key=len)
-#g = g.subgraph(largest_scc)
-
-logger.info(f"Nodes of graph after scc :{g.number_of_nodes()}")
-logger.info(f"Edges of graph after scc :{g.number_of_edges()}")
 
 logger.info("get source node")
+
+#Find the source and destination node selected from the graphical user interface
 test = [(u,v,k,d) for u,v,k,d in g.edges(keys=True, data=True) if  d['osmid'] == int(source_node)]
 if (len(test) < 1):
-    logger.error('Not source_node find close of the osmid selected')
+    logger.error('No source node found near the osmid selected')
     exit(1)
 else:
-    logger.info("The nearest node of the source node on the road has like osmid is " + str(test[0][0]))
+    logger.info("Source node used : " + str(test[0][0]))
     source_node = test[0][0]
 
 logger.info("get destination node")
 test = [(u,v,k,d) for u,v,k,d in g.edges(keys=True, data=True) if  d['osmid']==int(dest_node)]
 if (len(test) < 1):
-    logger.error('Not source_node find close of the osmid selected')
+    logger.error('No dest node found near the osmid selected')
     exit(1)
 else:
-    logger.info("The nearest node of the destination node on the road has like osmid is " + str(test[0][0]))
+    logger.info("Dest node used : " + str(test[0][0]))
     dest_node=test[0][0]
 
 nodes_proj, edges_proj = ox.graph_to_gdfs(g, nodes=True, edges=True)
 
+#dictionary setting default values for speeds using type of roads
 speed_map = {
     'motorway': 120,
     'trunk': 100,
@@ -141,10 +128,12 @@ speed_map = {
     'tertiary_link': 40,
     'road': 50
 }
+
 # new attribute list
 traveltimes = dict([])
 fixedmaxspeed = dict([])
 
+#Check if all edges have a speed or set it using the dictionary of default speeds
 for k in edges_proj.index:
     u = k[0]
     v = k[1]
@@ -159,6 +148,7 @@ for k in edges_proj.index:
     traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / fixedmaxspeed[(u, v, key)]) / 3.6) if \
         fixedmaxspeed[(u, v, key)] != 0 else sys.maxsize
 
+#Adds attributes to the graph
 nx.set_edge_attributes(g, fixedmaxspeed, "fixedmaxspeed")
 nx.set_edge_attributes(g, traveltimes, "traveltimes")
 
