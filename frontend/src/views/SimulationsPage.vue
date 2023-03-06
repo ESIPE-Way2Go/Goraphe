@@ -60,7 +60,7 @@
           <v-card-actions class="justify-space-between">
             <div>
               <v-btn color="secondary" @click="goSimulation(simulation.id)" v-if="simulation.status==='SUCCESS'">
-                Détails
+                Résultat
               </v-btn>
               <v-btn color="secondary" @click="goLogs(simulation.id)">
                 Logs
@@ -144,7 +144,7 @@ export default {
       simulationsInLoad: [],
       simulationsShow: [],
       simulations: [],
-      imageTest: require('@/assets/paris.jpg'),
+      imageTest: require('@/assets/paris.png'),
       deleteDialog: false,
       simulationId: -1,
       simulationTitle: "",
