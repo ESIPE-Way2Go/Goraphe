@@ -15,6 +15,9 @@ public class SimulationRequest {
     double[] center;
     int randomPoints;
 
+    int start_id;
+    int end_id;
+
     public int getRandomPoints() {
         return randomPoints;
     }
@@ -87,6 +90,22 @@ public class SimulationRequest {
         this.center = center;
     }
 
+
+    public int getStart_id() {
+        return start_id;
+    }
+
+    public void setStart_id(int start_id) {
+        this.start_id = start_id;
+    }
+
+    public int getEnd_id() {
+        return end_id;
+    }
+
+    public void setEnd_id(int end_id) {
+        this.end_id = end_id;
+    }
 
     @Override
     public String toString() {
