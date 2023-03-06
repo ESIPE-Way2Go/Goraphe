@@ -1,7 +1,16 @@
 <template>
   <v-container fluid style="padding: 10px">
+
+    <div class="fixed-loader" v-if="simulation.name===''">
+      <v-progress-circular
+          :size="50"
+          color="primary"
+          indeterminate
+      ></v-progress-circular>
+    </div>
+
     <v-row class="d-flex">
-      <div class="vh-100 w-100">
+      <div class="vh-100 w-100" >
         <l-map ref="map" v-model:zoom="zoom" :center="center" :bounds="bounds"
                :max-bounds="maxBounds" :options="{ zoomControl: false}"
         >
@@ -12,16 +21,15 @@
              attribution="OpenStreetMap contributors"
           ></l-tile-layer>
           <l-control-zoom position="bottomright" zoom-in-text="+" zoom-out-text="-" />
-          <l-geo-json   :geojson="simulation.graph" :options-style="styleGraph" ></l-geo-json>
+          <l-geo-json   :geojson="simulation.graph" :options-style="styleGraph"  :options="optionsPath"></l-geo-json>
             <l-geo-json ref="graph" :geojson="simulation.path"  :options-style="geoStyler" :visible=listLayout[0].isShow :options="optionsPath"   ></l-geo-json>
             <l-geo-json :geojson="simulation.randomPoints" :options-style="styleMarker" :visible=listLayout[1].isShow :options="optionsMarker"  ></l-geo-json>
-
         </l-map>
       </div>
 
       <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5" @click.stop="closeleft= !closeleft"
              v-if="closeleft"></v-btn>
-      <v-slide-y-transition>
+      <v-slide-y-transition v-if="simulation.name!==''">
         <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 " :class="{'panel-map-lg' : lgAndUp,'panel-map-md': md}"
                 v-if="!closeleft">
           <v-row align="start">
@@ -45,7 +53,7 @@
             <v-list-item
                 v-if="simulation.description.length>0"
                 title="Description"
-                variant="outlined"
+                variant="text"
                 rounded
                 :subtitle="simulation.description"
                 class="ma-1"
@@ -54,7 +62,7 @@
 
             <v-list-item
                 title="Module"
-                variant="outlined"
+                variant="text"
                 rounded
                 :subtitle="simulation.computingScript"
                 class="ma-1"
@@ -71,6 +79,15 @@
                 </v-chip>
               </v-item>
             </v-item-group>
+            <v-list-item >
+            <v-btn color="primary" prepend-icon="mdi-download" class="ma-1 align-self-center" @click="downloadFile" variant="outlined">
+              Excel
+            </v-btn>
+
+            <v-btn color="primary" class="ma-1 align-self-center" @click="gotoSimulation" variant="outlined">
+              Logs
+            </v-btn>
+              </v-list-item>
           </v-list>
         </v-card>
       </v-slide-y-transition>
@@ -78,7 +95,7 @@
 
       <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5 panel-map-right" @click.stop="closeright= !closeright"
              v-if="closeright"></v-btn>
-      <v-slide-y-transition>
+      <v-slide-y-transition v-if="simulation.name!==''">
         <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 panel-map-right" :class="{'panel-map-lg' : lgAndUp,'panel-map-md': md}"
                 v-if="!closeright">
           <v-row align="start">
@@ -201,10 +218,12 @@ export default {
         onEachFeature: (feature, layer) => {
           layer.bindTooltip(
               "<div>LoS:" +
-              feature.properties.evi_local +
+              feature.properties.evi_average_nip +
               "</div><div>nom: " +
               feature.properties.name +
-              "</div>",
+              "</div><div>ID:" +
+          feature.properties.osmid +
+          "</div>",
               {permanent: false, sticky: true}
           );
         }
@@ -265,12 +284,16 @@ export default {
     this.getSimulation()
   },
   methods: {
+    gotoSimulation(){
+      this.$router.push({name: 'simulation', params: {id: this.id}});
+    },
+
     uncheckRoadTypes() {
       this.selectedRoadTypes = [];
     },
 
     changeSimulationJson(v){
-      console.log(v)
+      //console.log(v)
       let tempo = this.listsOfJson.filter(json => json.find===v);
       tempo.forEach(json => {
         if(json.isPath) {
@@ -294,24 +317,26 @@ export default {
             this.simulation.roads = data['roads']
 
             let map = Object.entries(data['results']).sort( (r1,r2) => r1.key <r2.key);
-            console.log(map)
+            //console.log(map)
             let results = [];
             map.forEach( entry => {
               const [key, val] = entry;
               let tempo = key.split('_');
               if(tempo.length<2 && tempo[0]==='GRAPHE'){
-                console.log(JSON.parse(val))
+                //console.log(JSON.parse(val))
                 this.simulation.graph = JSON.parse(val);
               }
               if(tempo[0].includes("ITERATION")){
                 let number = tempo[0].substring("ITERATION".length)
-                console.log(tempo[0], number,tempo[1])
+                //console.log(tempo[0], number,tempo[1])
                 results.push({type:'ITERATION',number:number,isPath:tempo[1].includes('road'),json:JSON.parse(val),find:tempo[0]})
               }
               if(tempo[0].includes("FINAL")){
                 results.push({type:tempo[0],number:'',isPath:tempo[1].includes('road'),json:JSON.parse(val),find:tempo[0]})
                 if(tempo[1].includes('road')){
+                  //console.log(JSON.parse(val))
                   this.simulation.path= JSON.parse(val);
+                  //console.log(this.simulation.path)
                 }else{
                   this.simulation.randomPoints= JSON.parse(val);
                 }
@@ -324,6 +349,42 @@ export default {
             this.$refs.map.leafletObject.setMinZoom(6);
           });
     },
+
+    downloadFile() {
+      const url = '/api/simulation/' + this.id + '/download';
+      fetch(url, {method: 'GET', headers: authHeader()})
+          .then(response => {
+            // Check that the response status is in the 200-299 range,
+            // which indicates a successful response.
+            if (response.ok) {
+              // Get the filename from the Content-Disposition header
+              const contentDisposition = response.headers.get('Content-Disposition');
+              const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+              const filename = filenameMatch ? filenameMatch[1] : 'unknown';
+              // Create a new Blob object from the response body
+              return response.blob().then(blob => ({blob, filename}));
+            } else {
+              throw new Error(`Request failed with status ${response.status}`);
+            }
+          })
+          .then(({blob, filename}) => {
+            // Create a new URL object for the blob
+            const url = URL.createObjectURL(blob);
+            // Create a new anchor element to trigger the download
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            // Trigger the download by clicking the anchor element
+            link.click();
+            // Clean up the URL object and anchor element
+            URL.revokeObjectURL(url);
+            link.remove();
+          })
+          .catch(error => {
+            console.error(error);
+          });
+    },
+
   },
 };
 </script>
@@ -356,5 +417,18 @@ export default {
 }
 .panel-burger {
   z-index: 999;
+}
+
+.fixed-loader {
+  position: fixed;
+  width: 50px;
+  height: 50px;
+  padding: 10px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  margin-top: -25px;/* Negative half of height. */
+  margin-left: -25px;/* Negative half of width. */
 }
 </style>
