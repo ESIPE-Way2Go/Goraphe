@@ -90,7 +90,7 @@
                   <v-icon icon="mdi-close" color="error" v-else-if="log.status === 'ERROR'"></v-icon>
                   <v-progress-circular color="dark-blue" style="height: 18px" indeterminate width="3"
                                        v-else-if="log.status === 'LOAD'"></v-progress-circular>
-                  <v-icon icon="mdi-launch" color="grey" v-else></v-icon>
+                  <v-icon icon="mdi-dots-horizontal" color="grey" v-else></v-icon>
                 </div>
                 <div>{{ log.script }}</div>
               </template>

@@ -11,7 +11,7 @@
           </v-card-title>
           <v-card-subtitle> {{ simulation.date }}</v-card-subtitle>
           <v-card-actions class="justify-space-between">
-            <v-btn color="orange" @click="goLogs(simulation.id)">
+            <v-btn color="secondary" @click="goLogs(simulation.id)">
               Logs
             </v-btn>
           </v-card-actions>
