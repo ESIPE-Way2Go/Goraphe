@@ -44,8 +44,6 @@ public class SimulationEntity {
     @Convert(converter = CalendarConverter.class)
     private Calendar endDate;
 
-    @Column(name = "share_link", nullable = false, unique = true)
-    private UUID shareLink;
 
     @Column(name = "status", nullable = false)
     @Convert(converter = StatusSimulationConverter.class)
@@ -66,17 +64,9 @@ public class SimulationEntity {
         this.computingScript = computingScript;
         this.generationDistance = distance;
         this.roadType = roadTypes;
-        this.shareLink = UUID.randomUUID();
         this.status = StatusSimulation.WAIT;
     }
 
-    public UUID getShareLink() {
-        return shareLink;
-    }
-
-    public void setShareLink(UUID shareLink) {
-        this.shareLink = shareLink;
-    }
 
     /**
      * Returns this simulation's ID.
@@ -266,7 +256,6 @@ public class SimulationEntity {
                 ", roadType=" + roadType +
                 ", beginDate=" + beginDate +
                 ", endDate=" + endDate +
-                ", shareLink=" + shareLink +
                 ", status='" + status + '\'' +
                 ", logs=" + logs +
                 '}';
