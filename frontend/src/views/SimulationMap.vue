@@ -21,7 +21,7 @@
              attribution="OpenStreetMap contributors"
           ></l-tile-layer>
           <l-control-zoom position="bottomright" zoom-in-text="+" zoom-out-text="-" />
-          <l-geo-json   :geojson="simulation.graph" :options-style="styleGraph"  :options="optionsPath"></l-geo-json>
+          <l-geo-json   :geojson="simulation.graph" :options-style="styleGraph" ></l-geo-json>
             <l-geo-json ref="graph" :geojson="simulation.path"  :options-style="geoStyler" :visible=listLayout[0].isShow :options="optionsPath"   ></l-geo-json>
             <l-geo-json :geojson="simulation.randomPoints" :options-style="styleMarker" :visible=listLayout[1].isShow :options="optionsMarker"  ></l-geo-json>
         </l-map>
@@ -219,10 +219,19 @@ export default {
           layer.bindTooltip(
               "<div>LoS:" +
               feature.properties.evi_average_nip +
-              "</div><div>nom: " +
+              "<div>NIP:" +
+              feature.properties.impacted_paths +
+              "</div><div>NBP: " +
+              feature.properties.broken_paths +
+              "<div>TTR:" +
+              feature.properties.timetravel_ratio +
+              "<div>Beta:" +
+              feature.properties.beta_traveltimes +
+              "</div><div>Nom: " +
               feature.properties.name +
-              "</div><div>ID:" +
+              "</div><div>Osmid:" +
           feature.properties.osmid +
+
           "</div>",
               {permanent: false, sticky: true}
           );
@@ -315,28 +324,28 @@ export default {
             this.simulation.description = data['description']
             this.simulation.computingScript = data['script']
             this.simulation.roads = data['roads']
-
+            //get all the geojson data on a list
             let map = Object.entries(data['results']).sort( (r1,r2) => r1.key <r2.key);
-            //console.log(map)
+
             let results = [];
+
             map.forEach( entry => {
               const [key, val] = entry;
               let tempo = key.split('_');
+              //if geojson of the graph
               if(tempo.length<2 && tempo[0]==='GRAPHE'){
-                //console.log(JSON.parse(val))
                 this.simulation.graph = JSON.parse(val);
               }
+              //if geojson is an iteration
               if(tempo[0].includes("ITERATION")){
                 let number = tempo[0].substring("ITERATION".length)
-                //console.log(tempo[0], number,tempo[1])
                 results.push({type:'ITERATION',number:number,isPath:tempo[1].includes('road'),json:JSON.parse(val),find:tempo[0]})
               }
+              //if geojson is the final result
               if(tempo[0].includes("FINAL")){
                 results.push({type:tempo[0],number:'',isPath:tempo[1].includes('road'),json:JSON.parse(val),find:tempo[0]})
                 if(tempo[1].includes('road')){
-                  //console.log(JSON.parse(val))
                   this.simulation.path= JSON.parse(val);
-                  //console.log(this.simulation.path)
                 }else{
                   this.simulation.randomPoints= JSON.parse(val);
                 }
