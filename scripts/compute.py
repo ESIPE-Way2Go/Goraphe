@@ -61,7 +61,8 @@ def setup_logger(name, log_file, level=logging.DEBUG):
 
 def compute(graph_proj, point1, point2, dist, user, sim, nbPoints,source_node,dest_node):
     time_start = time.perf_counter()
-
+    #############################################BEGIN OF DON'T REMOVE#############################################
+    ###############################################################################################################
     # Directory
     directory = "scripts/" + user + "/" + sim + "/json"
     excel_directory = "scripts/" + user + "/" + sim
@@ -133,7 +134,8 @@ def compute(graph_proj, point1, point2, dist, user, sim, nbPoints,source_node,de
         essential_mw_edges = dict([])
         # motorway edges affecting the shortest paths
         impactful_mw_edges = []
-
+        ##############################################END OF DON'T REMOVE##############################################
+        ###############################################################################################################
         def edge_to_str(item):
             return str(item[0]) + "_" + str(item[1])
 
@@ -277,7 +279,8 @@ def compute(graph_proj, point1, point2, dist, user, sim, nbPoints,source_node,de
             results[edge_name]["traveltimes ratio (ref)"] = ref_ratio_traveltimes
             results[edge_name]["evi_local"] = evi_local
             results[edge_name]["evi_average_nip"] = evi_average_nip
-
+            #############################################BEGIN OF DON'T REMOVE#############################################
+            ###############################################################################################################
             #adding values to each dict used to create geojson for each iteration
             broken_paths_dict[(edge[0], edge[1], 0)] = float(nbp)
             impacted_paths_dict[(edge[0], edge[1], 0)] = float(nip)
@@ -408,7 +411,8 @@ def compute(graph_proj, point1, point2, dist, user, sim, nbPoints,source_node,de
     selected_route_geojson = shortest_path_geojson(graph_proj, source_node, dest_node, 'traveltimes', logger)
     with open(directory + "/FINAL_roadSelected.geojson", 'w') as f:
         f.write(selected_route_geojson)
-
+    ##############################################END OF DON'T REMOVE##############################################
+    ###############################################################################################################
     # calculate computational time
     time_elapsed = (time.perf_counter() - time_start)
     logger.info("Computing time : " + str(time_elapsed))
