@@ -8,6 +8,7 @@ import fr.esipe.way2go.dto.simulation.response.SimulationIdResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationMapResponse;
 import fr.esipe.way2go.dto.simulation.response.SimulationResponse;
 import fr.esipe.way2go.exception.simulation.*;
+import fr.esipe.way2go.repository.SimulationRepository;
 import fr.esipe.way2go.service.ScriptPythonService;
 import fr.esipe.way2go.service.SimulationService;
 import fr.esipe.way2go.service.UserService;
@@ -45,13 +46,16 @@ public class SimulationController {
     private int nbThreads;
 
     public static final Map<Long, Thread> THREAD_SIMULATIONS = new HashMap<>();
+    private final SimulationRepository simulationRepository;
 
     @Autowired
-    public SimulationController(SimulationService simulationService, UserService userService, ScriptPythonService scriptPythonService, JwtUtils jwtUtils) {
+    public SimulationController(SimulationService simulationService, UserService userService, ScriptPythonService scriptPythonService, JwtUtils jwtUtils,
+                                SimulationRepository simulationRepository) {
         this.simulationService = simulationService;
         this.userService = userService;
         this.scriptPythonService = scriptPythonService;
         this.jwtUtils = jwtUtils;
+        this.simulationRepository = simulationRepository;
     }
 
     /**
@@ -193,8 +197,17 @@ public class SimulationController {
     @DeleteMapping("/{id}/cancel")
     public ResponseEntity<Object> cancelSimulation(@RequestHeader HttpHeaders headers, @PathVariable Long id) {
         var thread = THREAD_SIMULATIONS.get(id);
-        if (thread == null)
+        if (thread == null) {
+            var simulationEntityOptional = simulationService.find(id);
+            if (simulationEntityOptional.isEmpty()) {
+                throw new SimulationNotFoundException();
+            }
+            var simulation = simulationEntityOptional.get();
+            simulation.setStatus(StatusSimulation.CANCEL);
+            simulation.setEndDate(Calendar.getInstance());
+            simulationService.save(simulation);
             return new ResponseEntity<>(HttpStatus.OK);
+        }
         thread.interrupt();
         THREAD_SIMULATIONS.remove(id);
         return new ResponseEntity<>(HttpStatus.OK);
