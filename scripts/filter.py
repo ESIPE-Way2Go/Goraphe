@@ -87,6 +87,7 @@ logger.info(f"Destination point : {point2}")
 #Create the graph using center coordinates and a radius distance
 g_not_proj = ox.graph_from_point(location, dist, simplify=False, network_type='drive', custom_filter=cf)
 g = ox.project_graph(g_not_proj)
+g = ox.simplify_graph(g, strict=False)
 
 logger.info(f"Nodes of graph :{g.number_of_nodes()}")
 logger.info(f"Edges of graph :{g.number_of_edges()}")
@@ -143,10 +144,11 @@ for k in edges_proj.index:
     edges_proj = edges_proj.fillna(value=np.nan)
     if math.isnan(float(edges_proj.at[k, 'maxspeed'])):
         maxspeed = float(speed_map.get(edges_proj.at[k, 'highway'], 0))
-        edges_proj.at[k, 'maxspeed'] = maxspeed
+        edges_proj.at[k, 'maxspeed'] = maxspeed/3.6
+        fixedmaxspeed[(u, v, key)] = maxspeed/3.6
     else:
         maxspeed = float(edges_proj.at[k, 'maxspeed'])
-    fixedmaxspeed[(u, v, key)] = maxspeed
+    fixedmaxspeed[(u, v, key)] = maxspeed/3.6
     traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / fixedmaxspeed[(u, v, key)])) if \
         fixedmaxspeed[(u, v, key)] != 0 else sys.maxsize
 

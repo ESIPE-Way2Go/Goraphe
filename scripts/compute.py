@@ -101,7 +101,7 @@ def compute(graph_proj, point1, point2, dist, user, sim, nbPoints,source_node,de
     final_evi_average_nip_dict = dict([])
 
     #Setting the number of iterations for the simulation
-    nb_iteration = 2
+    nb_iteration = 6
     logger.info("Iterations loop beginning with " + str(nb_iteration))
 
     # the selected route to analyze
