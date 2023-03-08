@@ -1,7 +1,7 @@
 <template>
   <v-container fluid style="padding: 10px">
 
-    <div class="fixed-loader" v-if="simulation.name===''">
+    <div class="fixed-loader" v-if="!legendsReady">
       <v-progress-circular
           :size="50"
           color="primary"
@@ -22,14 +22,14 @@
           ></l-tile-layer>
           <l-control-zoom position="bottomright" zoom-in-text="+" zoom-out-text="-" />
           <l-geo-json   :geojson="simulation.graph" :options-style="styleGraph" ></l-geo-json>
-            <l-geo-json ref="graph" :geojson="simulation.path"  :options-style="geoStyler" :visible=listLayout[0].isShow :options="optionsPath"   ></l-geo-json>
+            <l-geo-json ref="graph" :geojson="simulation.path"  :options-style="geoStyler" :visible=listLayout[0].isShow :options="optionsPath"  v-if="legendsReady"></l-geo-json>
             <l-geo-json :geojson="simulation.randomPoints" :options-style="styleMarker" :visible=listLayout[1].isShow :options="optionsMarker"  ></l-geo-json>
         </l-map>
       </div>
 
       <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5" @click.stop="closeleft= !closeleft"
              v-if="closeleft"></v-btn>
-      <v-slide-y-transition v-if="simulation.name!==''">
+      <v-slide-y-transition v-if="legendsReady">
         <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 " :class="{'panel-map-lg' : lgAndUp,'panel-map-md': md}"
                 v-if="!closeleft">
           <v-row align="start">
@@ -95,7 +95,7 @@
 
       <v-btn icon="mdi-chevron-right" class="position-fixed mt-15 panel-burger ma-5 panel-map-right" @click.stop="closeright= !closeright"
              v-if="closeright"></v-btn>
-      <v-slide-y-transition v-if="simulation.name!==''">
+      <v-slide-y-transition v-if="legendsReady">
         <v-card class="position-fixed pa-5 mt-15 panel-map ma-5 panel-map-right" :class="{'panel-map-lg' : lgAndUp,'panel-map-md': md}"
                 v-if="!closeright">
           <v-row align="start">
@@ -175,13 +175,14 @@ export default {
     const {sm, md, lgAndUp} = useDisplay();
 
     return {
+      step:100,
       listLegends: [
         {color:"#FFFFB2",start:0,end:100,titre:"LOS"},
-        {color:"#FED976",start:100,end:200,titre:"LOS"},
-        {color:"#FEB24C",start:200,end:300,titre:"LOS"},
-        {color:"#F03B20",start:300,end:400,titre:"LOS"},
-        {color:"#BD0026",start:400,end:500,titre:"LOS"},
-        {color:"#BE1D9B",start:500,end:600,titre:"LOS"}],
+        {color:"#FED976",start:100,end:100*2,titre:"LOS"},
+        {color:"#FEB24C",start:100*2,end:100*3,titre:"LOS"},
+        {color:"#F03B20",start:100*3,end:100*4,titre:"LOS"},
+        {color:"#BD0026",start:100*4,end:100*5,titre:"LOS"},
+        {color:"#BE1D9B",start:100*5,end:100*6,titre:"LOS"}],
 
       theme,
       toggleTheme: () => theme.global.name.value = theme.global.current.value.dark ? 'myCustomLightTheme' : 'dark',
@@ -264,7 +265,7 @@ export default {
       //style for the Path
       geoStyler: (feature)=>({
         weight: 5,
-        color: this.listLegends.map(c => {return {color: c.color,end: c.end}}).sort((a,b) =>{return (a.end - b.end)}).find(c => c.end > feature.properties.evi_local).color ,
+        color: this.colorFeat(feature),
         opacity: 0.8,
       }),
       //style for the Graph
@@ -286,7 +287,8 @@ export default {
           { name: "Chemin", isShow: true, },
         {name: "Points aléatoires", isShow: true}],
       listsOfJson: [],
-      selectedSimulation : "FINAL"
+      selectedSimulation : "FINAL",
+      legendsReady: false,
     }
   },
   mounted() {
@@ -297,8 +299,26 @@ export default {
       this.$router.push({name: 'simulation', params: {id: this.id}});
     },
 
+    colorFeat(feature){
+      const val = this.listLegends.map(c => {return {color: c.color,end: c.end}}).sort((a,b) =>{return (a.end - b.end)}).find(c => c.end > feature.properties.evi_average_nip);
+      const max = this.listLegends.reduce((prev, current) => (prev.end > current.end) ? prev : current)
+
+      if(val===undefined){
+        if(feature.properties.evi_average_nip>max.end){
+          return max.color;
+        }
+        return this.listLegends[0].color;
+      }
+      return val.color;
+    },
+
     uncheckRoadTypes() {
       this.selectedRoadTypes = [];
+    },
+
+    multipleFloat(value,multiple){
+      const result = value*multiple;
+      return Math.round(result* 100) /100
     },
 
     changeSimulationJson(v){
@@ -346,6 +366,22 @@ export default {
                 results.push({type:tempo[0],number:'',isPath:tempo[1].includes('road'),json:JSON.parse(val),find:tempo[0]})
                 if(tempo[1].includes('road')){
                   this.simulation.path= JSON.parse(val);
+                  //this.simulation.path.map(data)
+                  console.log(Math.max(...JSON.parse(val).features.map(f => f.properties.evi_average_nip)))
+                  let max = Math.max(...JSON.parse(val).features.map(f => f.properties.evi_average_nip));
+                  //max = Math.round(max)
+                  this.step = max/5;
+                  this.step = Math.round(this.step * 100) / 100
+                  console.log(this.step)
+                  this.listLegends=[
+                    {color:"#FFFFB2",start:0,end:this.step,titre:"LOS"},
+                    {color:"#FED976",start:this.step,end: this.multipleFloat(this.step,2),titre:"LOS"},
+                    {color:"#FEB24C",start: this.multipleFloat(this.step,2),end:this.multipleFloat(this.step,3),titre:"LOS"},
+                    {color:"#F03B20",start:this.multipleFloat(this.step,3),end:this.multipleFloat(this.step,4),titre:"LOS"},
+                    {color:"#BD0026",start:this.multipleFloat(this.step,4),end:this.multipleFloat(this.step,5),titre:"LOS"},
+                    {color:"#BE1D9B",start:this.multipleFloat(this.step,5),end:this.multipleFloat(this.step,6)  ,titre:"LOS"}]
+                  console.log(this.listLegends)
+                  this.legendsReady = true;
                 }else{
                   this.simulation.randomPoints= JSON.parse(val);
                 }
