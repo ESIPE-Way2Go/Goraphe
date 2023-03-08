@@ -1,5 +1,6 @@
 package fr.esipe.way2go.exception;
 
+import fr.esipe.way2go.exception.invite.InviteAlreadySendException;
 import fr.esipe.way2go.exception.invite.InviteNotFoundException;
 import fr.esipe.way2go.exception.simulation.SimulationForbidden;
 import fr.esipe.way2go.exception.simulation.SimulationNameFormatWrong;
@@ -110,6 +111,14 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(TokenExpiredException.class)
     public ResponseEntity<Object> handleTokenExpiredException(TokenExpiredException ex){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put(TIMESTAMP, LocalDateTime.now());
+        body.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InviteAlreadySendException.class)
+    public ResponseEntity<Object> handleTokenExpiredException(InviteAlreadySendException ex){
         Map<String, Object> body = new LinkedHashMap<>();
         body.put(TIMESTAMP, LocalDateTime.now());
         body.put(MESSAGE, ex.getMessage());

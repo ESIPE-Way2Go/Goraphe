@@ -10,6 +10,7 @@ import fr.esipe.way2go.dto.user.request.UpdatePasswordRequest;
 import fr.esipe.way2go.dto.user.request.UserRequest;
 import fr.esipe.way2go.dto.user.response.UserInfoResponse;
 import fr.esipe.way2go.dto.user.response.UserResponse;
+import fr.esipe.way2go.exception.invite.InviteAlreadySendException;
 import fr.esipe.way2go.exception.user.*;
 import fr.esipe.way2go.exception.invite.InviteNotFoundException;
 import fr.esipe.way2go.service.EmailService;
@@ -257,6 +258,10 @@ public class AdminController {
         var user = userService.getUserByEmail(email);
         if (user.isPresent())
             throw new UserEmailFound(email);
+        var invite = inviteService.findByEmail(userBeforeInvitationRequest.getEmail());
+
+        if (invite.isPresent())
+            throw new InviteAlreadySendException(email);
         var inviteEntity = new InviteEntity(
                 email, generateToken()
         );
