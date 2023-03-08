@@ -70,7 +70,7 @@
             </v-list-item>
 
             <v-item-group multiple selected-class="bg-purple">
-              <div class="text-caption mb-2">Tags</div>
+              <div class="text-caption mb-2 ml-3">Routes choisies</div>
               <v-item
                   v-for="road in simulation.roads"
                   :key="road" >
