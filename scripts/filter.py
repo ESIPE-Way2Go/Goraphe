@@ -145,7 +145,6 @@ for k in edges_proj.index:
     if math.isnan(float(edges_proj.at[k, 'maxspeed'])):
         maxspeed = float(speed_map.get(edges_proj.at[k, 'highway'], 0))
         edges_proj.at[k, 'maxspeed'] = maxspeed/3.6
-        fixedmaxspeed[(u, v, key)] = maxspeed/3.6
     else:
         maxspeed = float(edges_proj.at[k, 'maxspeed'])
     fixedmaxspeed[(u, v, key)] = maxspeed/3.6
