@@ -126,7 +126,9 @@ speed_map = {
     'primary_link': 40,
     'secondary_link': 40,
     'tertiary_link': 40,
-    'road': 50
+    'road': 50,
+    'service' : 40,
+    'residential' : 40
 }
 
 # new attribute list
