@@ -89,17 +89,18 @@ This project was built with the tehchnologies next
 git clone https://github.com/ESIPE-Way2Go/Goraphe.git
 ```
 Or download the zip of the project with the user interface.
-The project MUST be placed in the WSL2 in order for it to work properly.
+The project MUST be placed in the WSL2 in order for it to work properly in the directory **/home/name_of_user/**
 
 ![image](https://user-images.githubusercontent.com/77906813/223176368-ca90f455-2870-4401-b730-7304ffbdad99.png)
 
 2. Go to root of the project
-3. There is a user created with the script in **bdd** repository. This user is **admin** and password is **0000**. To change password, you must encrypt your new password [bcrypt](https://www.bcrypt.fr/) and update the start.sql.script.
+3. There is a user created with the script in **bdd** repository. This user is **admin** and password is **0000**. To change password, you must encrypt your new password [bcrypt](https://www.bcrypt.fr/) and update the **start.sql**.
 4. Change the request with new ones below
 ```sql
 INSERT INTO public."user"(username, password, email, role) VALUES ('admin', '{bcrypt}your password', 'email', 'ROLE_ADMIN');
 ```
 :warning: don't change the **ROLE_ADMIN** for **admin role**
+
 5. Create a file environnement called **.env** in the root repository of project like as following
 ```
 SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/goraphe
