@@ -14,7 +14,7 @@
           <div class="d-flex justify-content-between">
             <div class="flex-column">
               <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">
-                Status
+                Statut
               </div>
               <div class="ma-2 pa-1 h5  text-caption text-uppercase font-weight-bold">
                 <v-badge :color="(status === 'ERROR' || status === 'CANCEL') ? 'error' : (status ==='SUCCESS')? 'success' : 'warning'" content="" dot inline></v-badge>
@@ -29,7 +29,7 @@
               </v-sheet>
             </div>
             <div class="flex-column">
-              <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">Duration</div>
+              <div class="ma-2 pa-1 h5 text-accent text-overline font-weight-bold">Durée</div>
               <v-sheet class="ma-2 pa-1 h5  text-caption font-weight-bold text-uppercase">{{ duration }}</v-sheet>
             </div>
 

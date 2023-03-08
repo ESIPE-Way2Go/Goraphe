@@ -55,7 +55,7 @@
                               @update:modelValue="updateEnd"></v-text-field>
                 <v-text-field variant="outlined" v-model.trim="center" label="Centre" density="compact"
                               @update:modelValue="circleUpdate"></v-text-field>
-                <v-text-field variant="outlined" v-model.number.trim="randomPoints" label="Nombres de points Random"
+                <v-text-field variant="outlined" v-model.number.trim="randomPoints" label="Nombres de points aléatoires"
                               type="number" density="compact"
                               :min="2"
                               max="100" step="1"></v-text-field>
@@ -246,7 +246,7 @@ export default {
   methods: {
     circleUpdate() {
       this.center = this.center.split(',').map(parseFloat);
-      console.log(this.center);
+      //console.log(this.center);
       this.circle_center.remove();
       this.circle_center = L.circle(this.center, {radius: this.dist}).addTo(this.map);
     },
@@ -391,7 +391,7 @@ export default {
         this.$router.push({name: 'simulation', params: {id: data['simulationId']}});
 
       } catch (error) {
-        console.error(error);
+        //console.error(error);
       }
     }
   },
