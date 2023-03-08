@@ -148,7 +148,7 @@ for k in edges_proj.index:
     else:
         maxspeed = float(edges_proj.at[k, 'maxspeed'])
     fixedmaxspeed[(u, v, key)] = maxspeed/3.6
-    traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / fixedmaxspeed[(u, v, key)])) if \
+    traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / fixedmaxspeed[(u, v, key)]/3.6)) if \
         fixedmaxspeed[(u, v, key)] != 0 else sys.maxsize
 
 #Adds attributes to the graph
