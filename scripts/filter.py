@@ -147,7 +147,7 @@ for k in edges_proj.index:
         edges_proj.at[k, 'maxspeed'] = maxspeed
     else:
         maxspeed = float(edges_proj.at[k, 'maxspeed'])
-    fixedmaxspeed[(u, v, key)] = maxspeed/3.6
+    fixedmaxspeed[(u, v, key)] = maxspeed
     traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / fixedmaxspeed[(u, v, key)]/3.6)) if \
         fixedmaxspeed[(u, v, key)] != 0 else sys.maxsize
 
