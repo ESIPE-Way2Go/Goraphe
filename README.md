@@ -58,6 +58,7 @@ This project was built with the tehchnologies next
 ### Prerequisites
 #### Docker
 1. Install [docker](https://docs.docker.com/desktop/)
+2. Let the recommended parameters for the installation
 
 ### Linux distribution for WSL (Windows Subsystem for Linux)
 1. Go to the Miscrosoft Store and search "Ubuntu"
@@ -66,11 +67,11 @@ This project was built with the tehchnologies next
 ![Capture d’écran 2023-03-12 182059](https://user-images.githubusercontent.com/117312169/224561561-e3da476c-bb59-43a7-bfc2-17da54bf9e88.jpg)
 
 3. You will have to enter a username and a password to create a UNIX user
-4. Click on Windows+R and type "cmd" then click on "Ok"
+4. Click on Windows+R and type ```cmd``` then click on "Ok"
 
 ![Capture d’écran 2023-03-12 183039](https://user-images.githubusercontent.com/117312169/224561882-952f625e-0381-4ca5-b581-7ef98fd2df3c.jpg)
 
-5.Type "wsl --set-default ubuntu" and enter
+5.Type ```wsl --set-default ubuntu``` and enter
 
 ![Capture d’écran 2023-03-12 183153](https://user-images.githubusercontent.com/117312169/224561951-fb1d2e8f-5b9a-41e9-a03a-df85b5331553.jpg)
 
