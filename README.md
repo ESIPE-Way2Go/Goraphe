@@ -117,16 +117,12 @@ SERVER_URL_DEV=http://localhost
 SPRING_MAIL_USERNAME=url of your google account
 SPRING_MAIL_PASSWORD=password of your google account (step STMP 10)
 ```
-6. Create a file environnement in called **.env** in the **frontend** repository of project like as following
-```bash
-VUE_APP_MAPBOX_KEY=key mapbox
-VUE_APP_SEARCH_KEY=key app search key
-```
-7. Execute the following command in terminal (WSL)
+
+6. Execute the following command in terminal (WSL)
 ```
 docker-compose up
 ```
-8. If you turn the application in local, this one should now be running at http://localhost.
+7. If you turn the application in local, this one should now be running at http://localhost.
 
 ### Remarque
 As our project execute a python script, you can change the script python **without restart the container**. There is a share folder with the container dockers nominate **scripts**. You have to create a **scripts** repository on your machine at the root of the project.
