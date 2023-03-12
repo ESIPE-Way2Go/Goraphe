@@ -192,7 +192,7 @@ export default {
         L.latLng(48.8393560, 2.5859384),
         L.latLng(48.8400943, 2.5861805)
       ],
-      router: L.Routing.mapbox(process.env.VUE_APP_MAPBOX_KEY)
+
     }).addTo(map);
 
     this.control = control;
@@ -246,7 +246,6 @@ export default {
   methods: {
     circleUpdate() {
       this.center = this.center.split(',').map(parseFloat);
-      //console.log(this.center);
       this.circle_center.remove();
       this.circle_center = L.circle(this.center, {radius: this.dist}).addTo(this.map);
     },
@@ -260,7 +259,7 @@ export default {
     async querySelections(v) {
       const provider = new OpenCageProvider({
         params: {
-          key: process.env.VUE_APP_SEARCH_KEY,
+          key: 'ab736f9a32a2477aaf2036de1dc4340d',
         },
       });
       this.loading = true

@@ -87,6 +87,7 @@ logger.info(f"Destination point : {point2}")
 #Create the graph using center coordinates and a radius distance
 g_not_proj = ox.graph_from_point(location, dist, simplify=False, network_type='drive', custom_filter=cf)
 g = ox.project_graph(g_not_proj)
+g = ox.simplify_graph(g, strict=False)
 
 logger.info(f"Nodes of graph :{g.number_of_nodes()}")
 logger.info(f"Edges of graph :{g.number_of_edges()}")
@@ -147,7 +148,7 @@ for k in edges_proj.index:
     else:
         maxspeed = float(edges_proj.at[k, 'maxspeed'])
     fixedmaxspeed[(u, v, key)] = maxspeed
-    traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / fixedmaxspeed[(u, v, key)])) if \
+    traveltimes[(u, v, key)] = ((float(edges_proj.at[k, 'length']) / (fixedmaxspeed[(u, v, key)]/3.6))) if \
         fixedmaxspeed[(u, v, key)] != 0 else sys.maxsize
 
 #Adds attributes to the graph
