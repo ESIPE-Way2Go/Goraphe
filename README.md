@@ -59,6 +59,12 @@ This project was built with the tehchnologies next
 #### Docker
 1. Install [docker](https://docs.docker.com/desktop/)
 
+### Linux distribution for WSL (Windows Subsystem for Linux)
+1. Go to the Miscrosoft Store and search "Ubuntu"
+2. Click to install it
+
+
+
 #### Gmail (SMTP)
 1. You must have an email account to use the administration features like create account, invite people.
 2. Create an email account 
